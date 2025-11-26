@@ -1,0 +1,27 @@
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  list-style: none;
+}
+
+.breadcrumb-item {
+  line-height: 1.125rem;
+  text-transform: capitalize;
+
+  > * {
+    vertical-align: middle;
+  }
+
+  > a.link {
+    color: currentColor;
+    text-decoration: none;
+
+    &:hover {
+      color: currentColor;
+      text-decoration: underline;
+    }
+  }
+}
