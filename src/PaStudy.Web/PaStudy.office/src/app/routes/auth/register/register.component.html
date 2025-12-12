@@ -1,0 +1,113 @@
+<form class="register-form" [formGroup]="registerForm">
+  <div class="form-header">
+    <h1>Welcome</h1>
+    <h2>It only takes a few seconds to create your account</h2>
+  </div>
+
+  <div class="form-grid">
+    <!-- Left column -->
+    <div class="form-field">
+      <label>Ім'я</label>
+      <input class="register-control" formControlName="firstName" type="text" />
+    </div>
+
+    <div class="form-field">
+      <label>Прізвище</label>
+      <input class="register-control" formControlName="lastName" type="text" />
+    </div>
+
+    <div class="form-field">
+      <label>По батькові</label>
+      <input
+        class="register-control"
+        formControlName="middleName"
+        type="text"
+      />
+    </div>
+
+    <div class="form-field">
+      <label>Нікнейм</label>
+      <input
+        class="register-control"
+        formControlName="displayName"
+        type="text"
+      />
+    </div>
+
+    <div class="form-field">
+      <label>Дата народження</label>
+      <input
+        class="register-control"
+        formControlName="dateOfBirth"
+        type="date"
+      />
+    </div>
+
+    <!-- Right column -->
+    <div class="form-field">
+      <label>Email</label>
+      <input class="register-control" formControlName="email" type="email" />
+    </div>
+
+    <div class="form-field">
+      <label>Телефон</label>
+      <input
+        class="register-control"
+        formControlName="phoneNumber"
+        type="text"
+      />
+    </div>
+
+    <div class="form-field">
+      <label>Пароль</label>
+      <input
+        class="register-control"
+        formControlName="password"
+        type="password"
+        [class.is-invalid]="
+          registerForm.get('password')?.invalid &&
+          registerForm.get('password')?.touched
+        "
+      />
+    </div>
+
+    <div class="form-field">
+      <label>Підтвердження пароля</label>
+      <input
+        class="register-control"
+        formControlName="confirmPassword"
+        type="password"
+      />
+    </div>
+
+    <div class="form-field">
+      <label>Роль</label>
+      <select class="register-control" formControlName="role">
+        <option [value]="0">Student</option>
+        <option [value]="1">Teacher</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label>Група</label>
+      <select class="register-control" formControlName="groupId">
+        @for (group of groups; track group.id) {
+        <option [value]="group.id">
+          {{ group.groupNumber }}
+        </option>
+        }
+      </select>
+    </div>
+  </div>
+  @if(registerForm.invalid) {
+  <h1>{{ getFormErrors() | json }}</h1>
+  }
+  <button
+    [disabled]="registerForm.invalid"
+    type="submit"
+    class="btn-primary"
+    (click)="submit()"
+  >
+    Зареєструватися
+  </button>
+</form>

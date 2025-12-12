@@ -20,4 +20,9 @@
     <ProjectReference Include="..\PaStudy.Infrastructure\PaStudy.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Helpers\Requests\" />
+    <Folder Include="Helpers\Responses\" />
+  </ItemGroup>
+
 </Project>

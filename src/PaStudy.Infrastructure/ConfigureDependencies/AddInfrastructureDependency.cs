@@ -7,16 +7,21 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using PaStudy.Infrastructure.Models;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using PaStudy.Infrastructure.Data.Interceptors;
 namespace PaStudy.Infrastructure.ConfigureDependencies
 {
     public static class AddInfrastructureDependency
     {
         public static IServiceCollection AddDbDependencies(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<PaStudyDbContext>(options =>
+            services.AddDbContext<PaStudyDbContext>((sp, options) =>
+            {
+                options.AddInterceptors(sp.GetService<ISaveChangesInterceptor>());  
                 options.UseSqlServer(configuration.GetConnectionString("PaStudyConnection"),
-                x => x.MigrationsAssembly("PaStudy.Infrastructure"))
-            );
+                x => x.MigrationsAssembly("PaStudy.Infrastructure"));
+            });
+            services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptors>();
             return services;
         }
         public static IServiceCollection AddInfrastructureIdentity(this IServiceCollection services, IConfiguration configuration)

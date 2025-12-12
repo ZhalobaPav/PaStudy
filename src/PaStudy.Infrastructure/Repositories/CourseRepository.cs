@@ -1,5 +1,5 @@
 ﻿using PaStudy.Core.Entities;
-using PaStudy.Core.Interfaces;
+using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
 using System.Collections.Immutable;

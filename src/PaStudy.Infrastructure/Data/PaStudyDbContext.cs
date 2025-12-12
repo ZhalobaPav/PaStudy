@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
 using System.Reflection;
+using PaStudy.Infrastructure.Models;
 
 namespace PaStudy.Infrastructure.Data;
 
-public class PaStudyDbContext: IdentityDbContext<IdentityUser, IdentityRole, string>
+public class PaStudyDbContext: IdentityDbContext<ApplicationUser, IdentityRole, string>
 {
     public PaStudyDbContext(DbContextOptions<PaStudyDbContext> options): base(options)
     {

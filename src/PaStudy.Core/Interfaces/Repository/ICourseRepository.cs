@@ -1,7 +1,7 @@
 ﻿using PaStudy.Core.Entities;
 using System.Collections.Immutable;
 
-namespace PaStudy.Core.Interfaces
+namespace PaStudy.Core.Interfaces.Repository
 {
     public interface ICourseRepository
     {

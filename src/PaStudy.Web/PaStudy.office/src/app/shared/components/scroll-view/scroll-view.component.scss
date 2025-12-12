@@ -1,0 +1,37 @@
+:host {
+  ng-scrollbar {
+    &::before {
+      content: "";
+      z-index: 1;
+      position: absolute;
+      top: 0;
+      height: 10px;
+      width: calc(100% - 14px);
+      background: linear-gradient(#f3f4f7, transparent);
+    }
+
+    .pa-scrollbar-thumb {
+      background-color: $color-border-grey;
+      transition: bacground-color 0.2s ease-in-out;
+      &:hover,
+      &:active {
+        background-color: $color-disabled-dark-grey;
+      }
+      width: 6px;
+    }
+    .scrollbar-track {
+      width: 6px !important;
+      background-color: white;
+    }
+
+    .scrollbar-viewport-wrapper {
+      right: 23px !important;
+    }
+
+    scrollbar-y {
+      margin-top: 6px;
+      margin-right: 16px;
+      right: -12px !important;
+    }
+  }
+}

@@ -1,27 +1,23 @@
 ﻿using PaStudy.Core.Entities;
-using PaStudy.Core.Interfaces;
+using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.ConfigureDependencies;
 using PaStudy.Infrastructure.Models;
+using PavStudy.API.Extensions;
 using System.Collections.Immutable;
 
 namespace PavStudy.API.Endpoints;
 
 public class Courses : EndpointGroupBase
 {
-    private readonly ICourseRepository _repository;
 
-    public Courses(ICourseRepository repository)
-    {
-        _repository = repository;
-    }
     public override void Map(WebApplication app)
     {
-        app.MapGroupd(this)
-            .MapGet("/", () => "This is the Courses endpoint.");
+        app.MapGroup(this)
+            .MapGet(GetCourses);
     }
 
-    public async Task<ImmutableArray<Course>> GetCourses(CancellationToken cancellationToken)
+    public async Task<ImmutableArray<Course>> GetCourses(CancellationToken cancellationToken, ICourseRepository repository)
     {
-        return await _repository.GetCourses(cancellationToken);
+        return await repository.GetCourses(cancellationToken);
     }
 }

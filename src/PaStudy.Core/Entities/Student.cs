@@ -13,6 +13,5 @@ public class Student: BaseAuditableEntity
     public int GroupId { get; set; }
     public Group Group { get; set; }
     public ICollection<Enrollment> Enrollments { get; set; }
-
 }
 

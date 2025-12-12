@@ -1,0 +1,12 @@
+<div class="table-wrapper">
+  <div class="table-controls"></div>
+  <div class="rows">
+    <app-scroll-view>
+      @for (row of rowLines; track $index) {
+      <ng-container
+        *ngTemplateOutlet="rowTemplate; context: { row: row }"
+      ></ng-container>
+      }
+    </app-scroll-view>
+  </div>
+</div>
