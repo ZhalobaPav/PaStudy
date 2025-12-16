@@ -12,6 +12,7 @@ export interface User {
   avatar?: string;
   roles?: any[];
   permissions?: any[];
-  userRole: UserRole;
+  role: UserRole;
   groupId: number;
+  phoneNumber: string;
 }

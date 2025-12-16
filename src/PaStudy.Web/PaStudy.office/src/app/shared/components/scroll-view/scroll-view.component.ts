@@ -15,9 +15,7 @@ export class ScrollViewComponent implements AfterViewInit {
 
   public autoHeughtDisabled = false;
 
-  ngAfterViewInit(): void {
-    throw new Error('Method not implemented.');
-  }
+  ngAfterViewInit(): void {}
 
   updateView(): void {
     this.scrollBarRef.update();

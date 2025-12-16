@@ -1,11 +1,12 @@
 ﻿using PaStudy.Core.Helpers.DTOs.Users;
 using PaStudy.Core.Helpers.Enums;
 using PaStudy.Core.Helpers.Extensions.MapperHelpers;
-using PaStudy.Core.Helpers.FilterObjects;
+using PaStudy.Core.Helpers.FilterObjects.UserFilters;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Core.Interfaces.Service;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 
 namespace PaStudy.Core.Services;
 

@@ -1,0 +1,30 @@
+.table-wrapper {
+  border-radius: 4px;
+  padding: 15px;
+  background: #f3f4f7;
+  height: calc(100vh - 140px);
+}
+
+.rows {
+  height: calc(100vh - 270px);
+  margin-top: 10px;
+  position: relative;
+}
+
+.row {
+  margin: 10px 0 10px 0;
+  background-color: #ffffff;
+  border-radius: 3px;
+  border: 1px solid #dbdfe8;
+  min-height: 35px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  padding-left: 14px;
+  &:hover {
+    box-shadow: 0 0 12px 0 #9aa0bc80;
+  }
+}

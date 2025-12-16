@@ -1,0 +1,15 @@
+<app-table
+  [rowTemplate]="rowTemplate"
+  (fetch)="fetchUsers($event)"
+  [rows]="users"
+  [config]="tableConfig"
+>
+</app-table>
+
+<ng-template #rowTemplate let-row="row">
+  <span>{{ row | userName }}</span>
+  <span>{{ row.dateOfBirth | date }}</span>
+  <span> {{ row.email }} </span>
+  <span> {{ row.phoneNumber }} </span>
+  <span> {{ row.group?.groupNumber }} </span>
+</ng-template>

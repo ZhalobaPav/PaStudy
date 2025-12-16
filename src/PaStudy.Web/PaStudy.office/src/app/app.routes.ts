@@ -17,4 +17,9 @@ export const routes: Routes = [
       import('./routes/auth/auth.module').then((mod) => mod.AuthModule),
     data: { breadcrumb: { skip: true } },
   },
+  {
+    path: 'users',
+    loadChildren: () =>
+      import('./routes/users/user.module').then((mod) => mod.UserModule),
+  },
 ];

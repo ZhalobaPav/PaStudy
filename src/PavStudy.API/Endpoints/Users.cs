@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PaStudy.Core.Helpers.DTOs.Users;
-using PaStudy.Core.Helpers.FilterObjects;
+using PaStudy.Core.Helpers.FilterObjects.UserFilters;
 using PaStudy.Core.Interfaces.Service;
 using PaStudy.Infrastructure.Models;
 using PavStudy.API.Extensions;
