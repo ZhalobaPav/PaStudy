@@ -1,6 +1,6 @@
 import { Component, DestroyRef, Input, OnInit } from '@angular/core';
 import { TableFilterBase } from '../filter-base';
-import { UntypedFormBuilder, ɵInternalFormsSharedModule } from '@angular/forms';
+import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
 import { debounce, filter, first, map, of, take, tap, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ITableFilter } from '../filter.model';
@@ -8,7 +8,7 @@ import { ITableFilter } from '../filter.model';
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [ɵInternalFormsSharedModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss',
 })
@@ -40,7 +40,7 @@ export class SearchFilterComponent
     query: null,
   });
 
-  setCachedGarages() {
+  setCachedValue() {
     this.filterState$
       .pipe(
         first(),

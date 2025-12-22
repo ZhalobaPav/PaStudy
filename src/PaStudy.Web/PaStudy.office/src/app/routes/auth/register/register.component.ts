@@ -6,8 +6,6 @@ import { AuthService } from '../auth.service';
 import { UserRole } from '../../../shared/enums/userRole';
 import { catchError, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CourseService } from '../../courses/course.service';
-import { ICourse } from '../../../shared/models/course';
 import { GroupsService } from '../../groups/groups.service';
 import { IGroup } from '../../../shared/models/group';
 

@@ -8,6 +8,8 @@ export interface ITableFilter {
   filterState$: BehaviorSubject<any>;
   resetState$: Subject<any>;
   updateValue(value: any): void;
-  setCachedGarages(): void;
+  setCachedValue(): void;
   reset(): void;
 }
+
+export type KeyValueObject = Record<string, any>;

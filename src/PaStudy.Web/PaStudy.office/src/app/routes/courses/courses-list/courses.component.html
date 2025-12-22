@@ -1,0 +1,17 @@
+<app-table
+  [rows]="courses()"
+  (fetch)="fetchCourses($event)"
+  [rowTemplate]="rowTemplate"
+>
+</app-table>
+
+<ng-template #rowTemplate let-row="row">
+  <a [routerLink]="['/courses/course-details', row.id]" class="course-link">
+    {{ row.title }}
+  </a>
+  <span>{{ row.description }}</span>
+  <span>{{ row.categoryName }}</span>
+  @for (teacher of row.teachers; track $index) {
+  <span>{{ teacher.firstName }}</span>
+  }
+</ng-template>

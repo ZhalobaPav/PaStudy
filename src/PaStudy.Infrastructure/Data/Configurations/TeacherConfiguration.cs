@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PaStudy.Core.Entities;
+using PaStudy.Infrastructure.Models;
 
 namespace PaStudy.Infrastructure.Data.Configurations;
 public class TeacherConfiguration: IEntityTypeConfiguration<Teacher>
@@ -10,7 +11,7 @@ public class TeacherConfiguration: IEntityTypeConfiguration<Teacher>
         builder.HasKey(t => t.Id);
 
         builder
-            .HasOne<IdentityUser>()
+            .HasOne<ApplicationUser>()
             .WithMany()
             .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.Restrict);

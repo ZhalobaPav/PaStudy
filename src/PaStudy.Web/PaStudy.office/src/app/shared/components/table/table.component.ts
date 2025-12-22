@@ -7,6 +7,7 @@ import {
   Input,
   OnInit,
   Output,
+  signal,
   TemplateRef,
 } from '@angular/core';
 import { FetchOptions, Header, TableConfig } from './models/table.models';
@@ -39,7 +40,9 @@ export class TableComponent<TFilter extends object, TRow = unknown>
         this.fetch.emit(fetchOptions);
       });
     this.emitFetch();
+    this.gridTemplateColumns.set(this.templateColumn());
   }
+
   @Input()
   rowTemplate!: TemplateRef<any>;
   @Output()
@@ -57,6 +60,7 @@ export class TableComponent<TFilter extends object, TRow = unknown>
     }
     safeDetectChanges(this.cdr);
   }
+  public gridTemplateColumns = signal<string>('');
   public rowLines: any[] = [];
   public headers: Header[] = [];
   public rowsPerPage = 20;
@@ -67,7 +71,13 @@ export class TableComponent<TFilter extends object, TRow = unknown>
 
   private fetch$ = new Subject<{ isNextPage?: boolean }>();
   public filterState$ = new BehaviorSubject<any>(null);
+  public resetState$ = new Subject();
+
   emitFetch(isNextPage?: boolean) {
     this.fetch$.next({ isNextPage: Boolean(isNextPage) });
+  }
+
+  templateColumn() {
+    return this.headers.map((h) => `${h.width}px`).join(' ');
   }
 }

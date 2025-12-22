@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PaStudy.Core.Entities;
+using PaStudy.Infrastructure.Models;
 
 namespace PaStudy.Infrastructure.Data.Configurations;
 public class StudentConfiguration : IEntityTypeConfiguration<Student>
@@ -23,7 +24,7 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder
-            .HasOne<IdentityUser>()
+            .HasOne<ApplicationUser>()
             .WithMany()
             .HasForeignKey(s => s.UserId)
             .HasPrincipalKey("Id")

@@ -1,0 +1,14 @@
+.search-filter {
+  border-radius: 4px;
+  border: solid 1px #dbdfe8;
+  background-color: #ffff;
+  height: 40px;
+  padding: 0 14px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  input {
+    width: 100%;
+    border: none;
+  }
+}

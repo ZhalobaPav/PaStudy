@@ -22,4 +22,9 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./routes/users/user.module').then((mod) => mod.UserModule),
   },
+  {
+    path: 'courses',
+    loadChildren: () =>
+      import('./routes/courses/course.module').then((mod) => mod.CoursesModule),
+  },
 ];

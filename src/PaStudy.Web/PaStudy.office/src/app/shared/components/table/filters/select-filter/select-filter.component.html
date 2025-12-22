@@ -1,0 +1,22 @@
+<div class="select-filter">
+  <div class="select-area">
+    <div class="select-label">
+      <span class="placeholder">{{ placeholder }}</span>
+      <span>{{ label }}</span>
+    </div>
+  </div>
+</div>
+
+@if(!isCollapsed){
+<div class="dropdown" [formGroup]="form">
+  <ng-container formArrayName="options">
+    @for (optionForm of optionsFormArray.controls; let i = $index; track i ) {
+    <label class="option" [formGroupName]="i">
+      <span> {{ optionForm.get("label")?.value }} </span>
+      <input type="checkbox" formControlName="checked" />
+      <div class="checkmark"></div>
+    </label>
+    }
+  </ng-container>
+</div>
+}

@@ -1,4 +1,19 @@
 <div class="table-wrapper">
+  <div class="headers" [style.grid-template-columns]="gridTemplateColumns()">
+    @for (header of headers; track $index) {
+    <div class="header">
+      <div class="header-label">
+        {{ header.label }}
+      </div>
+      <pa-filter-rerender
+        [header]="header"
+        [filterState$]="filterState$"
+        [resetState$]="resetState$"
+      >
+      </pa-filter-rerender>
+    </div>
+    }
+  </div>
   <div class="table-controls"></div>
   <div class="rows">
     @if(rowLines.length > 0){
