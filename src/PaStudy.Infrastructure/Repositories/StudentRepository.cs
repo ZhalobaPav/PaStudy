@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PaStudy.Core.Entities;
 using PaStudy.Core.Helpers.DTOs.Group;
 using PaStudy.Core.Helpers.DTOs.Student;
+using PaStudy.Core.Helpers.FilterObjects.UserFilters;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
@@ -45,10 +46,21 @@ public class StudentRepository: IStudentRepository
     }
 
 
-    public async Task<ImmutableArray<StudentDto>> GetStudents(CancellationToken cancellationToken)
+    public async Task<ImmutableArray<StudentDto>> GetStudents(CancellationToken cancellationToken, UserFilter userFilter)
     {
-        var students = await _context.Set<Student>()
-            .Include(s => s.Group)
+        var query = _context.Set<Student>().AsQueryable();
+        if(userFilter.CourseId.HasValue)
+        {
+            int courseId = userFilter.CourseId.Value;
+            query = query.Where(s => s.Enrollments.Any(sc => sc.CourseId == courseId));
+        }
+        if (!string.IsNullOrWhiteSpace(userFilter.SearchTerm))
+        {
+            var term = userFilter.SearchTerm.ToLower();
+            query = query.Where(s => s.FirstName.ToLower().Contains(term) ||
+                                     s.LastName.ToLower().Contains(term));
+        }
+        var students = await query
             .Join(_userManager.Users, 
                 student => student.UserId, 
                 user => user.Id, 

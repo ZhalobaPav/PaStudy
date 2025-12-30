@@ -4,6 +4,7 @@ using PaStudy.Core.Entities;
 using PaStudy.Core.Helpers.DTOs;
 using PaStudy.Core.Helpers.DTOs.Group;
 using PaStudy.Core.Helpers.DTOs.Teacher;
+using PaStudy.Core.Helpers.FilterObjects.UserFilters;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
@@ -22,9 +23,21 @@ public class TeacherRepository: ITeacherRepository
         _dbContext = dbContext;
         _userManager = userManager;
     }
-    public async Task<ImmutableArray<TeacherDto>> GetTeachers(CancellationToken cancellationToken)
+    public async Task<ImmutableArray<TeacherDto>> GetTeachers(CancellationToken cancellationToken, UserFilter userFilter)
     {
-        var teachers = await _dbContext.Set<Teacher>()
+        var query = _dbContext.Set<Teacher>().AsQueryable();
+        if (!string.IsNullOrWhiteSpace(userFilter.SearchTerm))
+        {
+            var term = userFilter.SearchTerm.ToLower();
+            query = query.Where(t => t.FirstName.ToLower().Contains(term) ||
+                                     t.LastName.ToLower().Contains(term) ||
+                                     t.MiddleName.ToLower().Contains(term));
+        }
+        if(userFilter.CourseId.HasValue)
+        {
+            query = query.Where(t => t.TeacherCourses.Any(c => c.CourseId == userFilter.CourseId.Value));
+        }
+        var teachers = await query
             .Include(t => t.GroupOfCurator)
             .Join(
                 _userManager.Users,

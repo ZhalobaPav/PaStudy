@@ -8,4 +8,6 @@ public class UserFilter
     public int? Skip { get; set; }
     public string? SearchTerm { get; set; }
     public FilterUserProfile? FilterUserProfile { get; set; }
+    public int? CourseId { get; set; }
+    
 }

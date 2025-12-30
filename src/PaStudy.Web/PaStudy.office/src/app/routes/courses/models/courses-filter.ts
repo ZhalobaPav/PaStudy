@@ -1,3 +1,4 @@
 export interface CoursesFilter {
-  searchTerm: string;
+  searchTerm?: string;
+  courseId?: number;
 }

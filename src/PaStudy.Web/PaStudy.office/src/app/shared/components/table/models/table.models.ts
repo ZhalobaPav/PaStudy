@@ -14,11 +14,11 @@ export interface Header {
 }
 
 export interface BaseFetchOptions {
-  take: number;
-  skip: number;
+  take?: number;
+  skip?: number;
   filters: any;
-  sortColumn: string;
-  sortOrder: SortOrder;
+  sortColumn?: string;
+  sortOrder?: SortOrder;
 }
 
 export enum SortOrder {

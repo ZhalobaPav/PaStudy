@@ -1,1 +1,22 @@
-<p>course-details works!</p>
+<div class="container">
+  <div class="header-navigation">
+    <ul class="header-navigation">
+      @for (header of headerConfig; track $index) {
+      <li
+        class="header-elem"
+        [class.active]="activeTab() === header.title"
+        (click)="setTab(header.title)"
+      >
+        <a>
+          {{ header.title }}
+        </a>
+      </li>
+      }
+    </ul>
+  </div>
+  @switch(activeTab()){ @case (tab.Students){
+  <app-course-students></app-course-students>
+  } @default {
+  <app-course-info [course]="course()"></app-course-info>
+  } }
+</div>

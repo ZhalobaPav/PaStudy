@@ -25,13 +25,13 @@ public class UserService: IUserService
     {
         async Task<IEnumerable<UserProfileResponseDto>> GetStudentsProfilesAsync()
         {
-            var students = await _studentRepository.GetStudents(cancellationToken);
+            var students = await _studentRepository.GetStudents(cancellationToken, userFilter);
             return students.Select(s => s.ToUserProfile());
         }
 
         async Task<IEnumerable<UserProfileResponseDto>> GetTeachersProfilesAsync()
         {
-            var teachers = await _teacherRepository.GetTeachers(cancellationToken);
+            var teachers = await _teacherRepository.GetTeachers(cancellationToken, userFilter);
             return teachers.Select(s => s.ToUserProfile());
         }
         var tasks = new List<Task<IEnumerable<UserProfileResponseDto>>>();

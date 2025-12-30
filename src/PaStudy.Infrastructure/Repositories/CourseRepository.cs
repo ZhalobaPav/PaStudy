@@ -43,16 +43,19 @@ public class CourseRepository: ICourseRepository
 
     public async Task<CourseDto> GetCourseByIdAsync(int id, CancellationToken cancellationToken)
     {
-        var course = await _context.Set<Course>().FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
-        if (course == null)
+        var course = await _context.Set<Course>()
+        .Where(c => c.Id == id)
+        .Select(c => new CourseDto()
         {
-            return null;
-        }
-        return new CourseDto
-        {
-            Id = course.Id,
-            Title = course.Title
-        };
+            Id = c.Id,
+            Title = c.Title,
+            Description = c.Description,
+            CategoryName = c.Category.Name,
+            Teachers = c.TeacherCourses.Select(tc => tc.Teacher.ToTeacherDto()).ToImmutableArray()
+        })
+        .FirstOrDefaultAsync(cancellationToken);
+
+        return course;
     }
 }
 
