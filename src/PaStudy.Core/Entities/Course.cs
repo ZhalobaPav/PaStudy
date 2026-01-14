@@ -9,6 +9,7 @@ public class Course: BaseAuditableEntity
     public int? CategoryId { get; set; }
     public Category? Category { get; set; }
     public ICollection<Enrollment> Enrollments { get; set; }
+    public ICollection<Assignment> Assignments { get; set; }
     public ICollection<TeacherCourses> TeacherCourses { get; set; }
 }
 

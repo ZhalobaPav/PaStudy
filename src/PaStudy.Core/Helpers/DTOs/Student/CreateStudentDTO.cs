@@ -1,4 +1,4 @@
-﻿namespace PaStudy.Core.Helpers.DTOs;
+﻿namespace PaStudy.Core.Helpers.DTOs.Student;
 
 public class CreateStudentDTO
 {

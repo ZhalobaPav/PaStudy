@@ -18,9 +18,7 @@ export class CourseStudentsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   public tableConfig = tableConfig;
   public users = signal<User[]>([]);
-  ngOnInit(): void {
-    this.fetchUsers();
-  }
+  ngOnInit(): void {}
 
   public fetchUsers() {
     const courseId = this.route.snapshot.paramMap.get('id');

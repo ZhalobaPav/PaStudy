@@ -22,7 +22,7 @@ public class UserService: IUserService
     }
 
     public async Task<ImmutableArray<UserProfileResponseDto>> GetUsers(UserFilter userFilter, CancellationToken cancellationToken)
-    {
+        {
         async Task<IEnumerable<UserProfileResponseDto>> GetStudentsProfilesAsync()
         {
             var students = await _studentRepository.GetStudents(cancellationToken, userFilter);

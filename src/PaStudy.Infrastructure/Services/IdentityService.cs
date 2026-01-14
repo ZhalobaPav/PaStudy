@@ -1,10 +1,18 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using PaStudy.Core.Entities;
 using PaStudy.Core.Helpers.DTOs;
 using PaStudy.Core.Helpers.DTOs.Identity;
+using PaStudy.Core.Helpers.DTOs.Teacher;
+using PaStudy.Core.Helpers.DTOs.Users;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace PaStudy.Infrastructure.Services;
 
@@ -15,19 +23,25 @@ public class IdentityService
     private readonly IStudentRepository _studentRepository;
     private readonly ITeacherRepository _teacherRepository;
     private readonly PaStudyDbContext _dbContext;
+    private readonly IConfiguration _configuration;
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
     public IdentityService(
-        UserManager<ApplicationUser> userManager, 
-        RoleManager<IdentityRole> roleManager, 
+        UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole> roleManager,
         IStudentRepository studentRepository,
         ITeacherRepository teacherRepository,
-        PaStudyDbContext dbContext)
+        PaStudyDbContext dbContext, 
+        IConfiguration configuration,
+        SignInManager<ApplicationUser> signInManager)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _studentRepository = studentRepository;
         _teacherRepository = teacherRepository;
         _dbContext = dbContext;
+        _configuration = configuration;
+        _signInManager = signInManager;
     }
     public async Task<IdentityResult> RegisterUserAsync(CreateUserDto userDto)
     {
@@ -59,9 +73,9 @@ public class IdentityService
         using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
-            if (userDto.Equals(UserRole.Student))
+            if (userDto.Role.Equals(UserRole.Student))
             {
-                var student = new Student() 
+                var student = new Student()
                 {
                     FirstName = userDto.FirstName,
                     LastName = userDto.LastName,
@@ -92,6 +106,52 @@ public class IdentityService
 
             return IdentityResult.Failed(new IdentityError { Description = $"An error occurred while creating the profile: {ex.Message}" });
         }
+        await transaction.CommitAsync();
         return IdentityResult.Success;
+    }
+
+    public async Task<AuthResultDto> LoginAsync(LoginUserDto loginUserDto)
+    {
+        var user = await _userManager.FindByEmailAsync(loginUserDto.Email);
+        if (user == null)
+        {
+            return new AuthResultDto { Succeeded = false, Errors = new[] { "Користувача не знайдено" } };
+        }
+        var result = await _signInManager.CheckPasswordSignInAsync(user, loginUserDto.Password, false);
+        if (!result.Succeeded)
+        {
+            return new AuthResultDto { Succeeded = false, Errors = new[] { "Невірний пароль" } };
+        }
+        var token = GenerateToken(user);
+        return new AuthResultDto
+        {
+            Succeeded = true,
+            Token = token
+        };
+    }
+
+    public string GenerateToken(ApplicationUser user)
+    {
+        var jwtOptions = _configuration.GetSection("Jwt");
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions["SecretKey"]));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim("userName", user.UserName!)
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: jwtOptions["Issuer"],
+            audience: jwtOptions["Audience"],
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtOptions["DurationInMinutes"])),
+            signingCredentials: creds
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

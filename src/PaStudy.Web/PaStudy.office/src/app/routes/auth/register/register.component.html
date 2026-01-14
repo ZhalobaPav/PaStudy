@@ -99,9 +99,6 @@
       </select>
     </div>
   </div>
-  @if(registerForm.invalid) {
-  <h1>{{ getFormErrors() | json }}</h1>
-  }
   <button
     [disabled]="registerForm.invalid"
     type="submit"

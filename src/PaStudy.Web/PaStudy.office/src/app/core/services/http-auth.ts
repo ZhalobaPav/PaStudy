@@ -11,9 +11,9 @@ export class HttpAuth {
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
 
-  public get<T>(url: string): Observable<T> {
+  public get<T>(url: string, params?: any): Observable<T> {
     return this.http
-      .get<T>(url)
+      .get<T>(url, { params })
       .pipe(catchError((error: HttpErrorResponse) => this.handleError(error)));
   }
 

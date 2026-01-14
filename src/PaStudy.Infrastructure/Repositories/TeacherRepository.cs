@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PaStudy.Core.Entities;
-using PaStudy.Core.Helpers.DTOs;
+using PaStudy.Core.Entities.ConnectionEntities;
 using PaStudy.Core.Helpers.DTOs.Group;
 using PaStudy.Core.Helpers.DTOs.Teacher;
 using PaStudy.Core.Helpers.FilterObjects.UserFilters;
@@ -91,5 +91,18 @@ public class TeacherRepository: ITeacherRepository
         await teachers.AddAsync(teacher);
         await _dbContext.SaveChangesAsync();
         return teacher;
+    }
+    public async Task<Teacher?> GetByUserIdAsync(string userId, CancellationToken ct = default)
+    {
+        return await _dbContext.Set<Teacher>()   
+            .FirstOrDefaultAsync(t => t.UserId == userId, ct);
+    }
+
+    public async Task<bool> CanTeacherManageCourse(int teacherId, int courseId)
+    {
+        var teacherCourses = _dbContext.Set<TeacherCourses>();
+
+        return await teacherCourses
+            .AnyAsync(tc => tc.TeacherId == teacherId && tc.CourseId == courseId);
     }
 }
