@@ -1,0 +1,10 @@
+<div class="section">
+  <h1>{{ section().title }}</h1>
+  <p class="">{{ section().description }}</p>
+  @for (assignment of section().assignments; track $index) {
+    <app-assignment-item [assignment]="assignment"></app-assignment-item>
+  }
+  @if (isEditMode()) {
+    <button>Створити завдання</button>
+  }
+</div>

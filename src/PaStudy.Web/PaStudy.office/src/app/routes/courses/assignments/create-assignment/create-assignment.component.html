@@ -1,0 +1,14 @@
+<div class="grid grid-cols-2 gap-1" [formGroup]="form">
+  <pa-input type="text" formControlName="title" placeholder="Title" />
+  <pa-input
+    type="text"
+    formControlName="description"
+    placeholder="Description"
+  />
+  <pa-input
+    type="number"
+    formControlName="maxPoints"
+    placeholder="Max points"
+  />
+  <pa-input type="date" formControlName="dueDate" placeholder="Due date" />
+</div>

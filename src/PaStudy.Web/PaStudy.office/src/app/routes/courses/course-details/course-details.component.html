@@ -2,21 +2,32 @@
   <div class="header-navigation">
     <ul class="header-navigation">
       @for (header of headerConfig; track $index) {
-      <li
-        class="header-elem"
-        [class.active]="activeTab() === header.title"
-        (click)="setTab(header.title)"
-      >
-        <a>
-          {{ header.title }}
-        </a>
-      </li>
+        <li
+          class="header-elem"
+          [class.active]="activeTab() === header.title"
+          (click)="setTab(header.title)"
+        >
+          <a>
+            {{ header.title }}
+          </a>
+        </li>
       }
+      <div class="edit-checkbox">
+        <span class="edit-title">Edit mode</span>
+        <input type="checkbox" [(ngModel)]="isEditMode" />
+      </div>
     </ul>
   </div>
-  @switch(activeTab()){ @case (tab.Students){
-  <app-course-students></app-course-students>
-  } @default {
-  <app-course-info [course]="course()"></app-course-info>
-  } }
+  @switch (activeTab()) {
+    @case (tab.Students) {
+      <app-course-students></app-course-students>
+    }
+    @default {
+      <app-course-info
+        [course]="course()"
+        [isEditMode]="isEditMode"
+      ></app-course-info>
+    }
+  }
+  <router-outlet></router-outlet>
 </div>

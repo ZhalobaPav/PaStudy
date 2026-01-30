@@ -17,15 +17,17 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
         builder.Property(a => a.Description)
             .HasMaxLength(2000);
 
-        builder.Property(a => a.AttachmentUrl)
-            .HasMaxLength(500);
-
         builder.Property(a => a.MaxPoints)
             .HasDefaultValue(100);
 
-        builder.HasOne(a => a.Course)
-            .WithMany(c => c.Assignments)
-            .HasForeignKey(a => a.CourseId)
+        builder.HasMany(a => a.Attachments)
+            .WithOne(at => at.Assignment)
+            .HasForeignKey(at => at.AssignmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(a => a.Section)
+            .WithMany(s => s.Assignments)
+            .HasForeignKey(s => s.SectionId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

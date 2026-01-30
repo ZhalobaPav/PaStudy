@@ -4,3 +4,11 @@
 <div class="description">
   <p>{{ course()?.description }}</p>
 </div>
+@if (course()) {
+  <app-assignment-list
+    [course]="course()"
+    [isEditMode]="isEditMode()"
+  ></app-assignment-list>
+} @else {
+  <h1>rofl</h1>
+}

@@ -27,7 +27,7 @@ export const routes: Routes = [
         path: 'courses',
         loadChildren: () =>
           import('./routes/courses/course.module').then(
-            (mod) => mod.CoursesModule
+            (mod) => mod.CoursesModule,
           ),
       },
     ],

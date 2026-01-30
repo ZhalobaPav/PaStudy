@@ -57,6 +57,7 @@ namespace PaStudy.Infrastructure.ConfigureDependencies
                             Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]))
                     };
                 });
+            services.AddAuthorization();
             return services;
         }
     }

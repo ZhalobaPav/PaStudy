@@ -1,1 +1,16 @@
-<p>pa-input works!</p>
+<div>
+  @if (label) {
+    <label class="form-label">{{ label }}</label>
+  }
+
+  <input
+    class="pa-input"
+    [type]="type"
+    [value]="value"
+    [disabled]="isDisabled"
+    [placeholder]="placeholder"
+    (input)="handleInput($event)"
+    (blur)="handleBlur()"
+    [class.is-invalid]="false"
+  />
+</div>

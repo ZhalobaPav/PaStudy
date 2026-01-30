@@ -8,9 +8,12 @@ import {
   HTTP_INTERCEPTORS,
   HttpClient,
   HttpClientModule,
+  provideHttpClient,
+  withInterceptors,
 } from '@angular/common/http';
 import { AuthInterceptor } from './core/interceptors/auth.intercept';
 import { AuthModule } from './routes/auth/auth.module';
+import { tokenInterceptor } from './core/interceptors/token.intereceptor';
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,6 +31,7 @@ import { AuthModule } from './routes/auth/auth.module';
       useClass: AuthInterceptor,
       multi: true,
     },
+    provideHttpClient(withInterceptors([tokenInterceptor])),
   ],
 })
 export class AppModule {}

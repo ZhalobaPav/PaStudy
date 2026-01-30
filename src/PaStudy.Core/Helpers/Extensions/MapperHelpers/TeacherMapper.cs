@@ -1,8 +1,5 @@
 ﻿using PaStudy.Core.Entities;
-using PaStudy.Core.Helpers.DTOs.Identity;
-using PaStudy.Core.Helpers.DTOs.Student;
 using PaStudy.Core.Helpers.DTOs.Teacher;
-using PaStudy.Core.Helpers.DTOs.Users;
 
 namespace PaStudy.Core.Helpers.Extensions.MapperHelpers;
 

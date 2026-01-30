@@ -1,6 +1,9 @@
 <div class="page-header-inner">
-  <h1 class="page-header-title">{{ title }} <small>{{ subtitle }}</small> </h1>
+  <h1 class="page-header-title">
+    {{ title }} <small>{{ subtitle }}</small>
+  </h1>
   @if (!hideBreadcrumb) {
-    <app-breadcrumb/>
+    <app-breadcrumb />
   }
+  <a routerLink="courses">Courses</a>
 </div>

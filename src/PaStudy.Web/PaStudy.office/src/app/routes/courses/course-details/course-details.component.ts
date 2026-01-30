@@ -1,6 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ICourse } from '../../../shared/models/course';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService } from '../course.service';
 import { take, tap } from 'rxjs';
 import {
@@ -19,9 +19,14 @@ export class CourseDetailsComponent implements OnInit {
   course = signal<ICourse | null>(null);
   activeTab = signal<CourseHeaderTitles>(CourseHeaderTitles.Course);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private courseService = inject(CourseService);
   public readonly tab = CourseHeaderTitles;
   readonly headerConfig: HeaderConfig[] = headerConfig;
+  public isEditMode = false;
+  public isCreatingAssignment = computed(() =>
+    this.router.url.includes('assignment/create'),
+  );
 
   ngOnInit(): void {
     const courseId = this.route.snapshot.paramMap.get('id');
@@ -37,7 +42,7 @@ export class CourseDetailsComponent implements OnInit {
             return;
           }
           this.course.set(response);
-        })
+        }),
       )
       .subscribe();
   }

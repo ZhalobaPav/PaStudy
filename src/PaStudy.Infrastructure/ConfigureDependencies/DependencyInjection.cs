@@ -16,11 +16,13 @@ public static class DependencyInjection
         services.AddScoped<IStudentRepository, StudentRepository>();
         services.AddScoped<ITeacherRepository, TeacherRepository>();
         services.AddScoped<IGroupRepository, GroupRepository>();
+        services.AddScoped<IAssignmentRepository, AssignmentRepository>();
 
         //Services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IdentityService>();
         services.AddScoped<DataSeederService>();
+        services.AddScoped<IAssignmentService, AssignmentService>();
         return services;
     }
 }

@@ -163,13 +163,6 @@ namespace PaStudy.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AttachmentUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("datetimeoffset");
 
@@ -194,6 +187,9 @@ namespace PaStudy.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(100);
 
+                    b.Property<int?>("SectionId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -201,9 +197,51 @@ namespace PaStudy.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId");
+                    b.HasIndex("SectionId");
 
                     b.ToTable("Assignment");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Attachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.ToTable("Attachment");
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.Category", b =>
@@ -369,6 +407,35 @@ namespace PaStudy.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Group");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Section", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Section");
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.Student", b =>
@@ -647,13 +714,23 @@ namespace PaStudy.Infrastructure.Migrations
 
             modelBuilder.Entity("PaStudy.Core.Entities.Assignment", b =>
                 {
-                    b.HasOne("PaStudy.Core.Entities.Course", "Course")
+                    b.HasOne("PaStudy.Core.Entities.Section", "Section")
                         .WithMany("Assignments")
-                        .HasForeignKey("CourseId")
+                        .HasForeignKey("SectionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Section");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Attachment", b =>
+                {
+                    b.HasOne("PaStudy.Core.Entities.Assignment", "Assignment")
+                        .WithMany("Attachments")
+                        .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Course");
+                    b.Navigation("Assignment");
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.ConnectionEntities.Enrollment", b =>
@@ -702,6 +779,17 @@ namespace PaStudy.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Section", b =>
+                {
+                    b.HasOne("PaStudy.Core.Entities.Course", "Course")
+                        .WithMany("Sections")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.Student", b =>
@@ -759,14 +847,16 @@ namespace PaStudy.Infrastructure.Migrations
 
             modelBuilder.Entity("PaStudy.Core.Entities.Assignment", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("Submissions");
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.Course", b =>
                 {
-                    b.Navigation("Assignments");
-
                     b.Navigation("Enrollments");
+
+                    b.Navigation("Sections");
 
                     b.Navigation("TeacherCourses");
                 });
@@ -777,6 +867,11 @@ namespace PaStudy.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Section", b =>
+                {
+                    b.Navigation("Assignments");
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.Student", b =>

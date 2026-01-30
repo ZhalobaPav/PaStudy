@@ -16,6 +16,7 @@ import { ICourse } from '../../../shared/models/course';
   selector: 'app-courses',
   templateUrl: './courses.component.html',
   styleUrl: './courses.component.scss',
+  standalone: false,
 })
 export class CoursesComponent {
   private courseService = inject(CourseService);
@@ -33,7 +34,7 @@ export class CoursesComponent {
           this.courses.set(courses);
         }),
         take(1),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
   }

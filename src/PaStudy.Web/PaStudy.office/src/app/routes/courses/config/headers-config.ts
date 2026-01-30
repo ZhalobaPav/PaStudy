@@ -1,6 +1,7 @@
 export enum CourseHeaderTitles {
   Course = 'Курс',
   Students = 'Учасники',
+  Assignments = 'Завдання',
   Notes = 'Оцінки',
 }
 

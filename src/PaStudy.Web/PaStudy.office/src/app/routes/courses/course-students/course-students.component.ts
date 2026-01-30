@@ -12,6 +12,7 @@ import { tableConfig } from '../../users/helpers/user-list-table.config';
   selector: 'app-course-students',
   templateUrl: './course-students.component.html',
   styleUrl: './course-students.component.scss',
+  standalone: false,
 })
 export class CourseStudentsComponent implements OnInit {
   private userService = inject(UserService);
@@ -39,7 +40,7 @@ export class CourseStudentsComponent implements OnInit {
         take(1),
         tap((response) => {
           this.users.set(response);
-        })
+        }),
       )
       .subscribe();
   }

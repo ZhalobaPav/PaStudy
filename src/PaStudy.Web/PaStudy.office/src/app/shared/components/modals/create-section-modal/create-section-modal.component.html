@@ -1,0 +1,53 @@
+<div class="modal-card">
+  <div class="modal-header">
+    <h2>Додати новий розділ</h2>
+    <button class="close-icon" (click)="close()">×</button>
+  </div>
+
+  <form [formGroup]="sectionForm" (ngSubmit)="onSubmit()">
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="title">Назва розділу</label>
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          placeholder="Наприклад: Вступ до курсу"
+          [class.error]="
+            sectionForm.get('title')?.invalid &&
+            sectionForm.get('title')?.touched
+          "
+        />
+        @if (
+          sectionForm.get("title")?.errors?.["required"] &&
+          sectionForm.get("title")?.touched
+        ) {
+          <small class="error-text">Назва є обов'язковою</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="description">Опис (необов'язково)</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="3"
+          placeholder="Короткий опис того, що вивчатиметься..."
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="close()">
+        Скасувати
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="sectionForm.invalid || isLoading()"
+      >
+        Створити
+      </button>
+    </div>
+  </form>
+</div>

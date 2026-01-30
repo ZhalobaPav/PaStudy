@@ -148,7 +148,7 @@ public class IdentityService
             issuer: jwtOptions["Issuer"],
             audience: jwtOptions["Audience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtOptions["DurationInMinutes"])),
+            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtOptions["ExpireMinutes"])),
             signingCredentials: creds
         );
 

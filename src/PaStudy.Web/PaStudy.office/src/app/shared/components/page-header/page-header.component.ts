@@ -1,12 +1,19 @@
-import { Component, inject, Input, OnInit, booleanAttribute, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  Component,
+  inject,
+  Input,
+  OnInit,
+  booleanAttribute,
+  ViewEncapsulation,
+} from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { MenuService } from '../../../core/bootstrap/menu.service';
 
 @Component({
   selector: 'app-page-header',
   standalone: true,
-  imports: [BreadcrumbComponent],
+  imports: [BreadcrumbComponent, RouterLink],
   templateUrl: './page-header.component.html',
   styleUrl: './page-header.component.scss',
   host: {

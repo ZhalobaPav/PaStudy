@@ -1,0 +1,16 @@
+<h1 class="assignment-title">Завдання</h1>
+@if (isEditMode()) {
+  <button (click)="openModal()">
+    <i class="bi bi-plus-circle"></i>
+    <span>Створити секцію</span>
+  </button>
+}
+
+<div class="assignments">
+  @for (section of sections(); track $index) {
+    <app-section-item
+      [section]="section"
+      [isEditMode]="isEditMode()"
+    ></app-section-item>
+  }
+</div>

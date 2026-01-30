@@ -8,7 +8,9 @@ import { take, tap } from 'rxjs/operators';
   selector: 'app-course-info',
   templateUrl: './course-info.component.html',
   styleUrl: './course-info.component.scss',
+  standalone: false,
 })
 export class CourseInfoComponent {
   public course = input.required<ICourse | null>();
+  public isEditMode = input.required<boolean>();
 }

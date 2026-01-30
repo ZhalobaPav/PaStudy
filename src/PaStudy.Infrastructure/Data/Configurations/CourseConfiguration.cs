@@ -30,9 +30,9 @@ public class CourseConfiguration: IEntityTypeConfiguration<Course>
             .HasForeignKey(tc => tc.CourseId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(c => c.Assignments)
-            .WithOne(a => a.Course)
-            .HasForeignKey(a => a.CourseId)
+        builder.HasMany(c => c.Sections)
+            .WithOne(s => s.Course)
+            .HasForeignKey(s => s.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

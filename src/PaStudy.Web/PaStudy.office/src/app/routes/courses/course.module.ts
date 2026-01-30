@@ -7,6 +7,8 @@ import { RouterModule } from '@angular/router';
 import { CourseDetailsComponent } from './course-details/course-details.component';
 import { CourseInfoComponent } from './course-info/course-info.component';
 import { CourseStudentsComponent } from './course-students/course-students.component';
+import { FormsModule, ɵInternalFormsSharedModule } from '@angular/forms';
+import { AssignmentModule } from './assignments/assignment.module';
 
 @NgModule({
   declarations: [
@@ -15,6 +17,13 @@ import { CourseStudentsComponent } from './course-students/course-students.compo
     CourseInfoComponent,
     CourseStudentsComponent,
   ],
-  imports: [TableModule, CourseRoutingModule, SharedModule, RouterModule],
+  imports: [
+    TableModule,
+    CourseRoutingModule,
+    SharedModule,
+    RouterModule,
+    FormsModule,
+    AssignmentModule,
+  ],
 })
 export class CoursesModule {}
