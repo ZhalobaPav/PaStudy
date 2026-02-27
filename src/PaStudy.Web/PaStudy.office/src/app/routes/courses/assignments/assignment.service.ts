@@ -21,5 +21,21 @@ export class AssignmentService {
       section,
     );
   }
+
+  createAssignment(
+    assignment: Assignment,
+  ): Observable<BaseResponse<Assignment>> {
+    return this.httpAuth.post<BaseResponse<Assignment>>(
+      'assignment',
+      assignment,
+    );
+  }
+
+  uploadFile(file: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.httpAuth.post<string>('Files/upload', formData);
+  }
   constructor() {}
 }

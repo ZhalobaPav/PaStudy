@@ -1,5 +1,9 @@
 ﻿using PaStudy.Core.Entities;
+using PaStudy.Core.Entities.Assignments;
+using PaStudy.Core.Entities.Assignments.Questions;
+using PaStudy.Core.Entities.Attachments;
 using PaStudy.Core.Helpers.DTOs.Assignment;
+using PaStudy.Core.Helpers.DTOs.Assignment.Quiz;
 using PaStudy.Core.Helpers.DTOs.Attachment;
 using PaStudy.Core.Helpers.DTOs.Section;
 using System.Collections.Immutable;
@@ -8,17 +12,6 @@ namespace PaStudy.Core.Helpers.Extensions.MapperHelpers;
 
 public static class AssignmentMapper
 {
-    public static Assignment ToAssignmentEntity(this CreateAssignmentDto createAssignmentDto)
-    {
-        return new Assignment
-        {
-            Title = createAssignmentDto.Title,
-            Description = createAssignmentDto.Description,
-            Attachments = createAssignmentDto.Attachments.Select((att) => att.ToAttachmentEntity()).ToList(),
-            DueDate = createAssignmentDto.DueDate,
-            MaxPoints = createAssignmentDto.MaxPoints,
-        };
-    }
     public static AssignmentDto ToAssignmentDto(this Assignment assignment)
     {
         return new AssignmentDto
@@ -28,7 +21,8 @@ public static class AssignmentMapper
             Description = assignment.Description ?? string.Empty,
             DueDate = assignment.DueDate ?? DateTime.MinValue,
             Attachments = assignment.Attachments.Select(att => att.ToAttachmentDto()).ToImmutableArray(),
-            MaxPoints = assignment.MaxPoints
+            MaxPoints = assignment.MaxPoints,
+            AssignmentType = assignment.AssignmentType
         };
     }
     public static AttachmentDto ToAttachmentDto(this Attachment attachment)
@@ -38,16 +32,6 @@ public static class AssignmentMapper
             FileName = attachment.FileName,
             FileUrl = attachment.FileUrl,
             ContentType = attachment.ContentType
-        };
-    }
-
-    public static Attachment ToAttachmentEntity(this AttachmentDto attachmentDto)
-    {
-        return new Attachment
-        {
-            FileName = attachmentDto.FileName,
-            FileUrl = attachmentDto.FileUrl,
-            ContentType = attachmentDto.ContentType
         };
     }
 

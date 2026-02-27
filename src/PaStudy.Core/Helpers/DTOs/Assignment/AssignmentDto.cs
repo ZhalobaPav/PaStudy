@@ -1,4 +1,5 @@
 ﻿using PaStudy.Core.Helpers.DTOs.Attachment;
+using PaStudy.Core.Helpers.Enums;
 using System.Collections.Immutable;
 
 namespace PaStudy.Core.Helpers.DTOs.Assignment;
@@ -11,4 +12,5 @@ public class AssignmentDto
     public DateTime DueDate { get; set; }
     public ImmutableArray<AttachmentDto?> Attachments { get; set; } = new ImmutableArray<AttachmentDto?>();
     public int MaxPoints { get; set; } = 100;
+    public AssignmentType AssignmentType { get; set; } = AssignmentType.Task;
 }

@@ -22,7 +22,7 @@ public class Assignment: EndpointGroupBase
             .MapPost(CreateSectionAsync, "section");
     }
 
-    public async Task<BaseResponse<PaStudy.Core.Entities.Assignment>> CreateAssignment(CreateAssignmentDto dto, IAssignmentService assignmentService, ClaimsPrincipal user)
+    public async Task<BaseResponse<PaStudy.Core.Entities.Assignments.Assignment>> CreateAssignment(CreateAssignmentDto dto, IAssignmentService assignmentService, ClaimsPrincipal user)
     {
         var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         return await assignmentService.CreateAssignmentAsync(dto, userId);

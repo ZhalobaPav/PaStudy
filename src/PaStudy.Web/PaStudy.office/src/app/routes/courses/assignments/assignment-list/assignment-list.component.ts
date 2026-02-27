@@ -7,6 +7,8 @@ import { take, tap } from 'rxjs';
 import { Section } from '../models/section';
 import { ModalService } from '../../../../shared/components/modals/modal.service';
 import { CreateSectionModalComponent } from '../../../../shared/components/modals/create-section-modal/create-section-modal.component';
+import { CreateAssignmentComponent } from '../create-assignment/create-assignment.component';
+import { CreateAssignmentModalComponent } from '../../../../shared/components/modals/create-assignment-modal/create-assignment-modal.component';
 
 @Component({
   selector: 'app-assignment-list',
@@ -40,7 +42,7 @@ export class AssignmentListComponent implements OnInit {
       .subscribe();
   }
 
-  openModal() {
+  openSectionModal() {
     this.modalService
       .open(CreateSectionModalComponent, { courseId: this.course()?.id })
       .closed.subscribe((newSection) => {

@@ -1,0 +1,9 @@
+:host ::ng-deep .custom-quill .ql-container {
+  min-height: 150px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+:host ::ng-deep .ql-toolbar {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}

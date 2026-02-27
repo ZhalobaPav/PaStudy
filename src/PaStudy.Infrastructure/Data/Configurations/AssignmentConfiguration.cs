@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PaStudy.Core.Entities;
+using PaStudy.Core.Entities.Assignments;
 
 namespace PaStudy.Infrastructure.Data.Configurations;
 
@@ -21,9 +21,8 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
             .HasDefaultValue(100);
 
         builder.HasMany(a => a.Attachments)
-            .WithOne(at => at.Assignment)
-            .HasForeignKey(at => at.AssignmentId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .WithMany()
+            .UsingEntity(j => j.ToTable("AssignmentAttachments"));
 
         builder.HasOne(a => a.Section)
             .WithMany(s => s.Assignments)

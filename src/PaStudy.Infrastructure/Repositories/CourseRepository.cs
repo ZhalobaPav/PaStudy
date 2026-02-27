@@ -20,24 +20,25 @@ public class CourseRepository: ICourseRepository
 
     public async Task<ImmutableArray<CourseDto>> GetCourses(CancellationToken cancellationToken, CourseFilter courseFilter)
     {
-        IQueryable<Course> courses = _context.Set<Course>().AsNoTracking();
+        var courses = _context.Set<Course>().AsNoTracking().AsSplitQuery();
         if(!string.IsNullOrEmpty(courseFilter.SearchTerm))
         {
-            var term = courseFilter.SearchTerm.ToLower();
-            courses = courses.Where(c => c.Title.Contains(term));
+            courses = courses.Where(c => c.Title.Contains(courseFilter.SearchTerm));
         }
-        courses = courses.OrderBy(c => c.Id);
         int pageNumber = courseFilter.PageNumber ?? 1;
         int pageSize = courseFilter.PageSize ?? 10;
-        courses = courses.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-        var result = await courses.Select(c => new CourseDto
-        {
-            Id = c.Id,
-            Title = c.Title,
-            Description = c.Description,
-            CategoryName = c.Category.Name,
-            Teachers = c.TeacherCourses.Select(tc => tc.Teacher.ToTeacherDto()).ToImmutableArray()
-        }).ToImmutableArrayAsync(cancellationToken);
+        var result = await courses
+            .OrderBy(c => c.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => new CourseDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                CategoryName = c.Category.Name,
+                Teachers = c.TeacherCourses.Select(tc => tc.Teacher).AsQueryable().Select(TeacherMapper.ToDto).ToImmutableArray()
+            }).ToImmutableArrayAsync(cancellationToken);
         return result;
     }
 

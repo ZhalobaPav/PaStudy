@@ -1,10 +1,10 @@
 ﻿using PaStudy.Core.Entities;
+using PaStudy.Core.Entities.Assignments;
 using PaStudy.Core.Helpers.DTOs.Assignment;
-using PaStudy.Core.Helpers.DTOs.Attachment;
 using PaStudy.Core.Helpers.DTOs.Reponses;
 using PaStudy.Core.Helpers.DTOs.Section;
-using PaStudy.Core.Helpers.Exceptions;
 using PaStudy.Core.Helpers.Extensions.MapperHelpers;
+using PaStudy.Core.Interfaces.Factories;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Core.Interfaces.Service;
 
@@ -14,11 +14,19 @@ public class AssignmentService: IAssignmentService
 {
     private readonly IAssignmentRepository _assignmentRepository;
     private readonly ITeacherRepository _teacherRepository;
+    private readonly IAttachmentService _attachmentService;
+    private readonly IAssignmentElementFactory _assignmentFactory;
 
-    public AssignmentService(IAssignmentRepository assignmentRepository, ITeacherRepository teacherRepository)
+    public AssignmentService(
+        IAssignmentRepository assignmentRepository, 
+        ITeacherRepository teacherRepository, 
+        IAttachmentService attachmentService, 
+        IAssignmentElementFactory assignmentFactory)
     {
         _assignmentRepository = assignmentRepository;
         _teacherRepository = teacherRepository;
+        _attachmentService = attachmentService;
+        _assignmentFactory = assignmentFactory;
     }
 
     public async Task<BaseResponse<Assignment>> CreateAssignmentAsync(CreateAssignmentDto dto, string userId)
@@ -26,7 +34,7 @@ public class AssignmentService: IAssignmentService
         var teacher = await _teacherRepository.GetByUserIdAsync(userId);
         if (teacher == null) BaseResponse<Assignment>.Failure("Teacher not found");
 
-        var assignment = dto.ToAssignmentEntity();
+        var assignment = _assignmentFactory.CreateAssignment(dto);
         var result = await _assignmentRepository.CreateAsync(assignment);
         return BaseResponse<Assignment>.Success(result);
     }
@@ -42,20 +50,6 @@ public class AssignmentService: IAssignmentService
         var section = dto.ToSectionEntity();
         var result = await _assignmentRepository.CreateSectionAsync(section);
         return BaseResponse<Section>.Success(result);
-    }
-
-    public async Task<string> CreateAttachmentAsync(CreateAttachmentRequest request) 
-    { 
-        var filePath = await _assignmentRepository.SaveFileAsync(request.File);
-        var createAttachmentDto = new CreateAttachmentDto
-        {
-            AssignmentId = request.AssignmentId,
-            FileName = request.File.FileName,
-            FileUrl = filePath, 
-            ContentType = request.File.ContentType
-        };
-        await _assignmentRepository.CreateAttachment(createAttachmentDto);
-        return filePath;
     }
 
 }

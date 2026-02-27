@@ -5,6 +5,8 @@
     <app-assignment-item [assignment]="assignment"></app-assignment-item>
   }
   @if (isEditMode()) {
-    <button>Створити завдання</button>
+    <button class="submit-btn" (click)="openAssignmentModal()">
+      Створити завдання
+    </button>
   }
 </div>

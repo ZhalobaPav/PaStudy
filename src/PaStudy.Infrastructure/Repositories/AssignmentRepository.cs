@@ -1,10 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using PaStudy.Core.Entities;
+using PaStudy.Core.Entities.Assignments;
+using PaStudy.Core.Entities.Attachments;
+using PaStudy.Core.Entities.ConnectionEntities;
 using PaStudy.Core.Helpers.DTOs.Assignment;
 using PaStudy.Core.Helpers.DTOs.Attachment;
 using PaStudy.Core.Helpers.DTOs.Section;
+using PaStudy.Core.Helpers.Exceptions;
 using PaStudy.Core.Helpers.Extensions.MapperHelpers;
+using PaStudy.Core.Interfaces.Factories;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
@@ -15,10 +20,12 @@ namespace PaStudy.Infrastructure.Repositories;
 public class AssignmentRepository: IAssignmentRepository
 {
     private readonly PaStudyDbContext _dbContext;
+    private readonly IAttachmentFactory _attachmentFactory;
 
-    public AssignmentRepository(PaStudyDbContext dbContext)
+    public AssignmentRepository(PaStudyDbContext dbContext, IAttachmentFactory attachmentFactory)
     {
         _dbContext = dbContext;
+        _attachmentFactory = attachmentFactory;
     }
     public async Task<Assignment> CreateAsync(Assignment assignment, CancellationToken ct = default)
     {
@@ -49,17 +56,18 @@ public class AssignmentRepository: IAssignmentRepository
         return await _dbContext.Set<Assignment>().Where(a => a.Section.CourseId == courseId).Select(a => a.ToAssignmentDto())
             .ToImmutableArrayAsync(cancellationToken);
     }
-    public async Task CreateAttachment(CreateAttachmentDto createAttachmentDto)
+    public async Task AddAttachmentsToAssignment(ICollection<CreateAttachmentDto> createAttachmentDtoList, int assignmentId)
     {
-        var attachments = _dbContext.Set<Attachment>();
-        var attachment = new Attachment
+        var assignment = await _dbContext.Set<Assignment>()
+        .Include(a => a.Attachments)
+        .FirstOrDefaultAsync(a => a.Id == assignmentId);
+
+        if (assignment == null) throw new NotFoundException("Assignment not found");
+        var attachments = createAttachmentDtoList.Select(a => _attachmentFactory.CreateAttachment(a));
+        foreach (var attachment in attachments)
         {
-            FileName = createAttachmentDto.FileName,
-            FileUrl = createAttachmentDto.FileUrl,
-            ContentType = createAttachmentDto.ContentType,
-            AssignmentId = createAttachmentDto.AssignmentId
-        };
-        await attachments.AddAsync(attachment);
+            assignment.Attachments.Add(attachment);
+        }
         await _dbContext.SaveChangesAsync();
     }
     public async Task<string> SaveFileAsync(IFormFile file)
