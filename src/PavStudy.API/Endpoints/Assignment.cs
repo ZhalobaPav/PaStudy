@@ -6,9 +6,11 @@ using PaStudy.Core.Helpers.Exceptions;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Core.Interfaces.Service;
 using PaStudy.Infrastructure.Models;
+using PaStudy.Infrastructure.Repositories;
 using PavStudy.API.Extensions;
 using System.Collections.Immutable;
 using System.Security.Claims;
+using System.Threading;
 
 namespace PavStudy.API.Endpoints;
 
@@ -17,7 +19,8 @@ public class Assignment: EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this).RequireAuthorization()
-            .MapGet(GetAssignments, "{courseId}")
+            .MapGet(GetAssignments, "sections/{courseId}")
+            .MapGet(GetAssignmentById, "/{assignmentId}")
             .MapPost(CreateAssignment)
             .MapPost(CreateSectionAsync, "section");
     }
@@ -38,5 +41,10 @@ public class Assignment: EndpointGroupBase
     public async Task<ImmutableArray<SectionDto>> GetAssignments(int courseId, IAssignmentRepository assignmentRepository, CancellationToken cancellationToken)
     {
         return await assignmentRepository.GetSectionsAsync(courseId, cancellationToken);
+    }
+
+    public async Task<AssignmentDto> GetAssignmentById(int assignmentId, CancellationToken cancellationToken, IAssignmentRepository assignmentRepository)
+    {
+        return await assignmentRepository.GetAssignmentByIdAsync(assignmentId, cancellationToken);
     }
 }

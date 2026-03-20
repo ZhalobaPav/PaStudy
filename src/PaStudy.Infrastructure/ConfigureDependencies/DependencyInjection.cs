@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IAttachmentFactory, AttachmentFactory>();
         services.AddScoped<IAssignmentElementFactory, AssignmentFactory>();
         services.AddScoped<IQuestionFactory, QuestionFactory>();
+        services.AddScoped<IUploadFactory, UploadFactory>();
         return services;
     }
 }

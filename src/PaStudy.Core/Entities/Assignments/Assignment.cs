@@ -1,11 +1,10 @@
 ﻿using PaStudy.Core.Entities.Attachments;
 using PaStudy.Core.Entities.Base;
-using PaStudy.Core.Entities.ConnectionEntities;
 using PaStudy.Core.Helpers.Enums;
 
 namespace PaStudy.Core.Entities.Assignments
 {
-    public class Assignment : BaseAuditableEntity
+    public abstract class Assignment : BaseAuditableEntity
     {
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }

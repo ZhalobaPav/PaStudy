@@ -11,15 +11,11 @@ const routes: Routes = [
   {
     path: 'course-details/:id',
     component: CourseDetailsComponent,
-    children: [
-      {
-        path: 'assignment',
-        loadChildren: () =>
-          import('./assignments/assignment.module').then(
-            (mod) => mod.AssignmentModule,
-          ),
-      },
-    ],
+  },
+  {
+    path: 'course-details/:id/assignment',
+    loadChildren: () =>
+      import('./assignments/assignment.module').then((m) => m.AssignmentModule),
   },
 ];
 

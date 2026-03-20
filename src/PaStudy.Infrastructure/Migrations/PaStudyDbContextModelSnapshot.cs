@@ -22,6 +22,36 @@ namespace PaStudy.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AssignmentAttachment", b =>
+                {
+                    b.Property<int>("AssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AttachmentsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AssignmentId", "AttachmentsId");
+
+                    b.HasIndex("AttachmentsId");
+
+                    b.ToTable("AssignmentAttachments", (string)null);
+                });
+
+            modelBuilder.Entity("AttachmentQuestion", b =>
+                {
+                    b.Property<int>("AttachmentsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AttachmentsId", "QuestionId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionAttachments", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -155,7 +185,7 @@ namespace PaStudy.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PaStudy.Core.Entities.Assignment", b =>
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Assignment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -165,6 +195,11 @@ namespace PaStudy.Infrastructure.Migrations
 
                     b.Property<byte>("AssignmentType")
                         .HasColumnType("tinyint");
+
+                    b.Property<string>("AssignmentTypeIndicator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("datetimeoffset");
@@ -202,10 +237,14 @@ namespace PaStudy.Infrastructure.Migrations
 
                     b.HasIndex("SectionId");
 
-                    b.ToTable("Assignment");
+                    b.ToTable("Assignment", (string)null);
+
+                    b.HasDiscriminator<string>("AssignmentTypeIndicator").HasValue("Assignment");
+
+                    b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("PaStudy.Core.Entities.Attachment", b =>
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.AwnserOption", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -213,12 +252,113 @@ namespace PaStudy.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AssignmentId")
+                    b.Property<bool>("IsCorrect")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("QuestionId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("AnswerOptions", (string)null);
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.MatchingPair", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("LeftSide")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RightSide")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("MatchingPairs", (string)null);
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.Question", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Feedback")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QuestionType")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<int?>("QuizAssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<byte>("Type")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuizAssignmentId");
+
+                    b.ToTable("Questions", (string)null);
+
+                    b.HasDiscriminator<string>("QuestionType").HasValue("Question");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Attachments.Attachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AttachmentType")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("datetimeoffset");
@@ -228,11 +368,16 @@ namespace PaStudy.Infrastructure.Migrations
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("FileUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("datetimeoffset");
@@ -242,9 +387,11 @@ namespace PaStudy.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignmentId");
+                    b.ToTable("Attachment", (string)null);
 
-                    b.ToTable("Attachment");
+                    b.HasDiscriminator<string>("AttachmentType").HasValue("Attachment");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.Category", b =>
@@ -664,6 +811,96 @@ namespace PaStudy.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.QuizAssignment", b =>
+                {
+                    b.HasBaseType("PaStudy.Core.Entities.Assignments.Assignment");
+
+                    b.Property<bool>("ShuffleQuestions")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("TimeLimitMinutes")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasDiscriminator().HasValue("Quiz");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.TaskAssignment", b =>
+                {
+                    b.HasBaseType("PaStudy.Core.Entities.Assignments.Assignment");
+
+                    b.HasDiscriminator().HasValue("Task");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.ChoiceQuestion", b =>
+                {
+                    b.HasBaseType("PaStudy.Core.Entities.Assignments.Questions.Question");
+
+                    b.HasDiscriminator().HasValue("Choice");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.MatchingQuestion", b =>
+                {
+                    b.HasBaseType("PaStudy.Core.Entities.Assignments.Questions.Question");
+
+                    b.HasDiscriminator().HasValue("Matching");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Attachments.DocumentAttachment", b =>
+                {
+                    b.HasBaseType("PaStudy.Core.Entities.Attachments.Attachment");
+
+                    b.HasDiscriminator().HasValue("Document");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Attachments.ImageAttachment", b =>
+                {
+                    b.HasBaseType("PaStudy.Core.Entities.Attachments.Attachment");
+
+                    b.Property<int>("Height")
+                        .HasColumnType("int")
+                        .HasColumnName("Height");
+
+                    b.Property<int>("Width")
+                        .HasColumnType("int")
+                        .HasColumnName("Width");
+
+                    b.HasDiscriminator().HasValue("Image");
+                });
+
+            modelBuilder.Entity("AssignmentAttachment", b =>
+                {
+                    b.HasOne("PaStudy.Core.Entities.Assignments.Assignment", null)
+                        .WithMany()
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PaStudy.Core.Entities.Attachments.Attachment", null)
+                        .WithMany()
+                        .HasForeignKey("AttachmentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AttachmentQuestion", b =>
+                {
+                    b.HasOne("PaStudy.Core.Entities.Attachments.Attachment", null)
+                        .WithMany()
+                        .HasForeignKey("AttachmentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PaStudy.Core.Entities.Assignments.Questions.Question", null)
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -715,7 +952,7 @@ namespace PaStudy.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PaStudy.Core.Entities.Assignment", b =>
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Assignment", b =>
                 {
                     b.HasOne("PaStudy.Core.Entities.Section", "Section")
                         .WithMany("Assignments")
@@ -725,15 +962,30 @@ namespace PaStudy.Infrastructure.Migrations
                     b.Navigation("Section");
                 });
 
-            modelBuilder.Entity("PaStudy.Core.Entities.Attachment", b =>
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.AwnserOption", b =>
                 {
-                    b.HasOne("PaStudy.Core.Entities.Assignment", "Assignment")
-                        .WithMany("Attachments")
-                        .HasForeignKey("AssignmentId")
+                    b.HasOne("PaStudy.Core.Entities.Assignments.Questions.ChoiceQuestion", null)
+                        .WithMany("Options")
+                        .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.Navigation("Assignment");
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.MatchingPair", b =>
+                {
+                    b.HasOne("PaStudy.Core.Entities.Assignments.Questions.MatchingQuestion", null)
+                        .WithMany("Pairs")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.Question", b =>
+                {
+                    b.HasOne("PaStudy.Core.Entities.Assignments.QuizAssignment", null)
+                        .WithMany("Questions")
+                        .HasForeignKey("QuizAssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.ConnectionEntities.Enrollment", b =>
@@ -814,7 +1066,7 @@ namespace PaStudy.Infrastructure.Migrations
 
             modelBuilder.Entity("PaStudy.Core.Entities.Submission", b =>
                 {
-                    b.HasOne("PaStudy.Core.Entities.Assignment", "Assignment")
+                    b.HasOne("PaStudy.Core.Entities.Assignments.Assignment", "Assignment")
                         .WithMany("Submissions")
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -848,10 +1100,8 @@ namespace PaStudy.Infrastructure.Migrations
                     b.Navigation("GroupOfCurator");
                 });
 
-            modelBuilder.Entity("PaStudy.Core.Entities.Assignment", b =>
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Assignment", b =>
                 {
-                    b.Navigation("Attachments");
-
                     b.Navigation("Submissions");
                 });
 
@@ -885,6 +1135,21 @@ namespace PaStudy.Infrastructure.Migrations
             modelBuilder.Entity("PaStudy.Core.Entities.Teacher", b =>
                 {
                     b.Navigation("TeacherCourses");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.QuizAssignment", b =>
+                {
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.ChoiceQuestion", b =>
+                {
+                    b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Assignments.Questions.MatchingQuestion", b =>
+                {
+                    b.Navigation("Pairs");
                 });
 #pragma warning restore 612, 618
         }

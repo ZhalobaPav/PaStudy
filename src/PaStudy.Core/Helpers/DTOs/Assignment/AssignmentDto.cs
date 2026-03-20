@@ -10,7 +10,7 @@ public class AssignmentDto
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DateTime DueDate { get; set; }
-    public ImmutableArray<AttachmentDto?> Attachments { get; set; } = new ImmutableArray<AttachmentDto?>();
+    public ImmutableArray<AttachmentDto>? Attachments { get; set; } = new ImmutableArray<AttachmentDto>();
     public int MaxPoints { get; set; } = 100;
     public AssignmentType AssignmentType { get; set; } = AssignmentType.Task;
 }

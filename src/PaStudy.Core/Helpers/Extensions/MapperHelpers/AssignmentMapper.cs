@@ -20,7 +20,8 @@ public static class AssignmentMapper
             Title = assignment.Title,
             Description = assignment.Description ?? string.Empty,
             DueDate = assignment.DueDate ?? DateTime.MinValue,
-            Attachments = assignment.Attachments.Select(att => att.ToAttachmentDto()).ToImmutableArray(),
+            Attachments = assignment.Attachments?.Select(att => att.ToAttachmentDto()).ToImmutableArray()
+              ?? ImmutableArray<AttachmentDto>.Empty,
             MaxPoints = assignment.MaxPoints,
             AssignmentType = assignment.AssignmentType
         };
@@ -39,6 +40,7 @@ public static class AssignmentMapper
     {
         return new SectionDto
         {
+            Id = section.Id,
             Title = section.Title,
             Description = section.Description,
             Order = section.Order,

@@ -11,6 +11,7 @@ namespace PaStudy.Core.Interfaces.Repository;
 public interface IAssignmentRepository
 {
     Task<ImmutableArray<AssignmentDto>> GetAssignmentsAsync(int courseId, CancellationToken cancellationToken);
+    Task<AssignmentDto> GetAssignmentByIdAsync(int assignmentId, CancellationToken cancellationToken);
     Task<ImmutableArray<SectionDto>> GetSectionsAsync(int courseId, CancellationToken cancellationToken);
     Task<Assignment> CreateAsync(Assignment assignment, CancellationToken ct = default);
     Task<Section> CreateSectionAsync(Section section, CancellationToken ct = default);

@@ -3,6 +3,7 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 @import "./base_styles/base.styles.scss";
+@import "ngx-toastr/toastr";
 /* You can add global styles to this file, and also import other style files */
 html,
 body {

@@ -1,8 +1,10 @@
 import {
   Component,
+  EventEmitter,
   forwardRef,
   inject,
   input,
+  Output,
   signal,
   ViewChild,
 } from '@angular/core';
@@ -14,7 +16,7 @@ import {
 } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
 import { AssignmentService } from '../../../routes/courses/assignments/assignment.service';
-import { take } from 'rxjs';
+import { PendingImage } from '../../../routes/courses/assignments/models/attachment';
 
 @Component({
   selector: 'app-text-editor',
@@ -32,6 +34,7 @@ import { take } from 'rxjs';
 })
 export class TextEditorComponent implements ControlValueAccessor {
   @ViewChild('quillEditor') quillComponent: any;
+  @Output() imageUploaded = new EventEmitter<PendingImage>();
   private assignmentService = inject(AssignmentService);
   value: string = '';
   placeholder = input<string>('');
@@ -76,15 +79,14 @@ export class TextEditorComponent implements ControlValueAccessor {
     input.onchange = () => {
       const file = input.files?.[0];
       if (!file) return;
-
-      this.assignmentService
-        .uploadFile(file)
-        .pipe(take(1))
-        .subscribe((url) => {
-          const range = this.quillInstance.getSelection(true);
-
-          this.quillInstance.insertEmbed(range.index, 'image', url);
-        });
+      const imageId = `img_${Date.now()}`;
+      const placeholder = `[[${imageId}]]`;
+      const range = this.quillInstance.getSelection(true);
+      this.quillInstance.insertText(range.index, placeholder);
+      this.imageUploaded.emit({
+        file: file,
+        tempUrl: imageId,
+      });
     };
   }
   private insertImage(url: string) {

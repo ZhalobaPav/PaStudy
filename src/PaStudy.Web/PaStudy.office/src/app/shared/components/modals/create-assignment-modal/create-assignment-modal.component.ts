@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { BaseModalComponent } from '../base-modal';
 import {
   FormArray,
@@ -10,9 +10,13 @@ import {
 } from '@angular/forms';
 import { AssignmentService } from '../../../../routes/courses/assignments/assignment.service';
 import { AssignmentType } from '../../../enums/assignment-type';
-import { take, tap } from 'rxjs';
+import { finalize, of, switchMap, take, tap } from 'rxjs';
 import { TextEditorComponent } from '../../text-editor/text-editor.component';
 import { ScrollViewComponent } from '../../scroll-view/scroll-view.component';
+import {
+  PendingImage,
+  UploadAttachment,
+} from '../../../../routes/courses/assignments/models/attachment';
 interface AssignmentForm {
   title: FormControl<string>;
   description: FormControl<string | null>;
@@ -22,10 +26,16 @@ interface AssignmentForm {
   assignmentType: FormControl<AssignmentType>;
 }
 
+interface ImageInfoFormGroup {
+  width: FormControl<number>;
+  height: FormControl<number>;
+}
+
 interface AttachmentFormGroup {
   fileName: FormControl<string>;
   fileUrl: FormControl<string>;
   contentType: FormControl<string>;
+  imageInfo: FormGroup<ImageInfoFormGroup> | FormControl<null>;
 }
 
 @Component({
@@ -39,8 +49,11 @@ export class CreateAssignmentModalComponent
   extends BaseModalComponent<{
     sectionId: number;
   }>
-  implements OnInit
+  implements OnInit, OnDestroy
 {
+  ngOnDestroy(): void {
+    this.pendingImages.forEach((img) => URL.revokeObjectURL(img.tempUrl));
+  }
   ngOnInit(): void {
     this.initForm();
   }
@@ -48,7 +61,7 @@ export class CreateAssignmentModalComponent
   private fb = inject(FormBuilder);
   private assignmentService = inject(AssignmentService);
   public isLoading = signal<boolean>(false);
-
+  private pendingImages: PendingImage[] = [];
   initForm() {
     this.assignmentForm = this.fb.nonNullable.group<AssignmentForm>({
       title: this.fb.nonNullable.control('', [Validators.required]),
@@ -63,13 +76,54 @@ export class CreateAssignmentModalComponent
   }
 
   public onSubmit(): void {
-    const formValues = this.assignmentForm.getRawValue();
-    this.assignmentService
-      .createAssignment(formValues)
+    if (this.assignmentForm.invalid) return;
+    this.isLoading.set(true);
+
+    const uploadingFiles$ =
+      this.pendingImages.length > 0
+        ? this.assignmentService.uploadMultipleFiles(
+            this.pendingImages.map((f) => f.file),
+          )
+        : of([]);
+    uploadingFiles$
       .pipe(
         take(1),
-        tap((response) => this.close(response)),
+        switchMap((uploadedAttachments: UploadAttachment[]) => {
+          const formValues = this.assignmentForm.getRawValue();
+          let finalDescription = formValues.description || '';
+          this.pendingImages.forEach((pending, index) => {
+            const remoteFile = uploadedAttachments[index];
+            if (remoteFile) {
+              const imgHtml = `<img src="${remoteFile.fileUrl}" alt="${remoteFile.fileName}">`;
+              finalDescription = finalDescription.replace(
+                `[[${pending.tempUrl}]]`,
+                imgHtml,
+              );
+            }
+          });
+          const createAssignmentDto = {
+            ...formValues,
+            description: finalDescription,
+            attachments: uploadedAttachments,
+            sectionId: this.data.sectionId,
+          };
+          return this.assignmentService.createAssignment(createAssignmentDto);
+        }),
+        finalize(() => {
+          this.isLoading.set(false);
+        }),
       )
-      .subscribe();
+      .subscribe({
+        next: (response) => {
+          this.close(response);
+        },
+        error: (err) => {
+          console.error('Error', err);
+        },
+      });
+  }
+
+  onImageUploaded(pending: PendingImage) {
+    this.pendingImages.push(pending);
   }
 }

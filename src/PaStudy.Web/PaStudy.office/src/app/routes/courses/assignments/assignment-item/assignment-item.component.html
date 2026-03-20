@@ -1,1 +1,8 @@
-<a>{{ assignment()?.title }}</a>
+<a class="item-element" [routerLink]="['assignment', assignment()?.id]">
+  <img
+    class="icon"
+    src="./../../../../../assets/images/icons/file-svgrepo-com.svg"
+    alt=""
+  />
+  <h2>{{ assignment()?.title }}</h2>
+</a>

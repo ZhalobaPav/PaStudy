@@ -1,5 +1,5 @@
 ﻿namespace PaStudy.Core.Entities.Attachments;
 
-public class DocumentAttachment
+public class DocumentAttachment: Attachment
 {
 }

@@ -1,9 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CreateAssignmentComponent } from './create-assignment/create-assignment.component';
+import { AssignmentDetailsComponent } from './assignment-details/assignment-details.component';
 
 const routes: Routes = [
-  { path: 'create', component: CreateAssignmentComponent },
+  {
+    path: ':assignmentId',
+    component: AssignmentDetailsComponent,
+  },
 ];
 @NgModule({
   declarations: [],

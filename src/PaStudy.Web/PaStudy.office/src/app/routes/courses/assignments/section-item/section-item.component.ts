@@ -15,6 +15,7 @@ export class SectionItemComponent {
   modalService = inject(ModalService);
 
   openAssignmentModal() {
+    console.log(this.section());
     this.modalService
       .open(CreateAssignmentModalComponent, { sectionId: this.section().id })
       .closed.subscribe((res) => {

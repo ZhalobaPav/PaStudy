@@ -43,9 +43,9 @@ public class AssignmentFactory : IAssignmentElementFactory
         };
     }
 
-    private Assignment CreateTaskAssignment(CreateAssignmentDto taskDto)
+    private TaskAssignment CreateTaskAssignment(CreateAssignmentDto taskDto)
     {
-        return new Assignment
+        return new TaskAssignment
         {
             Title = taskDto.Title,
             Description = taskDto.Description,

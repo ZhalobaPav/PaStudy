@@ -1,0 +1,26 @@
+.assignment-title {
+  padding: 0.5rem;
+  font-size: 2rem;
+}
+
+.rich-text-content {
+  display: block;
+  width: 100%;
+  ::ng-deep {
+    img {
+      display: block;
+      max-height: 400px;
+      height: auto;
+      object-fit: contain;
+      margin: 1rem auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    p {
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+  }
+}

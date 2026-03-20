@@ -8,6 +8,7 @@ public class AttachmentConfiguration : IEntityTypeConfiguration<Attachment>
 {
     public void Configure(EntityTypeBuilder<Attachment> builder)
     {
+        builder.ToTable("Attachment");
         builder.Property(a => a.FileName)
             .IsRequired()
             .HasMaxLength(255);
@@ -26,11 +27,17 @@ public class AttachmentConfiguration : IEntityTypeConfiguration<Attachment>
         builder.HasDiscriminator<string>("AttachmentType")
             .HasValue<ImageAttachment>("Image")
             .HasValue<DocumentAttachment>("Document");
+    }
+}
 
-        builder.Property(a => (a as ImageAttachment).Width)
+public class ImageAttachmentConfiguration : IEntityTypeConfiguration<ImageAttachment>
+{
+    public void Configure(EntityTypeBuilder<ImageAttachment> builder)
+    {
+        builder.Property(a => a.Width)
         .HasColumnName("Width");
 
-        builder.Property(a => (a as ImageAttachment).Height)
+        builder.Property(a => a.Height)
             .HasColumnName("Height");
     }
 }

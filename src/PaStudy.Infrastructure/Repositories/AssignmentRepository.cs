@@ -48,8 +48,41 @@ public class AssignmentRepository: IAssignmentRepository
     }
     public async Task<ImmutableArray<SectionDto>> GetSectionsAsync(int courseId, CancellationToken cancellationToken)
     {
-        return await _dbContext.Set<Section>().Where(s => s.CourseId == courseId).Select(s => s.ToSectionDto())
-            .ToImmutableArrayAsync(cancellationToken);
+        var sectionsList = await _dbContext.Set<Section>()
+            .Where(s => s.CourseId == courseId)
+            .OrderBy(s => s.Order)
+            .Select(s => new SectionDto
+            {
+                Id = s.Id,
+                Title = s.Title,
+                Description = s.Description,
+                Order = s.Order,
+                CourseId = s.CourseId,
+                Assignments = s.Assignments.Select(a => new AssignmentDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description ?? string.Empty,
+                    DueDate = a.DueDate ?? DateTime.MinValue,
+                    MaxPoints = a.MaxPoints,
+                    AssignmentType = a.AssignmentType,
+                    Attachments = a.Attachments.Select(att => new AttachmentDto
+                    {
+                        FileName = att.FileName,
+                        FileUrl = att.FileUrl,
+                        ContentType = att.ContentType,
+                        ImageInfo = (att.ContentType == "image/jpeg" || att.ContentType == "image/png" || att.ContentType == "image/gif")
+                            ? new ImageAttachmentInfo(
+                                ((ImageAttachment)att).Width,
+                                ((ImageAttachment)att).Height
+                              )
+                            : null
+                    }).ToImmutableArray()
+                }).ToImmutableArray()
+            })
+            .ToListAsync(cancellationToken);
+
+        return sectionsList.ToImmutableArray();
     }
     public async Task<ImmutableArray<AssignmentDto>> GetAssignmentsAsync(int courseId, CancellationToken cancellationToken)
     {
@@ -86,5 +119,16 @@ public class AssignmentRepository: IAssignmentRepository
         }
 
         return $"/uploads/attachments/{fileName}";
+    }
+
+    public async Task<AssignmentDto> GetAssignmentByIdAsync(int assignmentId, CancellationToken cancellationToken)
+    {
+        var assignment = await _dbContext.Set<Assignment>()
+            .Where(a => a.Id == assignmentId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (assignment == null)
+            throw new NotFoundException("Assignment not found");
+        return assignment.ToAssignmentDto();
     }
 }

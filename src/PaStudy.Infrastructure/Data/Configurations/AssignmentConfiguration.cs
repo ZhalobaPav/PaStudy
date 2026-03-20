@@ -10,6 +10,11 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
     {
         builder.HasKey(a => a.Id);
 
+        builder.ToTable("Assignment")
+            .HasDiscriminator<string>("AssignmentTypeIndicator")
+            .HasValue<TaskAssignment>("Task")
+            .HasValue<QuizAssignment>("Quiz");
+
         builder.Property(a => a.Title)
             .IsRequired()
             .HasMaxLength(200);
@@ -27,6 +32,22 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
         builder.HasOne(a => a.Section)
             .WithMany(s => s.Assignments)
             .HasForeignKey(s => s.SectionId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class QuizAssignmentConfiguration : IEntityTypeConfiguration<QuizAssignment>
+{
+    public void Configure(EntityTypeBuilder<QuizAssignment> builder)
+    {
+        builder.Property(q => q.ShuffleQuestions)
+            .HasDefaultValue(false);
+
+        builder.Property(q => q.TimeLimitMinutes)
+            .HasDefaultValue(0);
+
+        builder.HasMany(q => q.Questions)
+            .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
