@@ -9,4 +9,5 @@ public interface IStudentRepository
 {
     Task<ImmutableArray<StudentDto>> GetStudents(CancellationToken cancellationToken, UserFilter userFilter);
     Task<Student> CreateStudentAsync(Student student);
+    Task<Student?> GetByUserIdAsync(string userId, CancellationToken ct = default);
 }

@@ -228,6 +228,9 @@ namespace PaStudy.Infrastructure.Migrations
                     b.Property<int?>("SectionId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)

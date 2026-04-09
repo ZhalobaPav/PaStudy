@@ -25,6 +25,7 @@
   <ItemGroup>
     <Folder Include="Helpers\Requests\" />
     <Folder Include="Helpers\Responses\" />
+    <Folder Include="Middlewares\" />
   </ItemGroup>
 
 </Project>

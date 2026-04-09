@@ -1,0 +1,96 @@
+<app-scroll-view>
+  <div class="question-card" [formGroup]="questionForm()">
+    <div class="question-header">
+      <div class="header-left">
+        <span class="question-number">№{{ index() + 1 }}</span>
+      </div>
+
+      <div class="header-actions">
+        <div class="points-badge">
+          <input type="number" formControlName="points" class="points-input" />
+          <span>балів</span>
+        </div>
+        <button type="button" class="delete-btn" (click)="remove.emit()">
+          ×
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <pa-input
+        formControlName="text"
+        placeholder="Введіть текст питання..."
+        label="Питання"
+      />
+    </div>
+
+    @if (questionForm().get("type")?.value === QuestionType.SingleChoice) {
+      <div class="answers-section" formGroupName="choiceInfo">
+        <label>Варіанти відповіді:</label>
+
+        <div class="options-list" formArrayName="options">
+          @for (
+            optGroup of options.controls;
+            track optIdx;
+            let optIdx = $index
+          ) {
+            <div class="answer-row" [formGroupName]="optIdx">
+              <input type="radio" formControlName="isCorrect" [value]="true" />
+              <input
+                type="text"
+                formControlName="text"
+                placeholder="Варіант {{ optIdx + 1 }}"
+              />
+              <button
+                type="button"
+                class="remove-opt"
+                (click)="options.removeAt(optIdx)"
+              >
+                ×
+              </button>
+            </div>
+          }
+        </div>
+
+        <button type="button" class="add-link" (click)="addOption()">
+          + Додати варіант
+        </button>
+      </div>
+    }
+
+    @if (questionForm().get("type")?.value === QuestionType.Matching) {
+      <div class="answers-section" formGroupName="matchingInfo">
+        <label>Встановіть відповідність:</label>
+
+        <div class="pairs-list" formArrayName="pairs">
+          @for (pairGroup of pairs.controls; track pIdx; let pIdx = $index) {
+            <div class="matching-row" [formGroupName]="pIdx">
+              <input
+                type="text"
+                formControlName="leftSide"
+                placeholder="Елемент зліва"
+              />
+              <span class="match-arrow">↔</span>
+              <input
+                type="text"
+                formControlName="rightSide"
+                placeholder="Відповідність справа"
+              />
+              <button
+                type="button"
+                class="remove-opt"
+                (click)="pairs.removeAt(pIdx)"
+              >
+                ×
+              </button>
+            </div>
+          }
+        </div>
+
+        <button type="button" class="add-link" (click)="addPair()">
+          + Додати пару
+        </button>
+      </div>
+    }
+  </div>
+</app-scroll-view>

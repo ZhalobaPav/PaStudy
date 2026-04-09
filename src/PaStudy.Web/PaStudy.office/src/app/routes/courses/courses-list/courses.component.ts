@@ -2,6 +2,7 @@ import {
   Component,
   DestroyRef,
   inject,
+  OnInit,
   signal,
   ViewChild,
 } from '@angular/core';
@@ -12,6 +13,9 @@ import { finalize, take, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ICourse } from '../../../shared/models/course';
 import { LoaderService } from '../../../shared/services/loader.service';
+import { CourseQuantity } from '../../../shared/enums/course-quantity-type';
+import { TableConfig } from '../../../shared/components/table/models/table.models';
+import { tableConfig } from '../config/courses-table.config';
 
 @Component({
   selector: 'app-courses',
@@ -19,17 +23,19 @@ import { LoaderService } from '../../../shared/services/loader.service';
   styleUrl: './courses.component.scss',
   standalone: false,
 })
-export class CoursesComponent {
+export class CoursesComponent implements OnInit {
+  ngOnInit(): void {}
   private courseService = inject(CourseService);
   private destroyRef = inject(DestroyRef);
   private loaderService = inject(LoaderService);
-
+  public tableConfig: TableConfig = tableConfig;
   public courses = signal<ICourse[]>([]);
   @ViewChild(TableComponent, { static: true })
   tableComponentRef!: TableComponent<CoursesFilter>;
 
   fetchCourses(coursesFilter: CoursesFilter) {
     this.loaderService.busy();
+    coursesFilter.courseQuantity ??= CourseQuantity.All;
     this.courseService
       .getCourses(coursesFilter)
       .pipe(

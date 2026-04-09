@@ -9,7 +9,6 @@ using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
 using PaStudy.Infrastructure.Models;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace PaStudy.Infrastructure.Repositories;
 
@@ -84,5 +83,11 @@ public class StudentRepository: IStudentRepository
                 }
             }).ToImmutableArrayAsync(cancellationToken);
         return students;
+    }
+
+    public async Task<Student?> GetByUserIdAsync(string userId, CancellationToken ct = default)
+    {
+        return await _context.Set<Student>()
+            .FirstOrDefaultAsync(t => t.UserId == userId, ct);
     }
 }

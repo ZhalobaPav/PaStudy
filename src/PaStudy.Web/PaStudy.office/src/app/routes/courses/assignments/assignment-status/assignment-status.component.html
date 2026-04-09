@@ -1,0 +1,14 @@
+<div class="status-table-container">
+  <table class="status-table">
+    <tbody>
+      <tr>
+        <th scope="row">Максимальний бал</th>
+        <td>{{ assignment().maxPoints }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Термін виконання</th>
+        <td>{{ assignment().dueDate | date: "EEEE, d MMMM yyyy, HH:mm" }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

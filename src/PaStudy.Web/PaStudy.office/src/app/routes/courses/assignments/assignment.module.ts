@@ -7,6 +7,8 @@ import { RouterLink } from '@angular/router';
 import { PaInputComponent } from '../../../shared/components/pa-input/pa-input.component';
 import { SectionItemComponent } from './section-item/section-item.component';
 import { AssignmentDetailsComponent } from './assignment-details/assignment-details.component';
+import { DatePipe } from '@angular/common';
+import { AssignmentStatusComponent } from './assignment-status/assignment-status.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +22,8 @@ import { AssignmentDetailsComponent } from './assignment-details/assignment-deta
     AssignmentRoutingModule,
     RouterLink,
     PaInputComponent,
+    DatePipe,
+    AssignmentStatusComponent,
   ],
   exports: [AssignmentListComponent],
 })

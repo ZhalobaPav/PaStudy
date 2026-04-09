@@ -55,5 +55,9 @@ export class AssignmentService {
     );
   }
 
+  createQuiz(quizData: any): Observable<BaseResponse<any>> {
+    return this.httpAuth.post<BaseResponse<any>>('assignment', quizData);
+  }
+
   constructor() {}
 }

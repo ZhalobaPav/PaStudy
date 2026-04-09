@@ -25,3 +25,13 @@ export enum SortOrder {
   ACCENDING = 'Accending',
   DESCENDING = 'Descending',
 }
+
+export enum QuestionType {
+  SingleChoice = 0,
+  Matching = 1,
+}
+
+export const DEFAULT_FILTER_VALUES = {
+  skip: 15,
+  take: 1,
+};

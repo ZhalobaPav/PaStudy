@@ -1,19 +1,22 @@
 ﻿using PaStudy.Core.Entities.Assignments;
 using PaStudy.Core.Entities.Base;
+using PaStudy.Core.Helpers.Enums;
 
-namespace PaStudy.Core.Entities;
+namespace PaStudy.Core.Entities.Assignments.Submission;
 
-public class Submission: BaseAuditableEntity
+public abstract class Submission : BaseAuditableEntity
 {
-    public string? Content { get; set; }
-    public string? FileUrl { get; set; }
     public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
     public decimal? Grade { get; set; }
     public string? TeacherFeedback { get; set; }
     public DateTime? GradedAt { get; set; }
+
+    // Navigation properties
     public int AssignmentId { get; set; }
     public Assignment Assignment { get; set; } = null!;
 
     public int StudentId { get; set; }
     public Student Student { get; set; } = null!;
+
+    public SubmissionStatus Status { get; set; }
 }

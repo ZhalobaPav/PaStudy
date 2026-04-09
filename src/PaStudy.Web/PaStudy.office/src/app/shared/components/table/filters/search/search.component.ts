@@ -18,10 +18,14 @@ export class SearchFilterComponent
 {
   @Input()
   inputType: 'number' | 'text' = 'text';
-  constructor(public fb: UntypedFormBuilder, private destroyRef: DestroyRef) {
+  constructor(
+    public fb: UntypedFormBuilder,
+    private destroyRef: DestroyRef,
+  ) {
     super();
   }
   ngOnInit(): void {
+    this.setCachedValue();
     this.form
       .get('query')
       ?.valueChanges.pipe(
@@ -31,7 +35,7 @@ export class SearchFilterComponent
         tap((value) => {
           this.updateValue(value);
         }),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();
   }
@@ -46,7 +50,7 @@ export class SearchFilterComponent
         first(),
         filter(Boolean),
         map((state) => state[this.name]),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((cachedValue: string) => {
         this.form.get('query')?.patchValue(cachedValue, this.emitOptions);

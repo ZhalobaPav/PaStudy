@@ -1,8 +1,6 @@
 <a class="item-element" [routerLink]="['assignment', assignment()?.id]">
-  <img
-    class="icon"
-    src="./../../../../../assets/images/icons/file-svgrepo-com.svg"
-    alt=""
-  />
+  <img class="icon" src="{{ iconSrc }}" alt="" />
   <h2>{{ assignment()?.title }}</h2>
 </a>
+
+@if (isQuiz()) {}

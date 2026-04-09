@@ -4,10 +4,11 @@ import { customPasswordValidator } from '../shared/validators/password.validator
 import { confirmPasswordValidator } from '../shared/validators/confirmPassword.validator';
 import { AuthService } from '../auth.service';
 import { UserRole } from '../../../shared/enums/userRole';
-import { catchError, take } from 'rxjs';
+import { catchError, take, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GroupsService } from '../../groups/groups.service';
 import { IGroup } from '../../../shared/models/group';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -15,6 +16,7 @@ import { IGroup } from '../../../shared/models/group';
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnInit {
+  private router = inject(Router);
   ngOnInit(): void {
     this.initSubscriptions();
   }
@@ -49,13 +51,18 @@ export class RegisterComponent implements OnInit {
       displayName: ['', Validators.required],
       groupId: [-1, Validators.required],
     },
-    { validators: [confirmPasswordValidator] }
+    { validators: [confirmPasswordValidator] },
   );
 
   public submit(): void {
     this.authService
       .register(this.registerForm.getRawValue())
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap((response) => {
+          this.router.navigate(['']);
+        }),
+      )
       .subscribe();
   }
 

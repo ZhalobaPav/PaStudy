@@ -1,18 +1,22 @@
-<div class="loginForm" [formGroup]="loginForm">
-  <h1>Login</h1>
-  <div class="input-form">
-    <input placeholder="Email...." type="email" formControlName="email" />
+<div class="login-container">
+  <div class="login-image"></div>
+  <div class="loginForm" [formGroup]="loginForm">
+    <h1>Login</h1>
+    <p>Ready to start your study with us?</p>
+    <div class="input-form">
+      <input placeholder="Email...." type="email" formControlName="email" />
 
-    <input
-      placeholder="password...."
-      type="password"
-      formControlName="password"
-    />
-  </div>
+      <input
+        placeholder="password...."
+        type="password"
+        formControlName="password"
+      />
+    </div>
 
-  <div class="action-buttons">
-    <button class="login" (click)="login()">Sign in</button>
-
-    <a href="/register">Register</a>
+    <div class="action-buttons">
+      <button class="login" (click)="login()">Sign in</button>
+      <a href="/register">Register</a>
+    </div>
+    <div class="separator">or</div>
   </div>
 </div>

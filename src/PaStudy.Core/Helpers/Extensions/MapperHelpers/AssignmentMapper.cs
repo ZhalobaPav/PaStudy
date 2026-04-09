@@ -20,6 +20,7 @@ public static class AssignmentMapper
             Title = assignment.Title,
             Description = assignment.Description ?? string.Empty,
             DueDate = assignment.DueDate ?? DateTime.MinValue,
+            StartDate = assignment.StartDate,
             Attachments = assignment.Attachments?.Select(att => att.ToAttachmentDto()).ToImmutableArray()
               ?? ImmutableArray<AttachmentDto>.Empty,
             MaxPoints = assignment.MaxPoints,

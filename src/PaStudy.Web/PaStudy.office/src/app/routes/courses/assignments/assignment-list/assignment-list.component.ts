@@ -7,6 +7,7 @@ import { take, tap } from 'rxjs';
 import { Section } from '../models/section';
 import { ModalService } from '../../../../shared/components/modals/modal.service';
 import { CreateSectionModalComponent } from '../../../../shared/components/modals/create-section-modal/create-section-modal.component';
+import { CreateQuizBuilderComponent } from '../../../../shared/components/modals/create-quiz-builder/create-quiz-builder.component';
 
 @Component({
   selector: 'app-assignment-list',
@@ -44,10 +45,10 @@ export class AssignmentListComponent implements OnInit {
     this.modalService
       .open(CreateSectionModalComponent, { courseId: this.course()?.id })
       .closed.subscribe((newSection) => {
-        if (!newSection) {
+        if (!newSection?.data) {
           return;
         }
-        this.sections.update((list) => [...list, newSection]);
+        this.sections.update((list) => [...list, newSection.data]);
       });
   }
 }

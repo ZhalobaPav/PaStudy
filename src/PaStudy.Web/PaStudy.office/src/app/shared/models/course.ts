@@ -6,4 +6,6 @@ export interface ICourse {
   categoryName?: string;
   description?: string;
   teachers?: ITeacher[];
+  isEnrolled?: boolean;
+  isTeaching?: boolean;
 }

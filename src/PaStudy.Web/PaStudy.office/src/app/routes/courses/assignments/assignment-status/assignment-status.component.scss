@@ -1,0 +1,35 @@
+.status-table-container {
+  margin: 1.5rem 0;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  overflow: hidden;
+  .status-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    font-size: 14px;
+
+    tr {
+      border-bottom: 1px solid #dee2e6;
+      &:last-child {
+        border-bottom: none;
+      }
+      &:nth-child(odd) {
+        background-color: #f8f9fa;
+      }
+    }
+
+    th {
+      width: 30%;
+      text-align: left;
+      padding: 12px 15px;
+      font-weight: 700;
+      color: #212529;
+      border-right: 1px solid #dee2e6;
+    }
+    td {
+      padding: 12px 15px;
+      color: #495057;
+    }
+  }
+}

@@ -1,31 +1,34 @@
 <div class="table-wrapper">
   <div class="headers" [style.grid-template-columns]="gridTemplateColumns()">
     @for (header of headers; track $index) {
-    <div class="header">
-      <div class="header-label">
-        {{ header.label }}
+      <div class="header">
+        <div class="header-label">
+          {{ header.label }}
+        </div>
+        <pa-filter-rerender
+          [header]="header"
+          [filterState$]="filterState$"
+          [resetState$]="resetState$"
+        >
+        </pa-filter-rerender>
       </div>
-      <pa-filter-rerender
-        [header]="header"
-        [filterState$]="filterState$"
-        [resetState$]="resetState$"
-      >
-      </pa-filter-rerender>
-    </div>
     }
   </div>
   <div class="table-controls"></div>
   <div class="rows">
-    @if(rowLines.length > 0){
-    <app-scroll-view>
-      @for (row of rowLines; track $index) {
-      <div class="row">
-        <ng-container
-          *ngTemplateOutlet="rowTemplate; context: { row: row }"
-        ></ng-container>
-      </div>
-      }
-    </app-scroll-view>
+    @if (rowLines.length > 0) {
+      <app-scroll-view>
+        @for (row of rowLines; track $index) {
+          <div
+            class="row"
+            [style.grid-template-columns]="gridTemplateColumns()"
+          >
+            <ng-container
+              *ngTemplateOutlet="rowTemplate; context: { row: row }"
+            ></ng-container>
+          </div>
+        }
+      </app-scroll-view>
     }
   </div>
 </div>

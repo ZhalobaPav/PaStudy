@@ -4,6 +4,7 @@ import {
   DestroyRef,
   EventEmitter,
   inject,
+  input,
   Input,
   OnInit,
   Output,
@@ -11,18 +12,27 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { FetchOptions, Header, TableConfig } from './models/table.models';
-import { BehaviorSubject, debounceTime, skip, Subject } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  filter,
+  map,
+  pairwise,
+  Subject,
+} from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { safeDetectChanges } from '../../functions/common.functions';
+import { isEqual } from 'lodash-es';
 
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
 })
-export class TableComponent<TFilter extends object, TRow = unknown>
-  implements OnInit
-{
+export class TableComponent<
+  TFilter extends object,
+  TRow = unknown,
+> implements OnInit {
   ngOnInit(): void {
     this.fetch$
       .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
@@ -40,6 +50,16 @@ export class TableComponent<TFilter extends object, TRow = unknown>
         this.fetch.emit(fetchOptions);
       });
     this.emitFetch();
+    this.filterState$
+      .pipe(
+        map((state) => (!Object.keys(state || {}).length ? null : state)),
+        debounceTime(0),
+        pairwise(),
+        filter(([prev, curr]) => !isEqual(prev, curr)),
+      )
+      .subscribe(([prev, currentState]) => {
+        this.emitFetch();
+      });
     this.gridTemplateColumns.set(this.templateColumn());
   }
 
@@ -51,6 +71,7 @@ export class TableComponent<TFilter extends object, TRow = unknown>
   set config(value: TableConfig) {
     this.headers = value.headers;
   }
+  public constantColumnNumber = input<number | null>(null);
   @Input()
   set rows(value: any) {
     if (!this.pageNumber) {

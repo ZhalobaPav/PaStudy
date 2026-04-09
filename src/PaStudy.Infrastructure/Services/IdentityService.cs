@@ -122,7 +122,7 @@ public class IdentityService
         {
             return new AuthResultDto { Succeeded = false, Errors = new[] { "Невірний пароль" } };
         }
-        var token = GenerateToken(user);
+        var token = await GenerateToken(user);
         return new AuthResultDto
         {
             Succeeded = true,
@@ -130,12 +130,12 @@ public class IdentityService
         };
     }
 
-    public string GenerateToken(ApplicationUser user)
+    public async Task<string> GenerateToken(ApplicationUser user)
     {
         var jwtOptions = _configuration.GetSection("Jwt");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions["SecretKey"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+        var roles = await _userManager.GetRolesAsync(user);
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
@@ -143,7 +143,10 @@ public class IdentityService
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim("userName", user.UserName!)
         };
-
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
         var token = new JwtSecurityToken(
             issuer: jwtOptions["Issuer"],
             audience: jwtOptions["Audience"],

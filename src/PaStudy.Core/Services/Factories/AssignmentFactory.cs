@@ -21,23 +21,24 @@ public class AssignmentFactory : IAssignmentElementFactory
         return createAssignmentDto.AssignmentType switch
         {
             AssignmentType.Task => CreateTaskAssignment(createAssignmentDto),
-            AssignmentType.Quiz => CreateQuizAssignment((CreateQuizDto)createAssignmentDto),
+            AssignmentType.Quiz => CreateQuizAssignment(createAssignmentDto),
             _ => throw new ArgumentException("Invalid assignment type")
         };
     }
 
-    private QuizAssignment CreateQuizAssignment(CreateQuizDto quizDto)
+    private QuizAssignment CreateQuizAssignment(CreateAssignmentDto quizDto)
     {
         return new QuizAssignment
         {
             Title = quizDto.Title,
             Description = quizDto.Description,
-            ShuffleQuestions = quizDto.ShuffleQuestions,
+            ShuffleQuestions = quizDto.QuizInfo.ShuffleQuestions,
             MaxPoints = quizDto.MaxPoints,
-            TimeLimitMinutes = quizDto.TimeLimitMinutes,
-            Questions = quizDto.Questions.Select(question => _questionFactory.CreateQuestion(question)).ToList(),
+            TimeLimitMinutes = quizDto.QuizInfo.TimeLimitMinutes,
+            Questions = quizDto.QuizInfo.Questions.Select(question => _questionFactory.CreateQuestion(question)).ToList(),
             AssignmentType = AssignmentType.Quiz,
             DueDate = quizDto.DueDate,
+            StartDate = quizDto.StartDate,
             SectionId = quizDto.SectionId,
             Attachments = quizDto.Attachments.Select((att) => _attachmentFactory.CreateAttachment(att)).ToList(),
         };
@@ -51,6 +52,7 @@ public class AssignmentFactory : IAssignmentElementFactory
             Description = taskDto.Description,
             Attachments = taskDto.Attachments.Select((att) => _attachmentFactory.CreateAttachment(att)).ToList(),
             DueDate = taskDto.DueDate,
+            StartDate = taskDto.StartDate,
             MaxPoints = taskDto.MaxPoints,
             SectionId = taskDto.SectionId,
             AssignmentType = taskDto.AssignmentType

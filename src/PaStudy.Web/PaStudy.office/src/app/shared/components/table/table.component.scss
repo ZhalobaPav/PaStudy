@@ -7,7 +7,7 @@
 
 .headers {
   display: grid;
-  gap: 10px;
+  gap: 40px;
 }
 
 .rows {
@@ -23,9 +23,9 @@
   border: 1px solid #dbdfe8;
   min-height: 35px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  //grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   align-items: center;
-  gap: 10px;
+  gap: 30px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   padding-left: 14px;

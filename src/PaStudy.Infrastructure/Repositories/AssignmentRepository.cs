@@ -7,13 +7,16 @@ using PaStudy.Core.Entities.ConnectionEntities;
 using PaStudy.Core.Helpers.DTOs.Assignment;
 using PaStudy.Core.Helpers.DTOs.Attachment;
 using PaStudy.Core.Helpers.DTOs.Section;
+using PaStudy.Core.Helpers.Enums;
 using PaStudy.Core.Helpers.Exceptions;
+using PaStudy.Core.Helpers.Exceptions.AssignmentExceptions;
 using PaStudy.Core.Helpers.Extensions.MapperHelpers;
 using PaStudy.Core.Interfaces.Factories;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
 using System.Collections.Immutable;
+using System.Security.Claims;
 
 namespace PaStudy.Infrastructure.Repositories;
 
@@ -21,11 +24,13 @@ public class AssignmentRepository: IAssignmentRepository
 {
     private readonly PaStudyDbContext _dbContext;
     private readonly IAttachmentFactory _attachmentFactory;
+    private readonly IStudentRepository _studentRepository;
 
-    public AssignmentRepository(PaStudyDbContext dbContext, IAttachmentFactory attachmentFactory)
+    public AssignmentRepository(PaStudyDbContext dbContext, IAttachmentFactory attachmentFactory, IStudentRepository studentRepository)
     {
         _dbContext = dbContext;
         _attachmentFactory = attachmentFactory;
+        _studentRepository = studentRepository;
     }
     public async Task<Assignment> CreateAsync(Assignment assignment, CancellationToken ct = default)
     {
@@ -46,10 +51,26 @@ public class AssignmentRepository: IAssignmentRepository
         await _dbContext.SaveChangesAsync(ct);
         return section;
     }
-    public async Task<ImmutableArray<SectionDto>> GetSectionsAsync(int courseId, CancellationToken cancellationToken)
+    public async Task<ImmutableArray<SectionDto>> GetSectionsAsync(int courseId, CancellationToken cancellationToken, ClaimsPrincipal user)
     {
-        var sectionsList = await _dbContext.Set<Section>()
-            .Where(s => s.CourseId == courseId)
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId)) throw new UnauthorizedAccessException();
+
+        var accessQuery = _dbContext.Set<Course>()
+            .AsNoTracking()
+            .Where(c => c.Id == courseId);
+
+        if (user.IsInRole("Teacher"))
+        {
+            accessQuery = accessQuery.Where(c => c.TeacherCourses.Any(tc => tc.Teacher.UserId == userId));
+        }
+        else
+        {
+            accessQuery = accessQuery.Where(c => c.Enrollments.Any(e => e.Student.UserId == userId));
+        }
+
+        var sectionsData = await accessQuery
+            .SelectMany(c => c.Sections)
             .OrderBy(s => s.Order)
             .Select(s => new SectionDto
             {
@@ -64,6 +85,7 @@ public class AssignmentRepository: IAssignmentRepository
                     Title = a.Title,
                     Description = a.Description ?? string.Empty,
                     DueDate = a.DueDate ?? DateTime.MinValue,
+                    StartDate = a.StartDate,
                     MaxPoints = a.MaxPoints,
                     AssignmentType = a.AssignmentType,
                     Attachments = a.Attachments.Select(att => new AttachmentDto
@@ -72,17 +94,33 @@ public class AssignmentRepository: IAssignmentRepository
                         FileUrl = att.FileUrl,
                         ContentType = att.ContentType,
                         ImageInfo = (att.ContentType == "image/jpeg" || att.ContentType == "image/png" || att.ContentType == "image/gif")
-                            ? new ImageAttachmentInfo(
-                                ((ImageAttachment)att).Width,
-                                ((ImageAttachment)att).Height
-                              )
-                            : null
-                    }).ToImmutableArray()
+                        ? new ImageAttachmentInfo(
+                            ((ImageAttachment)att).Width,
+                            ((ImageAttachment)att).Height
+                        )
+                        : null
+                    }).ToImmutableArray(),
+                    QuizInfo = a.AssignmentType == AssignmentType.Quiz
+                        ? new QuizInfoBrief(
+                           ((QuizAssignment)a).ShuffleQuestions,
+                           ((QuizAssignment)a).TimeLimitMinutes,
+                           ((QuizAssignment)a).Questions.Count
+                        )
+                : null
                 }).ToImmutableArray()
             })
             .ToListAsync(cancellationToken);
 
-        return sectionsList.ToImmutableArray();
+        if (sectionsData.Count == 0)
+        {
+            bool hasAccess = await accessQuery.AnyAsync(cancellationToken);
+            if (!hasAccess)
+            {
+                throw new NotEnrolledException("You do not have access to this course or it doesn't exist.");
+            }
+        }
+
+        return sectionsData.ToImmutableArray();
     }
     public async Task<ImmutableArray<AssignmentDto>> GetAssignmentsAsync(int courseId, CancellationToken cancellationToken)
     {
@@ -123,12 +161,43 @@ public class AssignmentRepository: IAssignmentRepository
 
     public async Task<AssignmentDto> GetAssignmentByIdAsync(int assignmentId, CancellationToken cancellationToken)
     {
-        var assignment = await _dbContext.Set<Assignment>()
+        var dto = await _dbContext.Set<Assignment>()
+            .AsNoTracking()
             .Where(a => a.Id == assignmentId)
+            .Select(a => new AssignmentDto
+            {
+                Id = a.Id,
+                Title = a.Title,
+                Description = a.Description ?? string.Empty,
+                DueDate = a.DueDate ?? DateTime.MinValue,
+                StartDate = a.StartDate,
+                MaxPoints = a.MaxPoints,
+                AssignmentType = a.AssignmentType,
+
+                Attachments = a.Attachments.Select(att => new AttachmentDto
+                {
+                    FileName = att.FileName,
+                    FileUrl = att.FileUrl,
+                    ContentType = att.ContentType,
+                    ImageInfo = (att.ContentType == "image/jpeg" || att.ContentType == "image/png" || att.ContentType == "image/gif")
+                            ? new ImageAttachmentInfo(
+                                ((ImageAttachment)att).Width,
+                                ((ImageAttachment)att).Height) : null
+                }).ToImmutableArray(),
+
+                QuizInfo = a.AssignmentType == AssignmentType.Quiz
+                    ? new QuizInfoBrief(
+                       ((QuizAssignment)a).ShuffleQuestions,
+                       ((QuizAssignment)a).TimeLimitMinutes,
+                       ((QuizAssignment)a).Questions.Count
+                     )
+                    : null
+            })
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (assignment == null)
+        if (dto == null)
             throw new NotFoundException("Assignment not found");
-        return assignment.ToAssignmentDto();
+
+        return dto;
     }
 }

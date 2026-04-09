@@ -17,6 +17,7 @@ import {
   PendingImage,
   UploadAttachment,
 } from '../../../../routes/courses/assignments/models/attachment';
+import { QuizQuestionComponent } from '../../../../routes/courses/assignments/quiz-question/quiz-question.component';
 interface AssignmentForm {
   title: FormControl<string>;
   description: FormControl<string | null>;
@@ -41,7 +42,12 @@ interface AttachmentFormGroup {
 @Component({
   selector: 'app-create-assignment-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, TextEditorComponent, ScrollViewComponent],
+  imports: [
+    ReactiveFormsModule,
+    TextEditorComponent,
+    ScrollViewComponent,
+    QuizQuestionComponent,
+  ],
   templateUrl: './create-assignment-modal.component.html',
   styleUrl: './create-assignment-modal.component.scss',
 })
@@ -73,6 +79,10 @@ export class CreateAssignmentModalComponent
         Validators.required,
       ]),
     });
+  }
+
+  get questions(): FormArray {
+    return this.assignmentForm.get('questions') as FormArray;
   }
 
   public onSubmit(): void {

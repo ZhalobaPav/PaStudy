@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PaStudy.Core.Entities;
+using PaStudy.Core.Entities.Assignments.Submission;
 
 namespace PaStudy.Infrastructure.Data.Configurations;
 
@@ -10,11 +10,9 @@ public class SubmissionConfiguration : IEntityTypeConfiguration<Submission>
     {
         builder.HasKey(s => s.Id);
 
-        builder.Property(s => s.Content)
-            .HasMaxLength(4000);
-
-        builder.Property(s => s.FileUrl)
-            .HasMaxLength(500);
+        builder.HasDiscriminator<string>("SubmissionType")
+            .HasValue<TaskSubmission>("Task")
+            .HasValue<QuizSubmission>("Quiz");
 
         builder.Property(s => s.TeacherFeedback)
             .HasMaxLength(1000);

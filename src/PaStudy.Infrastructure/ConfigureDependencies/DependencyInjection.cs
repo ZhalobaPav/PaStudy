@@ -19,6 +19,9 @@ public static class DependencyInjection
         services.AddScoped<ITeacherRepository, TeacherRepository>();
         services.AddScoped<IGroupRepository, GroupRepository>();
         services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+        services.AddScoped<IQuestionRepository, QuestionRepository>();
+        services.AddScoped<ISubmissionRepository, SubmissionRepository>();
+        services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
         //Services
         services.AddScoped<IUserService, UserService>();
@@ -27,12 +30,16 @@ public static class DependencyInjection
         services.AddScoped<IAssignmentService, AssignmentService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
+        services.AddScoped<IScoringService, ScoringService>();
+        services.AddScoped<IQuizSubmissionService, QuizSubmissionService>();
+        services.AddScoped<ISubmissionService, SubmissionService>();
 
         //Factories
         services.AddScoped<IAttachmentFactory, AttachmentFactory>();
         services.AddScoped<IAssignmentElementFactory, AssignmentFactory>();
         services.AddScoped<IQuestionFactory, QuestionFactory>();
         services.AddScoped<IUploadFactory, UploadFactory>();
+        services.AddScoped<IQuestionAnswerFactory, QuestionAnswerFactory>();
         return services;
     }
 }

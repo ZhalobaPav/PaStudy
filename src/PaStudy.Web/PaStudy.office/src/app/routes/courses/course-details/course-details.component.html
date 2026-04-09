@@ -1,21 +1,25 @@
 <div class="container">
   <div class="header-navigation">
     <ul class="header-navigation">
-      @for (header of headerConfig; track $index) {
-        <li
-          class="header-elem"
-          [class.active]="activeTab() === header.title"
-          (click)="setTab(header.title)"
-        >
-          <a>
-            {{ header.title }}
-          </a>
-        </li>
+      @if (course()?.isEnrolled || course()?.isTeaching) {
+        @for (header of headerConfig; track $index) {
+          <li
+            class="header-elem"
+            [class.active]="activeTab() === header.title"
+            (click)="setTab(header.title)"
+          >
+            <a>
+              {{ header.title }}
+            </a>
+          </li>
+        }
       }
-      <div class="edit-checkbox">
-        <span class="edit-title">Edit mode</span>
-        <input type="checkbox" [(ngModel)]="isEditMode" />
-      </div>
+      @if (isTeacher) {
+        <div class="edit-checkbox">
+          <span class="edit-title">Edit mode</span>
+          <input type="checkbox" [(ngModel)]="isEditMode" />
+        </div>
+      }
     </ul>
   </div>
   @switch (activeTab()) {
@@ -28,6 +32,11 @@
         [isEditMode]="isEditMode"
       ></app-course-info>
     }
+  }
+  @if (isEnrollAvailable()) {
+    <button class="submit-btn" (click)="enrollToCourse()">
+      Записатися на курс
+    </button>
   }
   <router-outlet></router-outlet>
 </div>

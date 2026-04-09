@@ -1,2 +1,27 @@
-<h1 class="assignment-title">{{ assignment()?.title }}</h1>
-<div class="rich-text-content" [innerHTML]="assignment()?.description"></div>
+@if (assignment(); as data) {
+  <div class="assignment-box">
+    <h1 class="assignment-title">{{ data.title }}</h1>
+    @if (data.dueDate) {
+      @if (isOverdue()) {
+        <span
+          >Завдання прострочене. Мало бути виконане до
+          {{ data.dueDate | date }}</span
+        >
+      } @else {
+        <span>Завдання має бути виконане до {{ data.dueDate | date }}</span>
+      }
+    }
+    @if (isQuiz()) {
+      <p>
+        Обмеження в часі: {{ assignment()?.quizInfo?.timeLimitMinutes }} хвилин
+      </p>
+      <p>Кількість питань: {{ assignment()?.quizInfo?.questionQuantity }}</p>
+    }
+    <div class="rich-text-content" [innerHTML]="data.description"></div>
+    @if (hasNote()) {
+      <div class="status-wrapper">
+        <app-assignment-status [assignment]="data"></app-assignment-status>
+      </div>
+    }
+  </div>
+}

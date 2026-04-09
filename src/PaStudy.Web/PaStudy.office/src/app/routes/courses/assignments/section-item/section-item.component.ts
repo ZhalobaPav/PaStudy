@@ -2,6 +2,7 @@ import { Component, inject, input } from '@angular/core';
 import { Section } from '../models/section';
 import { CreateAssignmentModalComponent } from '../../../../shared/components/modals/create-assignment-modal/create-assignment-modal.component';
 import { ModalService } from '../../../../shared/components/modals/modal.service';
+import { CreateQuizBuilderComponent } from '../../../../shared/components/modals/create-quiz-builder/create-quiz-builder.component';
 
 @Component({
   selector: 'app-section-item',
@@ -21,5 +22,11 @@ export class SectionItemComponent {
       .closed.subscribe((res) => {
         console.log(res);
       });
+  }
+
+  openQuizModal() {
+    this.modalService
+      .open(CreateQuizBuilderComponent, { sectionId: this.section().id })
+      .closed.subscribe(() => {});
   }
 }

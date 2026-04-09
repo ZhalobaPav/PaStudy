@@ -1,0 +1,49 @@
+@use "variables" as vars;
+@use "sass:map";
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  .split-button-container {
+    display: inline-flex;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+    .main-button,
+    .arrow-button {
+      background-color: map.get(vars.$bg-colors, "create-quiz-button-color");
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        filter: brightness(1.1);
+      }
+    }
+    .main-button {
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+      flex-grow: 1;
+      font-weight: 500;
+    }
+
+    .arrow-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 8px;
+    }
+
+    .arrow-down {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid white;
+    }
+  }
+}
+.scrollable {
+  overflow-y: auto;
+}
