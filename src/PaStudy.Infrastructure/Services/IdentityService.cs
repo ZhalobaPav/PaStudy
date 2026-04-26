@@ -75,6 +75,10 @@ public class IdentityService
         {
             if (userDto.Role.Equals(UserRole.Student))
             {
+                if (userDto.GroupId is null)
+                {
+                    throw new Exception("GroupId is required for students.");
+                }
                 var student = new Student()
                 {
                     FirstName = userDto.FirstName,
@@ -82,7 +86,7 @@ public class IdentityService
                     MiddleName = userDto.MiddleName,
                     UserId = user.Id,
                     DateOfBirth = userDto.DateOfBirth,
-                    GroupId = userDto.GroupId
+                    GroupId = userDto.GroupId.Value
                 };
                 await _studentRepository.CreateStudentAsync(student);
             }
@@ -101,8 +105,10 @@ public class IdentityService
         }
         catch (Exception ex)
         {
-            await _userManager.DeleteAsync(user);
             await transaction.RollbackAsync();
+
+            _dbContext.ChangeTracker.Clear();
+            await _userManager.DeleteAsync(user);
 
             return IdentityResult.Failed(new IdentityError { Description = $"An error occurred while creating the profile: {ex.Message}" });
         }

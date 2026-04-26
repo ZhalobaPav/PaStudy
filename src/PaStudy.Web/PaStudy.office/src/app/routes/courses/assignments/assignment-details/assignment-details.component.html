@@ -1,27 +1,71 @@
 @if (assignment(); as data) {
-  <div class="assignment-box">
-    <h1 class="assignment-title">{{ data.title }}</h1>
-    @if (data.dueDate) {
-      @if (isOverdue()) {
-        <span
-          >Завдання прострочене. Мало бути виконане до
-          {{ data.dueDate | date }}</span
-        >
-      } @else {
-        <span>Завдання має бути виконане до {{ data.dueDate | date }}</span>
+  @if (isTeacher()) {
+    <div class="tabs-navigation">
+      <button
+        [class.active]="activeTab() === 'content'"
+        (click)="setTab('content')"
+      >
+        Інструкція
+      </button>
+      <button
+        [class.active]="activeTab() === 'grading'"
+        (click)="setTab('grading')"
+      >
+        Оцінювання
+      </button>
+    </div>
+  }
+  @if (activeTab() === "content") {
+    <div class="assignment-box">
+      <h1 class="assignment-title">{{ data.title }}</h1>
+      @if (data.dueDate) {
+        @if (isOverdue()) {
+          <span
+            >Завдання прострочене. Мало бути виконане до
+            {{ data.dueDate | date }}</span
+          >
+        } @else {
+          <span>Завдання має бути виконане до {{ data.dueDate | date }}</span>
+        }
       }
-    }
-    @if (isQuiz()) {
-      <p>
-        Обмеження в часі: {{ assignment()?.quizInfo?.timeLimitMinutes }} хвилин
-      </p>
-      <p>Кількість питань: {{ assignment()?.quizInfo?.questionQuantity }}</p>
-    }
-    <div class="rich-text-content" [innerHTML]="data.description"></div>
-    @if (hasNote()) {
-      <div class="status-wrapper">
-        <app-assignment-status [assignment]="data"></app-assignment-status>
-      </div>
-    }
-  </div>
+      @if (isQuiz()) {
+        <p>
+          Обмеження в часі:
+          {{ assignment()?.quizInfo?.timeLimitMinutes }} хвилин
+        </p>
+        <p>Кількість питань: {{ assignment()?.quizInfo?.questionQuantity }}</p>
+      }
+      <div class="rich-text-content" [innerHTML]="data.description"></div>
+      @if (isStudent()) {
+        @if (!this.isAssignmentSubmitMode() && !isSubmitBlocked()) {
+          <button class="submit-btn" (click)="openAssignmentSubmit()">
+            Здати роботу
+          </button>
+        }
+        @if (this.isAssignmentSubmitMode()) {
+          @switch (this.assignment()?.assignmentType) {
+            @case (AssignmentType.Task) {
+              <app-task-submission
+                (onCancelSubmission)="cancel()"
+                [assignmentId]="assignment()!.id"
+                (onSubmited)="fetchAssignment()"
+              ></app-task-submission>
+            }
+            @case (AssignmentType.Quiz) {
+              quiz
+            }
+          }
+        }
+      }
+      @if (hasNote()) {
+        <div class="status-wrapper">
+          <app-assignment-status [assignment]="data"></app-assignment-status>
+        </div>
+      }
+    </div>
+  } @else if (activeTab() === "grading" && isTeacher()) {
+    <app-teacher-submission
+      [assignmentId]="assignment()!.id"
+    ></app-teacher-submission>
+  }
 }

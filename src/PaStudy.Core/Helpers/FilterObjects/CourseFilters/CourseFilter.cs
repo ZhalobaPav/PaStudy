@@ -1,6 +1,6 @@
 ﻿namespace PaStudy.Core.Helpers.FilterObjects.CourseFilters;
 
-public class CourseFilter: BaseFilterRequest
+public record CourseFilter: BaseFilterRequest
 {
     public CourseQuantity CourseQuantity { get; set; } = CourseQuantity.All;
 }

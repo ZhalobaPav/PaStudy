@@ -1,6 +1,6 @@
 ﻿namespace PaStudy.Core.Helpers.FilterObjects;
 
-public class BaseFilterRequest
+public record BaseFilterRequest
 {
     public int? PageNumber { get; set; } = 1;
     public int? PageSize { get; set; } = 10;

@@ -104,11 +104,9 @@ export class CreateAssignmentModalComponent
           this.pendingImages.forEach((pending, index) => {
             const remoteFile = uploadedAttachments[index];
             if (remoteFile) {
-              const imgHtml = `<img src="${remoteFile.fileUrl}" alt="${remoteFile.fileName}">`;
-              finalDescription = finalDescription.replace(
-                `[[${pending.tempUrl}]]`,
-                imgHtml,
-              );
+              finalDescription = finalDescription
+                .split(pending.tempUrl)
+                .join(remoteFile.fileUrl);
             }
           });
           const createAssignmentDto = {
@@ -120,6 +118,8 @@ export class CreateAssignmentModalComponent
           return this.assignmentService.createAssignment(createAssignmentDto);
         }),
         finalize(() => {
+          this.pendingImages.forEach((img) => URL.revokeObjectURL(img.tempUrl));
+          this.pendingImages = [];
           this.isLoading.set(false);
         }),
       )

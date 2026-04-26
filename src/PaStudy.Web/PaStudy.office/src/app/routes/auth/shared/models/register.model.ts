@@ -10,6 +10,6 @@ export interface RegisterModel {
   role: UserRole;
   phoneNumber: string;
   displayName: string;
-  groupId: number;
+  groupId: number | null;
   dateOfBirth: Date;
 }

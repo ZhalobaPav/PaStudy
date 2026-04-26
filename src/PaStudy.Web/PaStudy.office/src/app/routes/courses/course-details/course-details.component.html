@@ -26,6 +26,9 @@
     @case (tab.Students) {
       <app-course-students></app-course-students>
     }
+    @case (tab.Notes) {
+      <app-course-notes></app-course-notes>
+    }
     @default {
       <app-course-info
         [course]="course()"

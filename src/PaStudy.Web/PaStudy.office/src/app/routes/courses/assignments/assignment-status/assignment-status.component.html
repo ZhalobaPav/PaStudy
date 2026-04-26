@@ -5,10 +5,33 @@
         <th scope="row">Максимальний бал</th>
         <td>{{ assignment().maxPoints }}</td>
       </tr>
-      <tr>
-        <th scope="row">Термін виконання</th>
-        <td>{{ assignment().dueDate | date: "EEEE, d MMMM yyyy, HH:mm" }}</td>
-      </tr>
+      @if (assignment().dueDate) {
+        <tr>
+          <th scope="row">Термін виконання</th>
+          <td>{{ assignment().dueDate | date: "EEEE, d MMMM yyyy, HH:mm" }}</td>
+        </tr>
+        <tr [class.overdue-row]="timeLeft().isOverdue">
+          <th scope="row">Залишилося часу</th>
+          <td>{{ timeLeft().text }}</td>
+        </tr>
+      }
+
+      @if (isSubmited()) {
+        <tr class="student-note">
+          <th scope="row">Здано</th>
+          <td>
+            <span class="show-full-span" (click)="expand()">{{
+              isExpand() ? "Згорнути" : "Показати повністю"
+            }}</span>
+            <div
+              #noteContainer
+              class="student-note-wrapper"
+              [style.maxHeight]="isExpand() ? 'none' : '6rem'"
+              [innerHTML]="submissionInfo()?.studentNote"
+            ></div>
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>

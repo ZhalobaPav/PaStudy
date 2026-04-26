@@ -24,7 +24,22 @@ export class AssignmentListComponent implements OnInit {
   ngOnInit(): void {
     this.fetchSections(this.course()?.id);
   }
-
+  onAssignmentCreated(event: {
+    assignment: Assignment;
+    sectionId: number | undefined;
+  }) {
+    this.sections.update((currentSections) =>
+      currentSections.map((section) => {
+        if (section.id === event.sectionId) {
+          return {
+            ...section,
+            assignments: [...(section.assignments || []), event.assignment],
+          };
+        }
+        return section;
+      }),
+    );
+  }
   fetchSections(courseId: number | undefined) {
     if (!courseId) {
       console.error('course is not find');

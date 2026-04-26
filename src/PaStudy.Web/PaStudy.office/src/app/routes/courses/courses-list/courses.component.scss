@@ -1,0 +1,7 @@
+.teacher-list {
+  display: flex;
+  gap: 5px;
+  .teacher-name:not(:last-child)::after {
+    content: ",";
+  }
+}

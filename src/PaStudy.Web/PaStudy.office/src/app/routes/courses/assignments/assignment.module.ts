@@ -9,6 +9,8 @@ import { SectionItemComponent } from './section-item/section-item.component';
 import { AssignmentDetailsComponent } from './assignment-details/assignment-details.component';
 import { DatePipe } from '@angular/common';
 import { AssignmentStatusComponent } from './assignment-status/assignment-status.component';
+import { TaskSubmissionComponent } from './submissions/task-submission/task-submission.component';
+import { TeacherSubmissionComponent } from './submissions/teacher-submission/teacher-submission.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +26,8 @@ import { AssignmentStatusComponent } from './assignment-status/assignment-status
     PaInputComponent,
     DatePipe,
     AssignmentStatusComponent,
+    TaskSubmissionComponent,
+    TeacherSubmissionComponent,
   ],
   exports: [AssignmentListComponent],
 })

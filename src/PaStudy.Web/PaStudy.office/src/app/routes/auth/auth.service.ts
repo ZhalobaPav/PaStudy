@@ -7,6 +7,7 @@ import { LoginModel, LoginResponse } from './shared/models/login.model';
 import { CLAIM_TYPES, TOKEN_KEY } from '../../shared/contsants/base.constants';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UserRoleString } from '../../shared/enums/userRole';
+import { StorageService } from '../../shared/services/storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,6 @@ import { UserRoleString } from '../../shared/enums/userRole';
 export class AuthService {
   private httpAuth = inject(HttpAuth);
   private router = inject(Router);
-
   private userRoleSubject = new BehaviorSubject<UserRoleString | null>(null);
   userRole$: Observable<string | null> = this.userRoleSubject.asObservable();
 
@@ -34,7 +34,11 @@ export class AuthService {
     return this.httpAuth.post<LoginResponse>(`auth/login`, loginModel);
   }
 
-  private loadUserFromToken() {
+  public logout() {
+    StorageService.removeItem(TOKEN_KEY);
+  }
+
+  public loadUserFromToken() {
     const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
       try {

@@ -33,3 +33,17 @@ public class SubmissionConfiguration : IEntityTypeConfiguration<Submission>
         builder.HasIndex(s => new { s.AssignmentId, s.StudentId }).IsUnique();
     }
 }
+
+public class TaskSubmissionConfiguration : IEntityTypeConfiguration<TaskSubmission>
+{
+    public void Configure(EntityTypeBuilder<TaskSubmission> builder)
+    {
+        builder.Property(t => t.StudentNotes)
+            .HasMaxLength(10000);
+
+        builder.HasMany(t => t.Attachments)
+            .WithOne()
+            .HasForeignKey("TaskSubmissionId")
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+}

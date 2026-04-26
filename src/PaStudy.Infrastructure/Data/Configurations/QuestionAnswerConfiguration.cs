@@ -42,15 +42,3 @@ public class MatchingAnswerPairConfiguration : IEntityTypeConfiguration<Matching
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
-
-public class TaskSubmissionConfiguration : IEntityTypeConfiguration<TaskSubmission>
-{
-    public void Configure(EntityTypeBuilder<TaskSubmission> builder)
-    {
-        builder.Property(ts => ts.StudentNotes).HasMaxLength(2000);
-
-        builder.HasMany(ts => ts.Attachments)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade);
-    }
-}

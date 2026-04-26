@@ -91,10 +91,11 @@
     <div class="form-field">
       <label>Група</label>
       <select class="register-control" formControlName="groupId">
+        <option [value]="null">Не є куратором</option>
         @for (group of groups; track group.id) {
-        <option [value]="group.id">
-          {{ group.groupNumber }}
-        </option>
+          <option [value]="group.id">
+            {{ group.groupNumber }}
+          </option>
         }
       </select>
     </div>

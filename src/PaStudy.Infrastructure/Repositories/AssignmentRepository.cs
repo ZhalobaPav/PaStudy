@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PaStudy.Core.Entities;
 using PaStudy.Core.Entities.Assignments;
+using PaStudy.Core.Entities.Assignments.Submission;
 using PaStudy.Core.Entities.Attachments;
 using PaStudy.Core.Entities.ConnectionEntities;
 using PaStudy.Core.Helpers.DTOs.Assignment;
@@ -11,11 +12,13 @@ using PaStudy.Core.Helpers.Enums;
 using PaStudy.Core.Helpers.Exceptions;
 using PaStudy.Core.Helpers.Exceptions.AssignmentExceptions;
 using PaStudy.Core.Helpers.Extensions.MapperHelpers;
+using PaStudy.Core.Helpers.StaticData;
 using PaStudy.Core.Interfaces.Factories;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Security.Claims;
 
 namespace PaStudy.Infrastructure.Repositories;
@@ -159,8 +162,9 @@ public class AssignmentRepository: IAssignmentRepository
         return $"/uploads/attachments/{fileName}";
     }
 
-    public async Task<AssignmentDto> GetAssignmentByIdAsync(int assignmentId, CancellationToken cancellationToken)
+    public async Task<AssignmentDto> GetAssignmentByIdAsync(int assignmentId, CancellationToken cancellationToken, ClaimsPrincipal user)
     {
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         var dto = await _dbContext.Set<Assignment>()
             .AsNoTracking()
             .Where(a => a.Id == assignmentId)
@@ -190,8 +194,30 @@ public class AssignmentRepository: IAssignmentRepository
                        ((QuizAssignment)a).ShuffleQuestions,
                        ((QuizAssignment)a).TimeLimitMinutes,
                        ((QuizAssignment)a).Questions.Count
-                     )
-                    : null
+                    )
+                    : null,
+                SubmissionInfo = a.Submissions
+                    .Where(s => s.Student.UserId == userId)
+                    .Select(s => new SubmissionInfo(
+                        s.Status != SubmissionStatus.Draft && s.Status != SubmissionStatus.Rejected,
+                        a.AssignmentType == AssignmentType.Task ? new TaskSubmissionDto((
+                        (TaskSubmission)s).StudentNotes, 
+                        ((TaskSubmission)s).Attachments.Select(att => new AttachmentDto
+                            {
+                                FileName = att.FileName,
+                                FileUrl = att.FileUrl,
+                                ContentType = att.ContentType,
+                                ImageInfo = (att.ContentType == "image/jpeg" || att.ContentType == "image/png" || att.ContentType == "image/gif")
+                                        ? new ImageAttachmentInfo(
+                                            ((ImageAttachment)att).Width,
+                                            ((ImageAttachment)att).Height) : null
+                            }).ToImmutableArray()) : null,
+                        s.SubmittedAt,
+                        s.Grade,
+                        s.TeacherFeedback
+                    ))
+                    .FirstOrDefault()
+
             })
             .FirstOrDefaultAsync(cancellationToken);
 

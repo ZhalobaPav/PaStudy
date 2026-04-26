@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Cors.Infrastructure;
 using PaStudy.Core.Entities;
 using PaStudy.Core.Helpers.DTOs.Course;
+using PaStudy.Core.Helpers.DTOs.Course.Note;
+using PaStudy.Core.Helpers.FilterObjects;
 using PaStudy.Core.Helpers.FilterObjects.CourseFilters;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.ConfigureDependencies;
@@ -19,13 +21,18 @@ public class Courses : EndpointGroupBase
         app.MapGroup(this).RequireAuthorization()
             .MapGet(GetCourses)
             .MapGet(GetCourseById, "{id}")
+            .MapGet(GetNotes, "{courseId}/notes")
             .MapPost(EnrollToCourse, "{id}/enroll");
     }
 
     public async Task<ImmutableArray<CourseDto>> GetCourses(CancellationToken cancellationToken, [AsParameters] CourseFilter courseFilter, ICourseRepository repository, ClaimsPrincipal user)
     {
-        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         return await repository.GetCourses(cancellationToken, courseFilter, user);
+    }
+
+    public async Task<ImmutableArray<NoteDto>> GetNotes(CancellationToken cancellationToken, [AsParameters] BaseFilterRequest courseFilter, ICourseRepository repository, ClaimsPrincipal user, int courseId)
+    {
+        return await repository.GetNotesAsync(courseId, cancellationToken, user, courseFilter);
     }
 
     public async Task<CourseDto> GetCourseById(int id, CancellationToken cancellationToken, ICourseRepository repository, ClaimsPrincipal user)

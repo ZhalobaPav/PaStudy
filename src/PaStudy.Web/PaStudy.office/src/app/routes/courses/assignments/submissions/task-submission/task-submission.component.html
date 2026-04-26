@@ -1,0 +1,13 @@
+<form [formGroup]="submissionForm" (ngSubmit)="onSubmit()">
+  <app-text-editor
+    formControlName="content"
+    placeholder=""
+    (imageUploaded)="onImageUploaded($event)"
+  ></app-text-editor>
+
+  <button class="submit-btn" type="submit" [disabled]="submissionForm.invalid">
+    Здати завдання
+  </button>
+
+  <button class="delete-btn" (click)="cancel()">Відмінити здачу</button>
+</form>

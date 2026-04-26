@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddScoped<IScoringService, ScoringService>();
         services.AddScoped<IQuizSubmissionService, QuizSubmissionService>();
         services.AddScoped<ISubmissionService, SubmissionService>();
+        services.AddScoped<IImageService, CloudinaryService>();
 
         //Factories
         services.AddScoped<IAttachmentFactory, AttachmentFactory>();

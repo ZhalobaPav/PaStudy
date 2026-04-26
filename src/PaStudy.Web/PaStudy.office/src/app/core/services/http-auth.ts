@@ -23,6 +23,12 @@ export class HttpAuth {
       .pipe(catchError((error: HttpErrorResponse) => this.handleError(error)));
   }
 
+  public put<T>(url: string, data: any): Observable<T> {
+    return this.http
+      .put<T>(url, data)
+      .pipe(catchError((error: HttpErrorResponse) => this.handleError(error)));
+  }
+
   private handleError(error: HttpErrorResponse) {
     if (error.status === 401) {
       localStorage.clear();

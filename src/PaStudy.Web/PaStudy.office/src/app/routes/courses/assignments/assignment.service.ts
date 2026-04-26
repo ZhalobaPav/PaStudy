@@ -1,10 +1,21 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpAuth } from '../../../core/services/http-auth';
-import { Assignment } from './models/assignment-item';
+import {
+  Assignment,
+  GradeSubmissionDto,
+  TaskSubmission,
+  TaskSubmissionDetails,
+} from './models/assignment-item';
 import { Observable } from 'rxjs';
 import { Section } from './models/section';
 import { BaseResponse } from '../../../shared/models/base/base-response';
 import { UploadAttachment } from './models/attachment';
+import {
+  CreateSubmissionDto,
+  SubmissionFilter,
+  SubmissionListItem,
+} from './models/submission';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -57,6 +68,37 @@ export class AssignmentService {
 
   createQuiz(quizData: any): Observable<BaseResponse<any>> {
     return this.httpAuth.post<BaseResponse<any>>('assignment', quizData);
+  }
+
+  submitAssignment(submission: CreateSubmissionDto) {
+    return this.httpAuth.post<void>('submission', submission);
+  }
+
+  fetchSubmissions(
+    filter: SubmissionFilter,
+    assignmentId: number,
+  ): Observable<SubmissionListItem[]> {
+    let params = new HttpParams().set('assignmentId', assignmentId.toString());
+
+    if (filter.pageNumber)
+      params = params.set('pageNumber', filter.pageNumber.toString());
+    if (filter.pageSize)
+      params = params.set('pageSize', filter.pageSize.toString());
+    if (filter.status !== undefined)
+      params = params.set('status', filter.status.toString());
+    return this.httpAuth.get<SubmissionListItem[]>('submission', params);
+  }
+
+  getSubmissionById(submissionId: number): Observable<TaskSubmissionDetails> {
+    return this.httpAuth.get<TaskSubmissionDetails>(
+      `submission/${submissionId}`,
+    );
+  }
+
+  public gradeSubmission(
+    data: GradeSubmissionDto,
+  ): Observable<TaskSubmissionDetails> {
+    return this.httpAuth.put<TaskSubmissionDetails>('submission', data);
   }
 
   constructor() {}

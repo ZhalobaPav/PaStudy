@@ -5,5 +5,5 @@ namespace PaStudy.Core.Interfaces.Factories;
 
 public interface IUploadFactory
 {
-    Task<CreateAttachmentDto> CreateDtoAsync(IFormFile file, string savedUrl);
+    Task<CreateAttachmentDto> CreateDtoAsync(IFormFile file, string savedUrl, int? width = null, int? height = null);
 }

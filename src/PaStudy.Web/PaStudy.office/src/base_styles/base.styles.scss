@@ -21,6 +21,18 @@
   }
 }
 
+.delete-btn {
+  border: 0.5px;
+  background: #ffeded;
+  color: #ff4d4d;
+  border: none;
+  border-radius: 1rem;
+  padding: 1rem;
+  cursor: pointer;
+  display: block;
+  margin: 2rem 10px;
+}
+
 .modal-card {
   background: white;
   border-radius: 12px;
@@ -130,5 +142,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.show-full-span {
+  font-size: 0.5rem;
+  color: #999;
+  text-align: end;
+  margin-top: 1rem;
+  display: block;
+  &:hover {
+    color: #000;
+    cursor: pointer;
   }
 }

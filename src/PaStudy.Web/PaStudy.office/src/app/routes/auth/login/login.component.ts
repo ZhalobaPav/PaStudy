@@ -40,6 +40,7 @@ export class LoginComponent implements OnInit {
         tap((response: LoginResponse | null) => {
           if (response?.succeeded && response?.token) {
             StorageService.setItem(TOKEN_KEY, response.token);
+            this.authService.loadUserFromToken();
             this.router.navigate(['/courses']);
           } else {
             this.notificationService.error(

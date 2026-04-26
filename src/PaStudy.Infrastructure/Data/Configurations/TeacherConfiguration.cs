@@ -26,7 +26,8 @@ public class TeacherConfiguration: IEntityTypeConfiguration<Teacher>
             HasOne(t =>t.GroupOfCurator)
             .WithOne(t=> t.CuratorOfGroup)
             .HasForeignKey<Teacher>(t => t.GroupId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
 
     }
 }

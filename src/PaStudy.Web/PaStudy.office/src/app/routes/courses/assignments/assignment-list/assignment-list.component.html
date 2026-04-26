@@ -11,6 +11,7 @@
     <app-section-item
       [section]="section"
       [isEditMode]="isEditMode()"
+      (assignmentCreated)="onAssignmentCreated($event)"
     ></app-section-item>
   }
 </div>

@@ -1,8 +1,14 @@
-﻿using PaStudy.Core.Entities.Assignments.Submission;
+﻿using PaStudy.Core.Entities.Assignments;
+using PaStudy.Core.Entities.Assignments.Submission;
 using PaStudy.Core.Helpers.DTOs.Submission;
 using PaStudy.Core.Helpers.Enums;
+using PaStudy.Core.Helpers.FilterObjects.CourseFilters;
+using PaStudy.Core.Helpers.FilterObjects.Submissions;
+using PaStudy.Core.Interfaces.Factories;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Core.Interfaces.Service;
+using System.Collections.Immutable;
+using System.Linq;
 
 namespace PaStudy.Core.Services;
 
@@ -11,17 +17,19 @@ public class SubmissionService : ISubmissionService
     private readonly ISubmissionRepository _submissionRepository;
     private readonly IQuizSubmissionService _quizSubmissionService;
     private readonly IStudentRepository _studentRepository;
+    private readonly IAttachmentFactory _attachmentFactory;
 
     public SubmissionService(
         ISubmissionRepository submissionRepository,
         IQuizSubmissionService quizSubmissionService, 
-        IStudentRepository studentRepository)
+        IStudentRepository studentRepository,
+        IAttachmentFactory attachmentFactory)
     {
         _submissionRepository = submissionRepository;
         _quizSubmissionService = quizSubmissionService;
         _studentRepository = studentRepository;
+        _attachmentFactory = attachmentFactory;
     }
-
     public async Task CreateSubmission(CreateSubmissionDto submissionDto, string userId)
     {
         var student = await _studentRepository.GetByUserIdAsync(userId);
@@ -67,7 +75,7 @@ public class SubmissionService : ISubmissionService
         return new TaskSubmission
         {
             StudentNotes = dto.TaskSubmission?.StudentNotes ?? string.Empty,
-            Attachments = dto.TaskSubmission?.Attachments
+            Attachments = dto.TaskSubmission?.Attachments.Select(s => _attachmentFactory.CreateAttachment(s)).ToList()
                           ?? new List<Entities.Attachments.Attachment>()
         };
     }

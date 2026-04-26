@@ -6,4 +6,7 @@
     <app-breadcrumb />
   }
   <div class="courses-link"><a routerLink="courses">Courses</a></div>
+  @if (isAuthenticated) {
+    <div class="logout"><button (click)="logout()">Logout</button></div>
+  }
 </div>

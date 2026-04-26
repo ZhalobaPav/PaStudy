@@ -1,0 +1,16 @@
+<app-table
+  [rows]="notes()"
+  (fetch)="fetchNotes($event)"
+  [rowTemplate]="rowTemplate"
+  [config]="tableConfig"
+>
+</app-table>
+
+<ng-template #rowTemplate let-row="row">
+  <p>
+    {{ row.assignmentInfo.name }}
+  </p>
+  <span>{{ row.grade }}</span>
+  <span>{{ row.assignmentInfo.maxPoints }}</span>
+  <span>{{ row.percentage }}</span>
+</ng-template>

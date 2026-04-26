@@ -10,6 +10,7 @@ using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
 using PaStudy.Infrastructure.Models;
 using System.Collections.Immutable;
+using System.Security.Claims;
 
 namespace PaStudy.Infrastructure.Repositories;
 
@@ -76,9 +77,6 @@ public class TeacherRepository: ITeacherRepository
         bool groupExists = await groups
             .AnyAsync(g => g.Id == teacherDto.GroupId);
 
-        if (!groupExists)
-            throw new ArgumentException($"Group with ID {teacherDto.GroupId} does not exist.");
-
         var teacher = new Teacher
         {
             UserId = teacherDto.UserId,
@@ -104,5 +102,23 @@ public class TeacherRepository: ITeacherRepository
 
         return await teacherCourses
             .AnyAsync(tc => tc.TeacherId == teacherId && tc.CourseId == courseId);
+    }
+
+    public async Task<bool> CanUserManageCourse(ClaimsPrincipal user, int courseId)
+    {
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+        {
+            return false;
+        }
+        var isTeacher = user.IsInRole("Teacher");
+        if (!isTeacher)
+        {
+            return false;
+        }
+        var teacherCourses = _dbContext.Set<TeacherCourses>();
+
+        return await teacherCourses
+            .AnyAsync(tc => tc.Teacher.UserId == userId && tc.CourseId == courseId);
     }
 }

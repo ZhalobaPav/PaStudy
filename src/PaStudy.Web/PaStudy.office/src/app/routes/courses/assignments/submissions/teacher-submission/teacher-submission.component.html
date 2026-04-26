@@ -1,0 +1,18 @@
+<app-table
+  [rows]="submissions()"
+  (fetch)="fetchSubmissions($event)"
+  [rowTemplate]="rowTemplate"
+  [config]="tableConfig"
+>
+</app-table>
+
+<ng-template #rowTemplate let-row="row">
+  <a class="course-link" [routerLink]="['submission', row.id]">
+    {{ row.studentFullName }}
+  </a>
+  <span>{{ row.submittedAt | date: "yyyy-MM-dd HH:mm" }}</span>
+  <span>{{ row.status }}</span>
+  @if (row.status === SubmissionStatus.Graded) {
+    <span>{{ row.grade }}</span>
+  }
+</ng-template>

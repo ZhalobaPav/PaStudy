@@ -9,6 +9,7 @@ import { CourseInfoComponent } from './course-info/course-info.component';
 import { CourseStudentsComponent } from './course-students/course-students.component';
 import { FormsModule, ɵInternalFormsSharedModule } from '@angular/forms';
 import { AssignmentModule } from './assignments/assignment.module';
+import { CourseNotesComponent } from './course-notes/course-notes.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { AssignmentModule } from './assignments/assignment.module';
     RouterModule,
     FormsModule,
     AssignmentModule,
+    CourseNotesComponent,
   ],
 })
 export class CoursesModule {}

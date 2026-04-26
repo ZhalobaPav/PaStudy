@@ -39,8 +39,8 @@ public class Assignment: EndpointGroupBase
         return await assignmentRepository.GetSectionsAsync(courseId, cancellationToken, user);
     }
 
-    public async Task<AssignmentDto> GetAssignmentById(int assignmentId, CancellationToken cancellationToken, IAssignmentRepository assignmentRepository)
+    public async Task<AssignmentDto> GetAssignmentById(int assignmentId, CancellationToken cancellationToken, IAssignmentRepository assignmentRepository, ClaimsPrincipal user)
     {
-        return await assignmentRepository.GetAssignmentByIdAsync(assignmentId, cancellationToken);
+        return await assignmentRepository.GetAssignmentByIdAsync(assignmentId, cancellationToken, user);
     }
 }

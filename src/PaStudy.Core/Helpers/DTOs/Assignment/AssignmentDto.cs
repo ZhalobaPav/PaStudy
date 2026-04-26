@@ -15,6 +15,17 @@ public class AssignmentDto
     public int MaxPoints { get; set; } = 100;
     public AssignmentType AssignmentType { get; set; } = AssignmentType.Task;
     public QuizInfoBrief? QuizInfo { get; set; }
+    public SubmissionInfo? SubmissionInfo { get; set; }
 }
 
 public record struct QuizInfoBrief(bool ShuffleQuestions, int TimeLimitMinutes, int questionQuantity);
+
+public record SubmissionInfo(
+    bool IsSubmitted,
+    TaskSubmissionDto? TaskSubmission, 
+    DateTime? SubmittedAt,
+    decimal? Grade,
+    string? TeacherFeedback
+);
+
+public record TaskSubmissionDto(string studentNote, ImmutableArray<AttachmentDto>? Attachments);

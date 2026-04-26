@@ -9,6 +9,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { MenuService } from '../../../core/bootstrap/menu.service';
+import { AuthService } from '../../../routes/auth/auth.service';
 
 @Component({
   selector: 'app-page-header',
@@ -24,7 +25,8 @@ import { MenuService } from '../../../core/bootstrap/menu.service';
 export class PageHeaderComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly menuService = inject(MenuService);
-
+  private readonly authService = inject(AuthService);
+  public readonly isAuthenticated = this.authService.isAuthorized;
   @Input() title: string = '';
   @Input() subtitle: string = '';
   @Input() nav: string[] = [];
@@ -34,5 +36,9 @@ export class PageHeaderComponent implements OnInit {
     const menuLevel = this.menuService.getLevel(routes);
 
     this.title = this.title || menuLevel[menuLevel.length - 1];
+  }
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['']);
   }
 }

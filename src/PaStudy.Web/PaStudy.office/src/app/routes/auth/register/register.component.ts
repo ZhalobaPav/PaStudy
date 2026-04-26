@@ -49,14 +49,21 @@ export class RegisterComponent implements OnInit {
       phoneNumber: ['', Validators.required],
       role: [UserRole.Student, Validators.required],
       displayName: ['', Validators.required],
-      groupId: [-1, Validators.required],
+      groupId: [null as number | null],
     },
     { validators: [confirmPasswordValidator] },
   );
 
   public submit(): void {
+    const formValue = this.registerForm.getRawValue();
+
+    const payload = {
+      ...formValue,
+      role: Number(formValue.role),
+      groupId: formValue.groupId !== null ? Number(formValue.groupId) : null,
+    };
     this.authService
-      .register(this.registerForm.getRawValue())
+      .register(payload)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         tap((response) => {

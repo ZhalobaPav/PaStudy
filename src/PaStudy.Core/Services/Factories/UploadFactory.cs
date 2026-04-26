@@ -6,7 +6,7 @@ namespace PaStudy.Core.Services.Factories;
 
 public class UploadFactory: IUploadFactory
 {
-    public async Task<CreateAttachmentDto> CreateDtoAsync(IFormFile file, string savedUrl)
+    public Task<CreateAttachmentDto> CreateDtoAsync(IFormFile file, string savedUrl, int? width = null, int? height = null)
     {
         var dto = new CreateAttachmentDto
         {
@@ -14,13 +14,11 @@ public class UploadFactory: IUploadFactory
             FileUrl = savedUrl,
             ContentType = file.ContentType
         };
-
-        if (AttachmentContentTypes.IsImageContentType(file.ContentType))
+        if (width.HasValue && height.HasValue)
         {
-            using var image = await SixLabors.ImageSharp.Image.LoadAsync(file.OpenReadStream());
-            dto.ImageInfo = new ImageAttachmentInfo(image.Width, image.Height);
+            dto.ImageInfo = new ImageAttachmentInfo(width.Value, height.Value);
         }
 
-        return dto;
+        return Task.FromResult(dto);
     }
 }

@@ -5,6 +5,9 @@
 .assignment-title {
   padding: 0.5rem;
   font-size: 2rem;
+  &::first-letter {
+    text-transform: uppercase;
+  }
 }
 
 .rich-text-content {
@@ -33,4 +36,30 @@
   display: block;
   width: 40%;
   margin: 5rem auto;
+}
+
+.tabs-navigation {
+  display: flex;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 20px;
+
+  button {
+    padding: 12px 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.2s;
+
+    &.active {
+      color: #007bff;
+      border-bottom: 2px solid #007bff;
+      margin-bottom: -2px;
+    }
+
+    &:hover:not(.active) {
+      background-color: #f8f9fa;
+    }
+  }
 }

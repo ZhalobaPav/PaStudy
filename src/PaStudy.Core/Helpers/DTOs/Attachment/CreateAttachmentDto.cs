@@ -1,4 +1,6 @@
-﻿namespace PaStudy.Core.Helpers.DTOs.Attachment;
+﻿using PaStudy.Core.Helpers.StaticData;
+
+namespace PaStudy.Core.Helpers.DTOs.Attachment;
 
 public record CreateAttachmentDto
 {
@@ -8,7 +10,7 @@ public record CreateAttachmentDto
     public ImageAttachmentInfo? ImageInfo { get; set; }
 }
 
-public record ImageAttachmentInfo(int Width, int Height);
+public record ImageAttachmentInfo(int Width = ImageConfiguration.DefaultImageWidth, int Height = ImageConfiguration.DefaultImageHeight);
 
 public static class AttachmentContentTypes
 {

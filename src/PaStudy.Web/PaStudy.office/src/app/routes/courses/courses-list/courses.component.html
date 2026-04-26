@@ -12,7 +12,9 @@
   </a>
   <span>{{ row.description }}</span>
   <span>{{ row.categoryName }}</span>
-  @for (teacher of row.teachers; track $index) {
-    <span>{{ teacher.firstName }}</span>
-  }
+  <div class="teacher-list">
+    @for (teacher of row.teachers; track $index) {
+      <span class="teacher-name">{{ teacher.firstName }}</span>
+    }
+  </div>
 </ng-template>

@@ -17,6 +17,7 @@ import {
 import { QuillModule } from 'ngx-quill';
 import { AssignmentService } from '../../../routes/courses/assignments/assignment.service';
 import { PendingImage } from '../../../routes/courses/assignments/models/attachment';
+import Quill from 'quill';
 
 @Component({
   selector: 'app-text-editor',
@@ -50,6 +51,8 @@ export class TextEditorComponent implements ControlValueAccessor {
     const toolbar = editor.getModule('toolbar');
 
     toolbar.addHandler('image', () => this.imageHandler());
+    const Image = Quill.import('formats/image') as any;
+    Image.sanitize = (url: string) => url;
   }
 
   onChanged(event: any) {
@@ -79,13 +82,20 @@ export class TextEditorComponent implements ControlValueAccessor {
     input.onchange = () => {
       const file = input.files?.[0];
       if (!file) return;
-      const imageId = `img_${Date.now()}`;
-      const placeholder = `[[${imageId}]]`;
+
+      // Створюємо тимчасовий URL для відображення в редакторі
+      const blobUrl = URL.createObjectURL(file);
+
       const range = this.quillInstance.getSelection(true);
-      this.quillInstance.insertText(range.index, placeholder);
+
+      // Вставляємо саме картинку (Quill створить <img src="blob:...">)
+      this.quillInstance.insertEmbed(range.index, 'image', blobUrl, 'user');
+      this.quillInstance.setSelection(range.index + 1);
+
+      // Повідомляємо батька, що у нас новий файл і його ключ - це blobUrl
       this.imageUploaded.emit({
         file: file,
-        tempUrl: imageId,
+        tempUrl: blobUrl,
       });
     };
   }

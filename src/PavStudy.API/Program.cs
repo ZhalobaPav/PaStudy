@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using PaStudy.Infrastructure.ConfigureDependencies;
+using PaStudy.Infrastructure.ConfigureDependencies.BindConfigurations;
 using PaStudy.Infrastructure.Services;
 using PavStudy.API.Extensions;
 
@@ -11,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAntiforgery();
 builder.Services.AddDbDependencies(builder.Configuration).AddInfrastructureIdentity(builder.Configuration); 
+builder.Services.BindCloudinaryConfiguration(builder.Configuration);
 builder.Services.AddDependencyInjection();
 builder.Services.AddCors(opt =>
 {

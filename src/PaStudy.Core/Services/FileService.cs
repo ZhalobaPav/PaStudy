@@ -8,11 +8,13 @@ namespace PaStudy.Core.Services;
 public class FileService: IFileService
 {
     private readonly IUploadFactory _uploadFactory;
+    private readonly IImageService _imageService;
     private readonly string _uploadPath;
 
-    public FileService(IUploadFactory uploadFactory)
+    public FileService(IUploadFactory uploadFactory, IImageService cloudinaryService)
     {
         _uploadFactory = uploadFactory;
+        _imageService = cloudinaryService;
         _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "attachments");
     }
     public async Task<CreateAttachmentDto> SaveFileAsync(IFormFile file)
@@ -22,18 +24,22 @@ public class FileService: IFileService
         {
             throw new ArgumentException("Unsupported file type");
         }
-
-        if (!Directory.Exists(_uploadPath)) Directory.CreateDirectory(_uploadPath);
-
-        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-        var filePath = Path.Combine(_uploadPath, fileName);
-        var relativeUrl = $"/uploads/attachments/{fileName}";
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        using var stream = file.OpenReadStream();
+        string finalUrl;
+        int? width = null;
+        int? height = null;
+        if (AttachmentContentTypes.IsImageContentType(file.ContentType))
         {
-            await file.CopyToAsync(stream);
-        }
+            var uploadResult = await _imageService.UploadImageAsync(stream, file.FileName);
 
-        return await _uploadFactory.CreateDtoAsync(file, relativeUrl);
+            finalUrl = uploadResult.Url;
+            width = uploadResult.Width;
+            height = uploadResult.Height;
+        }
+        else
+        {
+            finalUrl = await _imageService.UploadRawFileAsync(stream, file.FileName);
+        }
+        return await _uploadFactory.CreateDtoAsync(file, finalUrl, width, height);
     }
 }

@@ -4,5 +4,7 @@
   (onContentChanged)="onChanged($event)"
   [placeholder]="placeholder()"
   (onEditorCreated)="onEditorCreated($event)"
+  [sanitize]="false"
 >
 </quill-editor>
+{{ value }}

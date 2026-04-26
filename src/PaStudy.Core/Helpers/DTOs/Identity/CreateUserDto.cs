@@ -11,7 +11,7 @@
         public DateTime DateOfBirth { get; set; }
         public string DisplayName { get; set; }
         public string PhoneNumber { get; set; }
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
         public UserRole Role { get; set; } = UserRole.Student;
     }
 }
