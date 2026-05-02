@@ -8,21 +8,36 @@ export const tableConfig: TableConfig = {
       name: 'userName',
       label: 'Name',
       component: SearchFilterComponent,
-      width: 120,
+      width: 200,
       componentInputs: {
         inputType: 'text',
       },
     },
     {
-      name: 'userRole',
-      label: 'Role',
-      component: SelectFilterComponent,
+      name: 'dateOfBirth',
+      label: 'Birth date',
+      component: null,
+      width: 130,
+      componentInputs: {
+        inputType: 'date',
+      },
+    },
+    {
+      name: 'email',
+      label: 'Email',
+      component: null,
       width: 190,
       componentInputs: {
-        options: [
-          { label: 'Student', value: 'Student' },
-          { label: 'Teacher', value: 'Teacher' },
-        ],
+        inputType: 'text',
+      },
+    },
+    {
+      name: 'groupNumber',
+      label: 'Group number',
+      component: null,
+      width: 190,
+      componentInputs: {
+        inputType: 'number',
       },
     },
   ],

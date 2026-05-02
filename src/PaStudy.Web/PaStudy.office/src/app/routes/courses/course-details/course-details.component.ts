@@ -2,7 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ICourse } from '../../../shared/models/course';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService } from '../course.service';
-import { of, switchMap, take, tap } from 'rxjs';
+import { finalize, of, switchMap, take, tap } from 'rxjs';
 import {
   CourseHeaderTitles,
   HeaderConfig,
@@ -10,6 +10,7 @@ import {
 } from '../config/headers-config';
 import { AuthService } from '../../auth/auth.service';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-course-details',
@@ -25,6 +26,7 @@ export class CourseDetailsComponent implements OnInit {
   private authService = inject(AuthService);
   private courseService = inject(CourseService);
   private toasterService = inject(NotificationService);
+  private loaderService = inject(LoaderService);
   public readonly tab = CourseHeaderTitles;
   readonly headerConfig: HeaderConfig[] = headerConfig;
   public isEditMode = false;
@@ -43,6 +45,7 @@ export class CourseDetailsComponent implements OnInit {
   }
 
   fetchCourse(courseId: number) {
+    this.loaderService.busy();
     return this.courseService.getCourse(courseId).pipe(
       take(1),
       tap((response) => {
@@ -50,6 +53,9 @@ export class CourseDetailsComponent implements OnInit {
           return;
         }
         this.course.set(response);
+      }),
+      finalize(() => {
+        this.loaderService.idle();
       }),
     );
   }

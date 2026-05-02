@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Assignment } from '../models/assignment-item';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AssignmentService } from '../assignment.service';
 import { take, tap } from 'rxjs';
 import { AssignmentType } from '../../../../shared/enums/assignment-type';
@@ -15,6 +15,7 @@ import { AssignmentTabType } from '../models/assignment-tab-type';
 })
 export class AssignmentDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private assignmentService = inject(AssignmentService);
   private authService = inject(AuthService);
 
@@ -82,6 +83,15 @@ export class AssignmentDetailsComponent implements OnInit {
   }
 
   public openAssignmentSubmit(): void {
+    if (!this.assignment()) {
+      return;
+    }
+    if (this.isQuiz()) {
+      this.router.navigate(['quizzes', this.assignment()!.id, 'attempt'], {
+        relativeTo: this.route,
+      });
+      return;
+    }
     this.isAssignmentSubmitMode.update((val) => !val);
   }
 

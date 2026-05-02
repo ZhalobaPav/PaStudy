@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { importProvidersFrom, NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
@@ -37,6 +37,9 @@ import { LoaderService } from './shared/services/loader.service';
       multi: true,
     },
     provideHttpClient(withInterceptors([tokenInterceptor])),
+    importProvidersFrom(
+      NgxSpinnerModule.forRoot({ type: 'ball-scale-multiple' }),
+    ),
     LoaderService,
   ],
 })

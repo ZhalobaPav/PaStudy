@@ -1,1 +1,48 @@
-<p>overview works!</p>
+@if (isLoading()) {
+  <div class="loading">Завантаження профілю...</div>
+} @else {
+  @if (profileInfo(); as user) {
+    <div class="profile-container">
+      <header class="profile-header">
+        <div class="avatar-placeholder">
+          {{ user.fullName.charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-info">
+          <h1>{{ user.fullName }}</h1>
+          <p class="email">📧 {{ user.email }}</p>
+          <span
+            class="role-badge"
+            [class.teacher]="user.userRole === UserRole.Teacher"
+          >
+            {{ currentUserRole() }}
+          </span>
+        </div>
+      </header>
+
+      <section class="courses-section">
+        <h2>Мої курси ({{ user.courses.length }})</h2>
+
+        @if (user.courses.length === 0) {
+          <p class="empty-state">У вас поки немає активних курсів.</p>
+        } @else {
+          <div class="courses-grid">
+            @for (course of user.courses; track course.id) {
+              <div class="course-card">
+                <div class="course-category">{{ course.categoryName }}</div>
+                <h3>{{ course.title }}</h3>
+                <p class="course-desc">{{ course.description }}</p>
+
+                <div class="course-footer">
+                  <!-- <span class="teachers-info">
+                  👨‍🏫 {{ formatTeachers(course.teachers) }}
+                </span> -->
+                  <button class="btn-go">Перейти</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
+}

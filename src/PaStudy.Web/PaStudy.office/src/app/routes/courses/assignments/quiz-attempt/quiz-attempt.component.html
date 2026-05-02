@@ -1,0 +1,43 @@
+@if (isLoading()) {
+  <div class="loader">Завантаження тесту...</div>
+} @else {
+  @if (attemptInfo(); as attempt) {
+    <div class="quiz-container">
+      <header class="quiz-header sticky-top">
+        <div class="header-content">
+          <h2>{{ attempt.title }}</h2>
+
+          <div class="timer-badge" [class.danger]="timeLeftSeconds() <= 60">
+            ⏳ Залишилось: <strong>{{ formattedTime() }}</strong>
+          </div>
+        </div>
+
+        @if (tabSwitches() > 0) {
+          <div class="warning-bar">
+            ⚠️ Порушень фіксації вкладки: {{ tabSwitches() }} з 3
+          </div>
+        }
+      </header>
+
+      <div class="questions-list">
+        @for (
+          question of attempt.questions;
+          track question.id;
+          let i = $index
+        ) {
+          <app-quiz-card
+            [question]="question"
+            [index]="i + 1"
+            [savedAnswer]="savedAnswersMap()[question.id]"
+          ></app-quiz-card>
+        }
+      </div>
+
+      <div class="quiz-footer">
+        <button class="submit-btn" (click)="submitQuiz()">
+          Завершити тест
+        </button>
+      </div>
+    </div>
+  }
+}

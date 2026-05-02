@@ -28,7 +28,7 @@ export enum SortOrder {
 
 export enum QuestionType {
   SingleChoice = 0,
-  Matching = 1,
+  Matching = 2,
 }
 
 export const DEFAULT_FILTER_VALUES = {

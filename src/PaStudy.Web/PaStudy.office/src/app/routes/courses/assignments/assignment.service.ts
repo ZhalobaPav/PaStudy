@@ -16,6 +16,7 @@ import {
   SubmissionListItem,
 } from './models/submission';
 import { HttpParams } from '@angular/common/http';
+import { AttemptStartResponseDto } from './quiz-attempt/quiz.attempt.model';
 
 @Injectable({
   providedIn: 'root',
@@ -63,6 +64,13 @@ export class AssignmentService {
     return this.httpAuth.post<UploadAttachment[]>(
       'Files/upload-multiple',
       formData,
+    );
+  }
+
+  startQuizAttempt(quizId: number): Observable<any> {
+    return this.httpAuth.post<AttemptStartResponseDto>(
+      `assignment/quiz/${quizId}/startAttempt`,
+      {},
     );
   }
 

@@ -9,6 +9,7 @@ using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
 using PaStudy.Infrastructure.Models;
 using System.Collections.Immutable;
+using System.Security.Claims;
 
 namespace PaStudy.Infrastructure.Repositories;
 
@@ -44,7 +45,30 @@ public class StudentRepository: IStudentRepository
         return student;
     }
 
+    public async Task<StudentDto> GetStudentByUserId(string userId)
+    {
+        var student = await _context.Set<Student>().AsNoTracking().Include(s => s.Group).Where(s => s.UserId == userId).Select(s => new StudentDto
+        {
+            DateOfBirth = s.DateOfBirth,
+            FirstName = s.FirstName,
+            LastName = s.LastName,
+            Group = s.Group != null ? new GroupDto
+            {
+                Id = s.Group.Id,
+                Faculty = s.Group.Faculty,
+                GroupNumber = s.Group.GroupNumber,
+                InstitutionNumber = s.Group.InstitutionNumber,
+                Speciality = s.Group.Speciality
+            }: null,
+            Id = s.Id,
 
+        }).FirstOrDefaultAsync();
+        if(student == null)
+        {
+            throw new ArgumentNullException(nameof(student));
+        }
+        return student;
+    }
     public async Task<ImmutableArray<StudentDto>> GetStudents(CancellationToken cancellationToken, UserFilter userFilter)
     {
         var query = _context.Set<Student>().AsQueryable();

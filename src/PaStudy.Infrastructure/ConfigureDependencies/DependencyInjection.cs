@@ -22,6 +22,7 @@ public static class DependencyInjection
         services.AddScoped<IQuestionRepository, QuestionRepository>();
         services.AddScoped<ISubmissionRepository, SubmissionRepository>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+        services.AddScoped<IQuizRepository, QuizRepository>();
 
         //Services
         services.AddScoped<IUserService, UserService>();
@@ -34,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<IQuizSubmissionService, QuizSubmissionService>();
         services.AddScoped<ISubmissionService, SubmissionService>();
         services.AddScoped<IImageService, CloudinaryService>();
+        services.AddScoped<IOverviewService, OverviewService>();
 
         //Factories
         services.AddScoped<IAttachmentFactory, AttachmentFactory>();

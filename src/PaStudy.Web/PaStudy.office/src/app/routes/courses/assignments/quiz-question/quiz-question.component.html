@@ -35,7 +35,7 @@
             let optIdx = $index
           ) {
             <div class="answer-row" [formGroupName]="optIdx">
-              <input type="radio" formControlName="isCorrect" [value]="true" />
+              <input type="checkbox" formControlName="isCorrect" />
               <input
                 type="text"
                 formControlName="text"

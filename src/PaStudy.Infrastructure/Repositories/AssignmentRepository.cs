@@ -2,23 +2,22 @@
 using Microsoft.EntityFrameworkCore;
 using PaStudy.Core.Entities;
 using PaStudy.Core.Entities.Assignments;
+using PaStudy.Core.Entities.Assignments.Questions;
 using PaStudy.Core.Entities.Assignments.Submission;
 using PaStudy.Core.Entities.Attachments;
-using PaStudy.Core.Entities.ConnectionEntities;
 using PaStudy.Core.Helpers.DTOs.Assignment;
+using PaStudy.Core.Helpers.DTOs.Assignment.Quiz;
 using PaStudy.Core.Helpers.DTOs.Attachment;
 using PaStudy.Core.Helpers.DTOs.Section;
 using PaStudy.Core.Helpers.Enums;
 using PaStudy.Core.Helpers.Exceptions;
 using PaStudy.Core.Helpers.Exceptions.AssignmentExceptions;
 using PaStudy.Core.Helpers.Extensions.MapperHelpers;
-using PaStudy.Core.Helpers.StaticData;
 using PaStudy.Core.Interfaces.Factories;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Security.Claims;
 
 namespace PaStudy.Infrastructure.Repositories;
@@ -160,6 +159,84 @@ public class AssignmentRepository: IAssignmentRepository
         }
 
         return $"/uploads/attachments/{fileName}";
+    }
+
+    public async Task<StudentQuizDto?> GetQuizForPassingAsync(int quizId, CancellationToken cancellation)
+    {
+        var quiz = await _dbContext.Set<QuizAssignment>()
+            .AsNoTracking()
+            .Include(q => q.Questions)
+                .ThenInclude(q => (q as ChoiceQuestion).Options)
+            .Include(q => q.Attachments)
+            .FirstOrDefaultAsync(q => q.Id == quizId, cancellation);
+
+        if (quiz == null) return null;
+
+        var questions = quiz.Questions.Select(q =>
+        {
+            StudentChoiceInfo? choiceInfo = null;
+            StudentMatchingInfo? matchingInfo = null;
+
+            if (q is ChoiceQuestion cq)
+            {
+                var options = cq.Options
+                    .Select(o => new StudentAnswerOption(o.Id, o.Text))
+                    .OrderBy(_ => Guid.NewGuid())
+                    .ToList();
+                choiceInfo = new StudentChoiceInfo(options);
+            }
+            else if (q is MatchingQuestion mq)
+            {
+                var pairs = mq.Pairs.ToList();
+
+                var leftSide = pairs
+                    .Select(p => p.LeftSide)
+                    .OrderBy(_ => Guid.NewGuid())
+                    .ToList();
+
+                var rightSide = pairs
+                    .Select(p => p.RightSide)
+                    .OrderBy(_ => Guid.NewGuid())
+                    .ToList();
+
+                matchingInfo = new StudentMatchingInfo(leftSide, rightSide);
+            }
+
+            return new StudentQuestionDto(
+                q.Id,
+                q.Text,
+                q.Points,
+                q.Type,
+                choiceInfo,
+                matchingInfo,
+                q.Attachments.Select(a => new AttachmentDto
+                {
+                    FileName = a.FileName,
+                    FileUrl = a.FileUrl,
+                    ContentType = a.ContentType
+                }).ToList()
+            );
+        }).ToImmutableArray();
+
+        if (quiz.ShuffleQuestions)
+        {
+            questions = questions.OrderBy(_ => Guid.NewGuid()).ToImmutableArray();
+        }
+
+        return new StudentQuizDto(
+            quiz.Id,
+            quiz.Title,
+            quiz.Description,
+            quiz.TimeLimitMinutes,
+            quiz.DueDate,
+            quiz.MaxPoints,
+            questions,
+            quiz.Attachments.Select(a => new AttachmentDto
+            {
+                FileName = a.FileName,
+                FileUrl = a.FileUrl
+            }).ToImmutableArray()
+        );
     }
 
     public async Task<AssignmentDto> GetAssignmentByIdAsync(int assignmentId, CancellationToken cancellationToken, ClaimsPrincipal user)

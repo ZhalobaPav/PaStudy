@@ -1,0 +1,70 @@
+<div class="question-card">
+  <div class="card-header">
+    <h4 class="question-title">
+      <span class="question-number">{{ index() }}.</span>
+      {{ question().text }}
+    </h4>
+    <span class="points-badge">{{ question().points }} балів</span>
+  </div>
+
+  <div class="card-body">
+    @if (
+      question().type === QuestionType.SingleChoice && question().choiceInfo
+    ) {
+      <div class="options-container">
+        @for (option of question().choiceInfo!.options; track option.id) {
+          <label
+            class="option-item"
+            [class.selected]="selectedOptionId() === option.id"
+          >
+            <input
+              type="checkbox"
+              class="hidden-radio"
+              [name]="'question_' + question().id"
+              [value]="option.id"
+              [checked]="selectedOptionId() === option.id"
+              (change)="onOptionSelected(option.id)"
+            />
+
+            <span class="custom-radio"></span>
+            <span class="option-text">{{ option.text }}</span>
+          </label>
+        }
+      </div>
+    } @else if (
+      question().type === QuestionType.Matching && question().matchingInfo
+    ) {
+      <div class="matching-container">
+        @for (
+          leftItem of question().matchingInfo!.leftSide;
+          track leftItem.id
+        ) {
+          <div class="matching-row">
+            <div class="left-item">
+              {{ leftItem }}
+            </div>
+
+            <div class="right-item">
+              <select
+                class="matching-select"
+                [value]="matchingSelections()[leftItem.id] || ''"
+                (change)="onMatchingSelected(leftItem.id, $event)"
+              >
+                <option value="" disabled selected>
+                  Оберіть відповідність...
+                </option>
+
+                @for (
+                  rightItem of question().matchingInfo!.rightSide;
+                  track rightItem.id
+                ) {
+                  <option [value]="rightItem.id">{{ rightItem.text }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

@@ -2,6 +2,7 @@
 using PaStudy.Core.Entities;
 using PaStudy.Core.Entities.Assignments;
 using PaStudy.Core.Helpers.DTOs.Assignment;
+using PaStudy.Core.Helpers.DTOs.Assignment.Quiz;
 using PaStudy.Core.Helpers.DTOs.Attachment;
 using PaStudy.Core.Helpers.DTOs.Section;
 using System.Collections.Immutable;
@@ -17,5 +18,6 @@ public interface IAssignmentRepository
     Task<Assignment> CreateAsync(Assignment assignment, CancellationToken ct = default);
     Task<Section> CreateSectionAsync(Section section, CancellationToken ct = default);
     Task AddAttachmentsToAssignment(ICollection<CreateAttachmentDto> createAttachmentDtoList, int assignmentId);
+    Task<StudentQuizDto?> GetQuizForPassingAsync(int quizId, CancellationToken cancellation);
     Task<string> SaveFileAsync(IFormFile file);
 }

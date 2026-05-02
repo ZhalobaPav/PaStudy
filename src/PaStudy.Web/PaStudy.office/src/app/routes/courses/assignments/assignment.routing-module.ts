@@ -5,8 +5,11 @@ import { SubmissionDetailsComponent } from './submissions/submission-details/sub
 
 const routes: Routes = [
   {
-    path: ':assignmentId',
-    component: AssignmentDetailsComponent,
+    path: ':assignmentId/quizzes/:id/attempt',
+    loadComponent: () =>
+      import('./quiz-attempt/quiz-attempt.component').then(
+        (m) => m.QuizAttemptComponent,
+      ),
   },
   {
     path: ':assignmentId/submission/:id',
@@ -14,6 +17,10 @@ const routes: Routes = [
       import('./submissions/submission-details/submission-details.component').then(
         (m) => m.SubmissionDetailsComponent,
       ),
+  },
+  {
+    path: ':assignmentId',
+    component: AssignmentDetailsComponent,
   },
 ];
 @NgModule({

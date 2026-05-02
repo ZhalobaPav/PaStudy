@@ -1,5 +1,6 @@
 ﻿using PaStudy.Core.Helpers.DTOs.Attachment;
 using PaStudy.Core.Helpers.Enums;
+using System.Collections.Immutable;
 
 namespace PaStudy.Core.Helpers.DTOs.Assignment.Quiz;
 
@@ -14,6 +15,39 @@ public record CreateQuestionDto
     public List<CreateAttachmentDto>? Attachments { get; set; }
 }
 
+public record StudentQuizDto(
+    int Id,
+    string Title,
+    string? Description,
+    int TimeLimitMinutes,
+    DateTime? DueDate,
+    int MaxPoints,
+    ImmutableArray<StudentQuestionDto> Questions,
+    ImmutableArray<AttachmentDto> Attachments
+);
+
+public record StudentQuestionDto(
+    int Id,
+    string Text,
+    int Points,
+    QuestionType Type,
+    StudentChoiceInfo? ChoiceInfo,
+    StudentMatchingInfo? MatchingInfo,
+    List<AttachmentDto>? Attachments
+);
+
+public record SavedAnswerDto(
+    int QuestionId,
+    int? SelectedOptionId,
+    List<int>? SelectedOptionIds,
+    Dictionary<string, string>? MatchingAnswers,
+    string? TextResponse
+);
+
+public record StudentAnswerOption(int Id, string Text);
+public record StudentChoiceInfo(List<StudentAnswerOption> Options);
+
+public record StudentMatchingInfo(List<string> LeftSide, List<string> RightSide);
 public record CreateAnswerOption(string Text, bool IsCorrect);
 public record CreateMatchingPair(string LeftSide, string RightSide);
 

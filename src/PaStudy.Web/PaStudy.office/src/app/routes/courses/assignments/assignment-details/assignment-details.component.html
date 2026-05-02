@@ -39,7 +39,11 @@
       @if (isStudent()) {
         @if (!this.isAssignmentSubmitMode() && !isSubmitBlocked()) {
           <button class="submit-btn" (click)="openAssignmentSubmit()">
-            Здати роботу
+            @if (!isQuiz()) {
+              Здати роботу
+            } @else {
+              Почати проходження тесту
+            }
           </button>
         }
         @if (this.isAssignmentSubmitMode()) {
