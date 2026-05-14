@@ -2,10 +2,12 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Assignment } from '../models/assignment-item';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssignmentService } from '../assignment.service';
-import { take, tap } from 'rxjs';
+import { finalize, take, tap } from 'rxjs';
 import { AssignmentType } from '../../../../shared/enums/assignment-type';
 import { AuthService } from '../../../auth/auth.service';
 import { AssignmentTabType } from '../models/assignment-tab-type';
+import { LoaderService } from '../../../../shared/services/loader.service';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-assignment-details',
@@ -18,11 +20,12 @@ export class AssignmentDetailsComponent implements OnInit {
   private router = inject(Router);
   private assignmentService = inject(AssignmentService);
   private authService = inject(AuthService);
-
+  private loaderService = inject(LoaderService);
   public assignment = signal<Assignment | null>(null);
   public readonly currentDate = signal<Date>(new Date());
   private readonly typesWithoutNote = [AssignmentType.Reading];
   public readonly AssignmentType = AssignmentType;
+  private toasterService = inject(NotificationService);
   public activeTab = signal<AssignmentTabType>('content');
   public isOverdue = computed(() => {
     const assignment = this.assignment();
@@ -51,6 +54,10 @@ export class AssignmentDetailsComponent implements OnInit {
   public isTeacher = computed(() => {
     return this.authService.isTeacher();
   });
+
+  public goBackToCourse(): void {
+    this.router.navigate(['../../'], { relativeTo: this.route });
+  }
 
   public setTab(tab: 'content' | 'grading'): void {
     if (!this.isTeacher) {
@@ -87,7 +94,7 @@ export class AssignmentDetailsComponent implements OnInit {
       return;
     }
     if (this.isQuiz()) {
-      this.router.navigate(['quizzes', this.assignment()!.id, 'attempt'], {
+      this.router.navigate(['attempt'], {
         relativeTo: this.route,
       });
       return;
@@ -97,5 +104,33 @@ export class AssignmentDetailsComponent implements OnInit {
 
   public cancel(): void {
     this.isAssignmentSubmitMode.set(false);
+  }
+
+  public onDeleteAssignment(id: number, title: string) {
+    const confirmDelete = confirm(
+      `Ви впевнені, що хочете видалити завдання "${title}"?`,
+    );
+
+    if (confirmDelete) {
+      this.loaderService.busy();
+
+      this.assignmentService
+        .deleteAssignment(id)
+        .pipe(
+          take(1),
+          finalize(() => this.loaderService.idle()),
+        )
+        .subscribe({
+          next: () => {
+            this.toasterService.success('Завдання видалено');
+            this.router.navigate(['../../']);
+          },
+          error: (err) => {
+            this.toasterService.error(
+              err.error?.message || 'Помилка при видаленні',
+            );
+          },
+        });
+    }
   }
 }

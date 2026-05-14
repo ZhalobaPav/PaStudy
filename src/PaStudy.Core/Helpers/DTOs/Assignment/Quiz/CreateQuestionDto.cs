@@ -36,6 +36,22 @@ public record StudentQuestionDto(
     List<AttachmentDto>? Attachments
 );
 
+public record AttemptResultDto(
+    int AttemptId,
+    int QuizId,
+    decimal TotalScore,
+    decimal MaxPoints,
+    DateTime FinishedAt
+);
+
+public record AttemptAnswerPatchDto(
+    int QuestionId,
+    int? SelectedOptionId,
+    List<int>? SelectedOptionIds,
+    Dictionary<string, string>? MatchingAnswers,
+    string? TextResponse
+);
+
 public record SavedAnswerDto(
     int QuestionId,
     int? SelectedOptionId,
@@ -47,7 +63,9 @@ public record SavedAnswerDto(
 public record StudentAnswerOption(int Id, string Text);
 public record StudentChoiceInfo(List<StudentAnswerOption> Options);
 
-public record StudentMatchingInfo(List<string> LeftSide, List<string> RightSide);
+public record StudentMatchingInfo(
+    List<StudentAnswerOption> LeftSide,
+    List<StudentAnswerOption> RightSide);
 public record CreateAnswerOption(string Text, bool IsCorrect);
 public record CreateMatchingPair(string LeftSide, string RightSide);
 

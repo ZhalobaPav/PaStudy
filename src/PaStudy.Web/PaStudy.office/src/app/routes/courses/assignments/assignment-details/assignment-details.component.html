@@ -16,53 +16,85 @@
     </div>
   }
   @if (activeTab() === "content") {
-    <div class="assignment-box">
+    <div class="assignment-header-row">
       <h1 class="assignment-title">{{ data.title }}</h1>
-      @if (data.dueDate) {
-        @if (isOverdue()) {
-          <span
-            >Завдання прострочене. Мало бути виконане до
-            {{ data.dueDate | date }}</span
-          >
-        } @else {
-          <span>Завдання має бути виконане до {{ data.dueDate | date }}</span>
-        }
+
+      @if (isTeacher()) {
+        <button
+          class="btn-delete-assignment"
+          (click)="onDeleteAssignment(data.id, data.title)"
+        >
+          🗑️ Видалити завдання
+        </button>
       }
-      @if (isQuiz()) {
-        <p>
-          Обмеження в часі:
-          {{ assignment()?.quizInfo?.timeLimitMinutes }} хвилин
-        </p>
-        <p>Кількість питань: {{ assignment()?.quizInfo?.questionQuantity }}</p>
-      }
-      <div class="rich-text-content" [innerHTML]="data.description"></div>
-      @if (isStudent()) {
-        @if (!this.isAssignmentSubmitMode() && !isSubmitBlocked()) {
-          <button class="submit-btn" (click)="openAssignmentSubmit()">
-            @if (!isQuiz()) {
-              Здати роботу
-            } @else {
-              Почати проходження тесту
+    </div>
+    <div class="assignment-container">
+      <nav class="back-navigation">
+        <button class="back-link" (click)="goBackToCourse()">
+          <span class="arrow">←</span> Назад до курсу
+        </button>
+      </nav>
+      <div class="assignment-card main-content">
+        <h1 class="assignment-title">{{ data.title }}</h1>
+
+        <div class="assignment-meta">
+          @if (data.dueDate) {
+            <div class="meta-item" [class.overdue]="isOverdue()">
+              <i class="icon-calendar"></i>
+              @if (isOverdue()) {
+                <span>Прострочено: {{ data.dueDate | date: "medium" }}</span>
+              } @else {
+                <span>Дедлайн: {{ data.dueDate | date: "medium" }}</span>
+              }
+            </div>
+          }
+          @if (isQuiz()) {
+            <div class="meta-item">
+              <span>⏱ {{ assignment()?.quizInfo?.timeLimitMinutes }} хв.</span>
+            </div>
+            <div class="meta-item">
+              <span
+                >❓ Питань: {{ assignment()?.quizInfo?.questionQuantity }}</span
+              >
+            </div>
+          }
+        </div>
+
+        <hr class="divider" />
+
+        <div class="rich-text-content" [innerHTML]="data.description"></div>
+
+        @if (isStudent()) {
+          <div class="action-section">
+            @if (!this.isAssignmentSubmitMode() && !isSubmitBlocked()) {
+              <button
+                class="submit-btn highlight"
+                (click)="openAssignmentSubmit()"
+              >
+                {{ isQuiz() ? "Почати тест" : "Здати роботу" }}
+              </button>
             }
-          </button>
+          </div>
         }
-        @if (this.isAssignmentSubmitMode()) {
-          @switch (this.assignment()?.assignmentType) {
-            @case (AssignmentType.Task) {
-              <app-task-submission
-                (onCancelSubmission)="cancel()"
-                [assignmentId]="assignment()!.id"
-                (onSubmited)="fetchAssignment()"
-              ></app-task-submission>
-            }
-            @case (AssignmentType.Quiz) {
-              quiz
-            }
+      </div>
+      @if (this.isAssignmentSubmitMode()) {
+        @switch (this.assignment()?.assignmentType) {
+          @case (AssignmentType.Task) {
+            <app-task-submission
+              (onCancelSubmission)="cancel()"
+              [assignmentId]="assignment()!.id"
+              (onSubmited)="fetchAssignment()"
+            ></app-task-submission>
+          }
+          @case (AssignmentType.Quiz) {
+            quiz
           }
         }
       }
-      @if (hasNote()) {
-        <div class="status-wrapper">
+
+      @if (hasNote() && !isTeacher()) {
+        <div class="assignment-card status-card">
+          <h3 class="section-title">Статус виконання</h3>
           <app-assignment-status [assignment]="data"></app-assignment-status>
         </div>
       }

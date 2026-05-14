@@ -214,6 +214,9 @@ namespace PaStudy.Infrastructure.Migrations
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("datetimeoffset");
 
@@ -782,6 +785,68 @@ namespace PaStudy.Infrastructure.Migrations
                     b.ToTable("Group");
                 });
 
+            modelBuilder.Entity("PaStudy.Core.Entities.Notification.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClickActionUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("RecipientUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId")
+                        .HasDatabaseName("IX_Notification_CourseId")
+                        .HasFilter("[CourseId] IS NOT NULL");
+
+                    b.HasIndex("RecipientUserId", "IsRead")
+                        .HasDatabaseName("IX_Notification_Recipient_IsRead")
+                        .HasFilter("[RecipientUserId] IS NOT NULL");
+
+                    b.ToTable("Notification");
+                });
+
             modelBuilder.Entity("PaStudy.Core.Entities.Section", b =>
                 {
                     b.Property<int>("Id")
@@ -1326,6 +1391,16 @@ namespace PaStudy.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("PaStudy.Core.Entities.Notification.Notification", b =>
+                {
+                    b.HasOne("PaStudy.Core.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.Section", b =>

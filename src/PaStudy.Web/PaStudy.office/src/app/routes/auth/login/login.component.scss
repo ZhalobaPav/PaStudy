@@ -85,3 +85,27 @@ h1 {
 .login {
   margin: 1rem;
 }
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  padding: 0.6rem 1.2rem;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+  width: 80%;
+  justify-content: center;
+
+  &:hover {
+    background: #f8f9fa;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  }
+}

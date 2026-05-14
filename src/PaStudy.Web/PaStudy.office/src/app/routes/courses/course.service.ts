@@ -1,9 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpAuth } from '../../core/services/http-auth';
-import { ICourse } from '../../shared/models/course';
+import {
+  CreateCourseDto,
+  CreateCourseResponseDto,
+  ICourse,
+} from '../../shared/models/course';
 import { CoursesFilter } from './models/courses-filter';
 import { Note } from './models/note';
 import { BaseFilter } from '../../shared/models/base/base-filter-model';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -43,5 +48,11 @@ export class CourseService {
 
   public enrollToCourse(id: number) {
     return this.authHelper.post<void>(`Courses/${id}/enroll`, {});
+  }
+
+  public createCourse(
+    course: CreateCourseDto,
+  ): Observable<CreateCourseResponseDto> {
+    return this.authHelper.post('Courses', course);
   }
 }

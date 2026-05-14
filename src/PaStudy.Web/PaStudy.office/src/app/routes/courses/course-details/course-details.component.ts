@@ -7,6 +7,7 @@ import {
   CourseHeaderTitles,
   HeaderConfig,
   headerConfig,
+  RoleGuardEnum,
 } from '../config/headers-config';
 import { AuthService } from '../../auth/auth.service';
 import { NotificationService } from '../../../shared/services/notification.service';
@@ -27,6 +28,7 @@ export class CourseDetailsComponent implements OnInit {
   private courseService = inject(CourseService);
   private toasterService = inject(NotificationService);
   private loaderService = inject(LoaderService);
+  public UserRoleGuard = RoleGuardEnum;
   public readonly tab = CourseHeaderTitles;
   readonly headerConfig: HeaderConfig[] = headerConfig;
   public isEditMode = false;

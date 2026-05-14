@@ -47,8 +47,11 @@ public static class QuizMapper
         else if (question is MatchingQuestion mq)
         {
             matchingInfo = new StudentMatchingInfo(
-                mq.Pairs.Select(p => p.LeftSide).OrderBy(_ => Guid.NewGuid()).ToList(),
-                mq.Pairs.Select(p => p.RightSide).OrderBy(_ => Guid.NewGuid()).ToList()
+                mq.Pairs.Select(p => new StudentAnswerOption(p.Id, p.LeftSide))
+                        .OrderBy(_ => Guid.NewGuid()).ToList(),
+
+                mq.Pairs.Select(p => new StudentAnswerOption(p.Id, p.RightSide))
+                        .OrderBy(_ => Guid.NewGuid()).ToList()
             );
         }
 

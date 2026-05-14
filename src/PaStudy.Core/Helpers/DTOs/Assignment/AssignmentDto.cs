@@ -1,4 +1,5 @@
-﻿using PaStudy.Core.Helpers.DTOs.Attachment;
+﻿using PaStudy.Core.Entities.Assignments;
+using PaStudy.Core.Helpers.DTOs.Attachment;
 using PaStudy.Core.Helpers.Enums;
 using System.Collections.Immutable;
 
@@ -22,10 +23,12 @@ public record struct QuizInfoBrief(bool ShuffleQuestions, int TimeLimitMinutes, 
 
 public record SubmissionInfo(
     bool IsSubmitted,
-    TaskSubmissionDto? TaskSubmission, 
+    TaskSubmissionDto? TaskSubmission,
+    QuizSubmissionInfoDto? quizSubmission,
     DateTime? SubmittedAt,
     decimal? Grade,
     string? TeacherFeedback
 );
 
 public record TaskSubmissionDto(string studentNote, ImmutableArray<AttachmentDto>? Attachments);
+public record QuizSubmissionInfoDto(decimal TotalScore, QuizAttemptStatus attemptStatus, DateTime FinishedAt);

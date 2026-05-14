@@ -17,7 +17,7 @@ export class QuizCardComponent {
   public question = input.required<StudentQuestionDto>();
   public index = input.required<number>();
   public savedAnswer = input<SavedAnswerDto | undefined>();
-
+  public selectedOptionIds = signal<number[]>([]);
   public answerChanged = output<AttemptAnswerPatchDto>();
 
   public selectedOptionId = signal<number | null>(null);
@@ -33,6 +33,9 @@ export class QuizCardComponent {
         }
         if (answer?.matchingAnswers) {
           this.matchingSelections.set(answer.matchingAnswers);
+        }
+        if (answer?.selectedOptionIds) {
+          this.selectedOptionIds.set(answer.selectedOptionIds);
         }
       },
       { allowSignalWrites: true },
@@ -62,6 +65,24 @@ export class QuizCardComponent {
     this.answerChanged.emit({
       questionId: this.question().id,
       matchingAnswers: this.matchingSelections(),
+    });
+  }
+
+  public onMultipleOptionToggle(optionId: number, event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    const isChecked = checkbox.checked;
+
+    this.selectedOptionIds.update((currentIds) => {
+      if (isChecked) {
+        return [...currentIds, optionId];
+      } else {
+        return currentIds.filter((id) => id !== optionId);
+      }
+    });
+
+    this.answerChanged.emit({
+      questionId: this.question().id,
+      selectedOptionIds: this.selectedOptionIds(),
     });
   }
 }

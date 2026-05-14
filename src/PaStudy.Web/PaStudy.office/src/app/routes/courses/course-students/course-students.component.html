@@ -1,3 +1,9 @@
+@if (isEditMode && isTeacher()) {
+  <div class="ivite-wrapper">
+    <button class="invite-btn">Запросити студента</button>
+  </div>
+}
+
 <app-table
   [rowTemplate]="rowTemplate"
   (fetch)="fetchUsers()"

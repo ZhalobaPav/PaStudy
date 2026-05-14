@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddScoped<ISubmissionRepository, SubmissionRepository>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<IQuizRepository, QuizRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
         //Services
         services.AddScoped<IUserService, UserService>();

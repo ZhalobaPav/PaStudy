@@ -1,10 +1,20 @@
 <div class="status-table-container">
   <table class="status-table">
     <tbody>
-      <tr>
-        <th scope="row">Максимальний бал</th>
-        <td>{{ assignment().maxPoints }}</td>
-      </tr>
+      @if (status()) {
+        <tr>
+          <th scope="row">Статус роботи</th>
+          <td>{{ status() }}</td>
+        </tr>
+      }
+
+      @if (!isSubmited()) {
+        <tr>
+          <th scope="row">Максимальний бал</th>
+          <td>{{ assignment().maxPoints }}</td>
+        </tr>
+      }
+
       @if (assignment().dueDate) {
         <tr>
           <th scope="row">Термін виконання</th>
@@ -16,7 +26,7 @@
         </tr>
       }
 
-      @if (isSubmited()) {
+      @if (isSubmited() && isTask()) {
         <tr class="student-note">
           <th scope="row">Здано</th>
           <td>
@@ -26,8 +36,29 @@
             <div
               #noteContainer
               class="student-note-wrapper"
-              [style.maxHeight]="isExpand() ? 'none' : '6rem'"
+              [style.maxHeight]="isExpand() ? 'none' : '7rem'"
               [innerHTML]="submissionInfo()?.studentNote"
+            ></div>
+          </td>
+        </tr>
+      }
+      @if (isSubmited() && hasGrade()) {
+        <tr class="student-note">
+          <th scope="row">Оцінка</th>
+          <td>
+            <p>
+              {{ this.assignment().submissionInfo!.grade }} /
+              {{ this.assignment().maxPoints }}
+            </p>
+          </td>
+        </tr>
+      }
+      @if (isSubmited() && hasTeacherNotes()) {
+        <tr class="student-note">
+          <th scope="row">Відгук вчителя</th>
+          <td>
+            <div
+              [innerHTML]="this.assignment().submissionInfo!.teacherFeedback"
             ></div>
           </td>
         </tr>

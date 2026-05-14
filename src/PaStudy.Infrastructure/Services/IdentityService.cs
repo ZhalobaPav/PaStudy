@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -115,7 +116,41 @@ public class IdentityService
         await transaction.CommitAsync();
         return IdentityResult.Success;
     }
+    public async Task<AuthResultDto> GoogleLoginAsync(GoogleLoginDto dto)
+    {
+        GoogleJsonWebSignature.Payload payload;
+        try
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = new[] { _configuration["Google:ClientId"] }
+            };
+            payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken, settings);
+        }
+        catch
+        {
+            return new AuthResultDto { Succeeded = false, Errors = new[] { "Невалідний Google токен" } };
+        }
 
+        var user = await _userManager.FindByEmailAsync(payload.Email);
+        if (user == null)
+        {
+            user = new ApplicationUser
+            {
+                Email = payload.Email,
+                UserName = payload.Email,
+                EmailConfirmed = true
+            };
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                return new AuthResultDto { Succeeded = false, Errors = createResult.Errors.Select(e => e.Description) };
+            }
+        }
+
+        var token = await GenerateToken(user);
+        return new AuthResultDto { Succeeded = true, Token = token };
+    }
     public async Task<AuthResultDto> LoginAsync(LoginUserDto loginUserDto)
     {
         var user = await _userManager.FindByEmailAsync(loginUserDto.Email);

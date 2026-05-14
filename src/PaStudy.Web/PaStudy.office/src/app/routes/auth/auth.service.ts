@@ -30,6 +30,8 @@ export class AuthService {
     return this.httpAuth.post<string>(`auth/register`, user);
   }
 
+  public googleLogin() {}
+
   public login(loginModel: LoginModel) {
     return this.httpAuth.post<LoginResponse>(`auth/login`, loginModel);
   }

@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
-using PaStudy.Core.Entities;
+﻿using PaStudy.Core.Helpers.DTOs.Category;
 using PaStudy.Core.Helpers.DTOs.Course;
 using PaStudy.Core.Helpers.DTOs.Course.Note;
+using PaStudy.Core.Helpers.Exceptions;
 using PaStudy.Core.Helpers.FilterObjects;
 using PaStudy.Core.Helpers.FilterObjects.CourseFilters;
 using PaStudy.Core.Interfaces.Repository;
-using PaStudy.Infrastructure.ConfigureDependencies;
 using PaStudy.Infrastructure.Models;
 using PavStudy.API.Extensions;
 using System.Collections.Immutable;
@@ -22,7 +21,9 @@ public class Courses : EndpointGroupBase
             .MapGet(GetCourses)
             .MapGet(GetCourseById, "{id}")
             .MapGet(GetNotes, "{courseId}/notes")
-            .MapPost(EnrollToCourse, "{id}/enroll");
+            .MapPost(EnrollToCourse, "{id}/enroll")
+            .MapPost(CreateCourseAsync)
+            .MapGet(GetCategories, "Categories");
     }
 
     public async Task<ImmutableArray<CourseDto>> GetCourses(CancellationToken cancellationToken, [AsParameters] CourseFilter courseFilter, ICourseRepository repository, ClaimsPrincipal user)
@@ -40,6 +41,23 @@ public class Courses : EndpointGroupBase
         return await repository.GetCourseByIdAsync(id, cancellationToken, user);
     }
 
+
+    public async Task<IResult> CreateCourseAsync(CreateCourseDto dto, CancellationToken cancellationToken, ICourseRepository repository, ClaimsPrincipal user)
+    {
+        try
+        {
+            var result = await repository.CreateCourseAsync(dto, user, cancellationToken);
+            return result != null ? Results.Ok(result) : Results.BadRequest();
+        }
+        catch(ForbiddenException ex)
+        {
+            return Results.Problem(ex.Message, statusCode: 403);
+        }
+        catch(Exception ex)
+        {
+            return Results.Problem(ex.Message);
+        }
+    }
     public async Task<IResult> EnrollToCourse(int id, CancellationToken cancellationToken, IEnrollmentRepository repository, ClaimsPrincipal user)
     {
         try
@@ -55,5 +73,10 @@ public class Courses : EndpointGroupBase
         {
             return Results.NotFound(ex.Message);
         }
+    }
+
+    public async Task<ImmutableArray<CategoryBriefDto>> GetCategories(CancellationToken cancellationToken, ICourseRepository repository)
+    {
+        return await repository.GetCategoryBriefInfo(cancellationToken);
     }
 }

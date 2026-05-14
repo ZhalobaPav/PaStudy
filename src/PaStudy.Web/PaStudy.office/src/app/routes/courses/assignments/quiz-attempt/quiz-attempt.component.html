@@ -29,6 +29,7 @@
             [question]="question"
             [index]="i + 1"
             [savedAnswer]="savedAnswersMap()[question.id]"
+            (answerChanged)="onSaveAnswer($event)"
           ></app-quiz-card>
         }
       </div>

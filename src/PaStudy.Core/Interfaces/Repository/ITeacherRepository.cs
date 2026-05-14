@@ -13,4 +13,5 @@ public interface ITeacherRepository
     Task<Teacher?> GetByUserIdAsync(string userId, CancellationToken ct = default);
     Task<bool> CanTeacherManageCourse(int teacherId, int courseId);
     Task<bool> CanUserManageCourse(ClaimsPrincipal user, int courseId);
+    bool IsTeacher(ClaimsPrincipal user);
 }

@@ -141,3 +141,40 @@
     }
   }
 }
+
+.create-course-btn {
+  max-width: 20%;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.slider-container {
+  padding: 0 40px;
+  position: relative;
+  width: 100%;
+}
+
+swiper-container {
+  --swiper-theme-color: #007bff;
+  --swiper-navigation-size: 24px;
+  padding-bottom: 40px;
+}
+
+swiper-slide {
+  height: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.course-card {
+  width: 100%;
+  max-width: 350px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+}

@@ -1,5 +1,10 @@
 .assignment-box {
+  width: 70%;
+  margin: 0 auto;
+  background-color: #e1e6eb;
+  height: 90%;
   padding: 1rem;
+  border-radius: 4px;
 }
 
 .assignment-title {
@@ -13,6 +18,8 @@
 .rich-text-content {
   display: block;
   width: 100%;
+  color: #2d3748;
+  font-size: 1.1rem;
   ::ng-deep {
     img {
       display: block;
@@ -34,10 +41,22 @@
 
 .status-wrapper {
   display: block;
-  width: 40%;
-  margin: 5rem auto;
+  width: 70%;
+  margin: 10rem auto 0;
 }
 
+.action-section {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+.section-title {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: #2d3748;
+  border-left: 4px solid #3182ce;
+  padding-left: 1rem;
+}
 .tabs-navigation {
   display: flex;
   border-bottom: 2px solid #eee;
@@ -61,5 +80,83 @@
     &:hover:not(.active) {
       background-color: #f8f9fa;
     }
+  }
+}
+
+.assignment-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0 1rem;
+}
+
+.assignment-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+}
+
+.assignment-title {
+  margin: 0 0 1rem 0;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1a202c;
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+.assignment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  .meta-item {
+    padding: 0.5rem 1rem;
+    background: #f7fafc;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    color: #4a5568;
+    border: 1px solid #edf2f7;
+
+    &.overdue {
+      background: #fff5f5;
+      color: #c53030;
+      border-color: #feb2b2;
+    }
+  }
+}
+.status-card {
+  margin-top: 0;
+}
+.assignment-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.btn-delete-assignment {
+  background-color: #fee2e2; // ніжний червоний фон
+  color: #ef4444; // яскравий червоний текст/іконка
+  border: 1px solid #fca5a5;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #fca5a5;
+    color: #b91c1c;
   }
 }

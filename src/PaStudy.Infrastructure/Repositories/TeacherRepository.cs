@@ -96,6 +96,17 @@ public class TeacherRepository: ITeacherRepository
             .FirstOrDefaultAsync(t => t.UserId == userId, ct);
     }
 
+    public  bool IsTeacher(ClaimsPrincipal user)
+    {
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+        {
+            return false;
+        }
+        var isTeacher = user.IsInRole("Teacher");
+        return isTeacher;
+    }
+
     public async Task<bool> CanTeacherManageCourse(int teacherId, int courseId)
     {
         var teacherCourses = _dbContext.Set<TeacherCourses>();

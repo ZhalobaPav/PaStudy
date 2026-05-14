@@ -4,6 +4,7 @@ import { ProfileInfo } from '../models/profile.model';
 import { Observable } from 'rxjs';
 import { CoursesFilter } from '../../courses/models/courses-filter';
 import { CourseQuantity } from '../../../shared/enums/course-quantity-type';
+import { Category } from '../../../shared/models/category';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +18,10 @@ export class OverviewService {
     const urlParams = new URLSearchParams();
     urlParams.append('courseQuantity', CourseQuantity.Enrolled.toString());
     return this.http.get<ProfileInfo>(`overview?${urlParams.toString()}`);
+  }
+
+  public getInfoForCreateCourse(): Observable<Category[]> {
+    return this.http.get<Category[]>('Courses/Categories');
   }
   constructor() {}
 }

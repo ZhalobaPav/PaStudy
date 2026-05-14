@@ -5,7 +5,7 @@ import { SubmissionDetailsComponent } from './submissions/submission-details/sub
 
 const routes: Routes = [
   {
-    path: ':assignmentId/quizzes/:id/attempt',
+    path: ':assignmentId/attempt',
     loadComponent: () =>
       import('./quiz-attempt/quiz-attempt.component').then(
         (m) => m.QuizAttemptComponent,

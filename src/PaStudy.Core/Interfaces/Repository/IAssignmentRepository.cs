@@ -20,4 +20,5 @@ public interface IAssignmentRepository
     Task AddAttachmentsToAssignment(ICollection<CreateAttachmentDto> createAttachmentDtoList, int assignmentId);
     Task<StudentQuizDto?> GetQuizForPassingAsync(int quizId, CancellationToken cancellation);
     Task<string> SaveFileAsync(IFormFile file);
+    Task DeleteAssignmentAsync(int assignmentId, ClaimsPrincipal user);
 }

@@ -1,4 +1,5 @@
-﻿using PaStudy.Core.Helpers.DTOs.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using PaStudy.Core.Helpers.DTOs.Identity;
 using PaStudy.Core.Helpers.DTOs.Users;
 using PaStudy.Infrastructure.ConfigureDependencies;
 using PaStudy.Infrastructure.Models;
@@ -13,7 +14,8 @@ public class Auth : EndpointGroupBase
     {
         app.MapGroup(this)
             .MapPost(Login, "login")
-            .MapPost(Register, "register");
+            .MapPost(Register, "register")
+            .MapPost(GoogleLogin, "google-login");
     }
     
 
@@ -26,6 +28,16 @@ public class Auth : EndpointGroupBase
             return Results.Unauthorized();
         }
 
+        return Results.Ok(result);
+    }
+
+    public async Task<IResult> GoogleLogin(GoogleLoginDto model, IdentityService identityService)
+    {
+        var result = await identityService.GoogleLoginAsync(model);
+        if (!result.Succeeded)
+        {
+            return Results.Unauthorized();
+        }
         return Results.Ok(result);
     }
 

@@ -16,7 +16,11 @@ import {
   SubmissionListItem,
 } from './models/submission';
 import { HttpParams } from '@angular/common/http';
-import { AttemptStartResponseDto } from './quiz-attempt/quiz.attempt.model';
+import {
+  AttemptAnswerPatchDto,
+  AttemptResultDto,
+  AttemptStartResponseDto,
+} from './quiz-attempt/quiz.attempt.model';
 
 @Injectable({
   providedIn: 'root',
@@ -107,6 +111,24 @@ export class AssignmentService {
     data: GradeSubmissionDto,
   ): Observable<TaskSubmissionDetails> {
     return this.httpAuth.put<TaskSubmissionDetails>('submission', data);
+  }
+
+  public saveAnswer(
+    attemptId: number,
+    dto: AttemptAnswerPatchDto,
+  ): Observable<void> {
+    return this.httpAuth.patch<void>(`assignment/attempts/${attemptId}`, dto);
+  }
+
+  public submitAnswer(attemptId: number): Observable<AttemptResultDto> {
+    return this.httpAuth.post<AttemptResultDto>(
+      `assignment/attempts/${attemptId}/submit`,
+      {},
+    );
+  }
+
+  public deleteAssignment(id: number): Observable<any> {
+    return this.httpAuth.delete(`assignment/${id}`);
   }
 
   constructor() {}

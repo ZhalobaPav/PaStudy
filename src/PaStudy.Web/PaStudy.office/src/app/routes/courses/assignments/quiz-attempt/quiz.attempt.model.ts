@@ -58,3 +58,11 @@ export interface AttemptAnswerPatchDto {
   matchingAnswers?: Record<number, number>;
   textResponse?: string;
 }
+
+export interface AttemptResultDto {
+  attemptId: number;
+  quizId: number;
+  totalScore: number;
+  maxPoints: number;
+  finishedAt: string;
+}

@@ -27,12 +27,14 @@ public class AssignmentRepository: IAssignmentRepository
     private readonly PaStudyDbContext _dbContext;
     private readonly IAttachmentFactory _attachmentFactory;
     private readonly IStudentRepository _studentRepository;
+    private readonly ITeacherRepository _teacherRepository;
 
-    public AssignmentRepository(PaStudyDbContext dbContext, IAttachmentFactory attachmentFactory, IStudentRepository studentRepository)
+    public AssignmentRepository(PaStudyDbContext dbContext, IAttachmentFactory attachmentFactory, IStudentRepository studentRepository, ITeacherRepository teacherRepository)
     {
         _dbContext = dbContext;
         _attachmentFactory = attachmentFactory;
         _studentRepository = studentRepository;
+        _teacherRepository = teacherRepository;
     }
     public async Task<Assignment> CreateAsync(Assignment assignment, CancellationToken ct = default)
     {
@@ -190,12 +192,12 @@ public class AssignmentRepository: IAssignmentRepository
                 var pairs = mq.Pairs.ToList();
 
                 var leftSide = pairs
-                    .Select(p => p.LeftSide)
+                    .Select(p => new StudentAnswerOption(p.Id, p.LeftSide))
                     .OrderBy(_ => Guid.NewGuid())
                     .ToList();
 
                 var rightSide = pairs
-                    .Select(p => p.RightSide)
+                    .Select(p => new StudentAnswerOption(p.Id, p.RightSide))
                     .OrderBy(_ => Guid.NewGuid())
                     .ToList();
 
@@ -289,6 +291,7 @@ public class AssignmentRepository: IAssignmentRepository
                                             ((ImageAttachment)att).Width,
                                             ((ImageAttachment)att).Height) : null
                             }).ToImmutableArray()) : null,
+                        null,
                         s.SubmittedAt,
                         s.Grade,
                         s.TeacherFeedback
@@ -300,7 +303,52 @@ public class AssignmentRepository: IAssignmentRepository
 
         if (dto == null)
             throw new NotFoundException("Assignment not found");
+        if (dto.AssignmentType == AssignmentType.Quiz)
+        {
+            var bestAttempt = await _dbContext.Set<QuizAttempt>()
+                .Where(qa => qa.Quiz.Id == assignmentId && qa.UserId == userId && qa.Status == QuizAttemptStatus.Completed)
+                .OrderByDescending(qa => qa.TotalScore)
+                .Select(qa => new QuizSubmissionInfoDto(
+                    qa.TotalScore ?? 0,
+                    qa.Status,
+                    qa.SubmittedAt ?? DateTime.UtcNow
+                ))
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (bestAttempt != null)
+            {
+                dto.SubmissionInfo = new SubmissionInfo(
+                    true,
+                    null,
+                    bestAttempt,
+                    bestAttempt.FinishedAt,
+                    bestAttempt.TotalScore,
+                    null
+                );
+            }
+        }
 
         return dto;
+    }
+    public async Task DeleteAssignmentAsync(int assignmentId, ClaimsPrincipal user)
+    {
+        var assignment = await _dbContext.Set<Assignment>()
+            .Include(a => a.Section)
+            .FirstOrDefaultAsync(a => a.Id == assignmentId);
+
+        if (assignment == null)
+        {
+            throw new NotFoundException($"Assignment with id {assignmentId} not found");
+        }
+
+        var courseId = assignment.Section.CourseId;
+        var canManage = await _teacherRepository.CanUserManageCourse(user, courseId);
+        if (!canManage)
+        {
+            throw new ForbiddenException("You do not have permission to delete assignments in this course");
+        }
+
+        assignment.IsDeleted = true;
+        await _dbContext.SaveChangesAsync();
     }
 }

@@ -9,3 +9,17 @@ export interface ICourse {
   isEnrolled?: boolean;
   isTeaching?: boolean;
 }
+
+export interface CreateCourseDto {
+  title: string;
+  description: string;
+  categoryId: number;
+}
+
+export interface CreateCourseResponseDto {
+  id: number;
+  title: string;
+  description: string;
+  categoryId: number;
+  createdAt: Date;
+}

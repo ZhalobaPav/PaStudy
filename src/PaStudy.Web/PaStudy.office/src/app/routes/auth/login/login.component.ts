@@ -32,6 +32,7 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required]],
     });
   }
+  public loginWithGoogle() {}
 
   public login() {
     this.loaderService.busy();

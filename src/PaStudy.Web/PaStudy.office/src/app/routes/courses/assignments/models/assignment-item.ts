@@ -26,7 +26,13 @@ export interface SubmissionInfo {
   grade?: number | null;
   teacherFeedback?: string | null;
   taskSubmission?: TaskSubmission | null;
-  // quizSubmission?: QuizSubmissionBrief | null; // На майбутнє
+  quizSubmission?: QuizSubmissionBrief | null;
+}
+export interface QuizSubmissionBrief {
+  attemptId: number;
+  attemptNumber: number;
+  grade: number;
+  status: string;
 }
 
 export interface TaskSubmission {

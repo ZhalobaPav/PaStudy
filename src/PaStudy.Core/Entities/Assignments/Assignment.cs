@@ -18,5 +18,6 @@ namespace PaStudy.Core.Entities.Assignments
         public Section Section { get; set; }
         public ICollection<SubmissionEntity> Submissions { get; set; } = new List<SubmissionEntity>();
         public ICollection<Attachment> Attachments { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 }

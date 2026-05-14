@@ -12,4 +12,5 @@ public interface ISubmissionRepository
     Task<ImmutableArray<SubmissionListItemDto>> GetSubmissionsByAssignmentIdAsync(SubmissionFilter filter, CancellationToken cancellationToken);
     Task<TaskSubmissionDto> GetSubmissionByIdAsync(int id, ClaimsPrincipal user);
     Task<TaskSubmissionDto> GradeSubmissionAsync(GradeSubmissionDto dto, ClaimsPrincipal user);
+    Task UpdateCourseProgress(int studentId, int courseId);
 }

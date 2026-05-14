@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PaStudy.Core.Entities;
 using PaStudy.Core.Entities.Assignments;
 using PaStudy.Core.Entities.Assignments.Submission;
 using PaStudy.Core.Entities.ConnectionEntities;
@@ -14,6 +15,10 @@ using PaStudy.Infrastructure.Extensions;
 using PaStudy.Infrastructure.Migrations;
 using System.Collections.Immutable;
 using System.Security.Claims;
+using MassTransit;
+using PaStudy.Contracts.Commands;
+using PaStudy.Core.Helpers.DTOs.Notification;
+using PaStudy.Core.Entities.Notification;
 
 namespace PaStudy.Infrastructure.Repositories;
 
@@ -21,11 +26,13 @@ public class SubmissionRepository: ISubmissionRepository
 {
     private readonly PaStudyDbContext _dbContext;
     private readonly ITeacherRepository _teacherRepository;
+    private readonly INotificationRepository _notificationRepository;
 
-    public SubmissionRepository(PaStudyDbContext dbContext, ITeacherRepository teacherRepository)
+    public SubmissionRepository(PaStudyDbContext dbContext, ITeacherRepository teacherRepository, INotificationRepository notificationRepository)
     {
         _dbContext = dbContext;
         _teacherRepository = teacherRepository;
+        _notificationRepository = notificationRepository;
     }
     public async Task<ImmutableArray<SubmissionListItemDto>> GetSubmissionsByAssignmentIdAsync(SubmissionFilter filter, CancellationToken cancellationToken)
     {
@@ -54,6 +61,7 @@ public class SubmissionRepository: ISubmissionRepository
         var submission = await _dbContext.Set<Submission>()
         .Include(s => s.Assignment)
             .ThenInclude(a => a.Section)
+                .ThenInclude(sec => sec.Course)
         .Include(s => s.Student)
         .FirstOrDefaultAsync(s => s.Id == dto.SubmissionId);
         if (submission == null)
@@ -61,6 +69,7 @@ public class SubmissionRepository: ISubmissionRepository
             throw new ArgumentException($"Submission with id {dto.SubmissionId} not found");
         }
         var courseId = submission.Assignment.Section.CourseId;
+        var courseTitle = submission.Assignment.Section.Course.Title;
         var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)){
             throw new UnauthorizedAccessException("User must be authenticated to grade submissions");
@@ -81,10 +90,19 @@ public class SubmissionRepository: ISubmissionRepository
         submission.Status = SubmissionStatus.Graded;
         await _dbContext.SaveChangesAsync();
         await UpdateCourseProgress(submission.StudentId, courseId);
+        await _notificationRepository.AddNotificationAsync(new CreateNotificationDto
+        {
+            Title = "Роботу оцінено! 📝",
+            Message = $"Вашу роботу з завдання \"{submission.Assignment.Title}\" було оцінено.",
+            Type = NotificationType.GradeReceived,
+            RecipientUserId = submission.Student.UserId,
+            CourseId = courseId,
+            ClickActionUrl = $"/courses/course-details/{courseId}"
+        });
         return SubmissionMapping.MapToTaskDto(submission, user);
     }
 
-    private async Task UpdateCourseProgress(int studentId, int courseId)
+    public async Task UpdateCourseProgress(int studentId, int courseId)
     {
         if (courseId == 0) return;
 
@@ -93,23 +111,41 @@ public class SubmissionRepository: ISubmissionRepository
 
         if (enrollment == null) return;
 
-        var assignmentStats = await _dbContext.Set<Assignment>()
-            .Where(a => a.Section.CourseId == courseId)
-            .Select(a => new { a.Id, a.MaxPoints })
-            .ToListAsync();
+        var student = await _dbContext.Set<Student>().FindAsync(studentId);
+        if (student == null) return;
+        string userId = student.UserId;
 
-        var studentGrades = await _dbContext.Set<Submission>()
+        var totalAssignmentsCount = await _dbContext.Set<Assignment>()
+            .Where(a => a.Section.CourseId == courseId)
+            .CountAsync();
+
+        var taskGrades = await _dbContext.Set<Submission>()
             .Where(s => s.StudentId == studentId &&
                         s.Assignment.Section.CourseId == courseId &&
                         s.Status == SubmissionStatus.Graded)
             .Select(s => s.Grade)
             .ToListAsync();
 
-        if (assignmentStats.Any())
-        {
-            enrollment.Progress = (double)studentGrades.Count / assignmentStats.Count * 100;
+        int completedTasksCount = taskGrades.Count;
+        decimal tasksTotalPoints = taskGrades.Sum(g => g ?? 0);
 
-            enrollment.FinalGrade = studentGrades.Sum(g => g ?? 0);
+        var quizAttempts = await _dbContext.Set<QuizAttempt>()
+            .Where(a => a.UserId == userId &&
+                        a.Quiz.Section.CourseId == courseId &&
+                        a.Status == QuizAttemptStatus.Completed)
+            .GroupBy(a => a.QuizId)
+            .Select(group => group.Max(a => a.TotalScore ?? 0))
+            .ToListAsync();
+
+        int completedQuizzesCount = quizAttempts.Count;
+        decimal quizzesTotalPoints = quizAttempts.Sum();
+
+        if (totalAssignmentsCount > 0)
+        {
+            int totalCompletedActivities = completedTasksCount + completedQuizzesCount;
+
+            enrollment.Progress = (double)totalCompletedActivities / totalAssignmentsCount * 100;
+            enrollment.FinalGrade = tasksTotalPoints + quizzesTotalPoints;
 
             if (enrollment.Progress >= 100)
             {

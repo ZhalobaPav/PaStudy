@@ -26,11 +26,54 @@ export class AssignmentStatusComponent implements AfterViewChecked {
   @ViewChild('noteContainer') noteContainer!: ElementRef;
   public assignment = input.required<Assignment>();
 
-  public submissionInfo = computed(() => {
-    return this.assignment().assignmentType === AssignmentType.Task
-      ? this.assignment().submissionInfo?.taskSubmission
-      : null;
+  public submissionInfo = computed(
+    () => this.assignment().submissionInfo?.taskSubmission,
+  );
+
+  public hasGrade = computed(
+    () =>
+      this.assignment().submissionInfo?.grade !== null &&
+      this.assignment().submissionInfo?.grade !== undefined,
+  );
+
+  public status = computed(() => {
+    switch (true) {
+      case !this.assignment().submissionInfo?.isSubmitted:
+        return 'Не здано';
+      case this.hasGrade():
+        return 'Оцінено';
+      case this.assignment().submissionInfo?.isSubmitted && !this.hasGrade():
+        return 'Здано але не оцінено';
+      default:
+        return null;
+    }
   });
+
+  public hasTeacherNotes = computed(
+    () => !!this.assignment().submissionInfo?.teacherFeedback,
+  );
+
+  public isQuiz = computed(
+    () => this.assignment().assignmentType === AssignmentType.Quiz,
+  );
+  public isTask = computed(
+    () => this.assignment().assignmentType === AssignmentType.Task,
+  );
+
+  public quizResults = computed(() => {
+    if (
+      this.assignment().assignmentType === AssignmentType.Quiz &&
+      this.isSubmited()
+    ) {
+      return this.assignment().submissionInfo?.quizSubmission;
+    }
+    return null;
+  });
+
+  public hasContentToShow = computed(() => {
+    return !!this.submissionInfo()?.studentNote || !!this.quizResults();
+  });
+
   public hasOverflow = signal<boolean>(false);
   public isExpand = signal<boolean>(false);
   public isSubmited = computed(() => {

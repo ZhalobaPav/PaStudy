@@ -1,0 +1,66 @@
+<div class="modal-card">
+  <div class="modal-header">
+    <h2>Новий курс</h2>
+    <button class="close-icon" (click)="close()">×</button>
+  </div>
+
+  <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="title">Назва курсу</label>
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          placeholder="Назва курсу..."
+          [class.error]="
+            courseForm.get('title')?.invalid && courseForm.get('title')?.touched
+          "
+        />
+        @if (
+          courseForm.get("title")?.errors?.["required"] &&
+          courseForm.get("title")?.touched
+        ) {
+          <small class="error-text">Назва є обов'язковою</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="description">Опис (необов'язково)</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="3"
+          placeholder="Короткий опис того, що вивчатиметься..."
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="categoryId">Категорія</label>
+        <select
+          id="categoryId"
+          formControlName="categoryId"
+          class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+        >
+          <option [value]="-1" disabled>Оберіть категорію...</option>
+          @for (category of categories(); track category.id) {
+            <option [value]="category.id">{{ category.name }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="close()">
+        Скасувати
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="courseForm.invalid || isLoading()"
+      >
+        Створити
+      </button>
+    </div>
+  </form>
+</div>

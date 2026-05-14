@@ -10,10 +10,13 @@
   <ItemGroup>
     <PackageReference Include="MailKit" Version="4.15.1" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="9.1.0-develop.90" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.9" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PaStudy.Contracts\PaStudy.Contracts.csproj" />
+    <ProjectReference Include="..\PaStudy.Core\PaStudy.Core.csproj" />
   </ItemGroup>
 </Project>

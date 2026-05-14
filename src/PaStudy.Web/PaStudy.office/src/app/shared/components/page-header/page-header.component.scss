@@ -18,3 +18,181 @@
 .logout {
   margin-left: auto;
 }
+// Контейнер для всього елемента сповіщень у хедері
+.notification-container {
+  position: relative;
+  display: inline-block;
+
+  // Кнопка-дзвіночок
+  .notification-bell {
+    font-size: 1.4rem;
+    cursor: pointer;
+    position: relative;
+    padding: 8px;
+    border-radius: 50%;
+    transition:
+      background-color 0.2s ease,
+      transform 0.1s ease;
+    user-select: none;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    // Червоний бадж із кількістю непрочитаних
+    .badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background-color: #ef4444; // Яскравий червоний (Tailwind red-500)
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      padding: 2px 6px;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white; // Візуально відділяє бадж від фону хедера
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  }
+
+  // Випадаюче вікно зі списком
+  .notifications-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 12px;
+    width: 360px;
+    max-height: 480px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.1),
+      0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    overflow-y: auto;
+    z-index: 1000;
+    animation: slideDown 0.2s ease-out;
+
+    // Скроллбар (робимо його тонким і акуратним)
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    // Елемент списку (одне сповіщення)
+    .notif-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      position: relative;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background-color: #f8fafc;
+      }
+
+      h4 {
+        margin: 0 0 4px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1e293b;
+        line-height: 1.3;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #64748b;
+        line-height: 1.4;
+      }
+
+      // Стилі для НЕПРОЧИТАНОГО сповіщення
+      &.unread {
+        background-color: #f0fdf4; // Легкий зеленкуватий/блакитний відтінок для привернення уваги
+
+        &:hover {
+          background-color: #ecfdf5;
+        }
+
+        h4 {
+          color: #0f172a; // Робимо шрифт темнішим/жирнішим
+        }
+
+        // Маленька кольорова крапка-індикатор непрочитаного збоку
+        &::before {
+          content: "";
+          position: absolute;
+          left: 6px;
+          top: 20px;
+          width: 6px;
+          height: 6px;
+          background-color: #22c55e; // Зелений або синій колір
+          border-radius: 50%;
+        }
+      }
+    }
+
+    // Стан, коли сповіщень взагалі немає
+    .empty {
+      margin: 0;
+      padding: 32px 16px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Анімації
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Адаптивність для мобільних екранів
+@media (max-width: 480px) {
+  .notification-container .notifications-dropdown {
+    position: fixed;
+    top: 60px; // Висота вашого хедера
+    left: 16px;
+    right: 16px;
+    width: calc(100% - 32px);
+    max-height: 70vh;
+  }
+}

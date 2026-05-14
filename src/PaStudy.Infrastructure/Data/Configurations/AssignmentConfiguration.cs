@@ -33,6 +33,7 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
             .WithMany(s => s.Assignments)
             .HasForeignKey(s => s.SectionId)
             .OnDelete(DeleteBehavior.Cascade);
+        builder.HasQueryFilter(a => !a.IsDeleted);
     }
 }
 

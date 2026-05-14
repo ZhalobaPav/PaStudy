@@ -1,6 +1,7 @@
 ﻿using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace PavStudy.API.Extensions;
+namespace PaStudy.Infrastructure.ConfigureDependencies;
 
 public static class MessageBrokerExtension
 {

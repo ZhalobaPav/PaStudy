@@ -20,27 +20,66 @@
       </header>
 
       <section class="courses-section">
+        @if (isTeacher()) {
+          <div>
+            <button class="submit-btn" (click)="openCreateCourseModal()">
+              Створити курс
+            </button>
+          </div>
+        }
         <h2>Мої курси ({{ user.courses.length }})</h2>
 
         @if (user.courses.length === 0) {
           <p class="empty-state">У вас поки немає активних курсів.</p>
         } @else {
-          <div class="courses-grid">
-            @for (course of user.courses; track course.id) {
-              <div class="course-card">
-                <div class="course-category">{{ course.categoryName }}</div>
-                <h3>{{ course.title }}</h3>
-                <p class="course-desc">{{ course.description }}</p>
+          @if (hasManyCourses()) {
+            <div class="slider-container">
+              <swiper-container
+                slides-per-view="1"
+                space-between="20"
+                navigation="true"
+                pagination="true"
+                breakpoints='{"768": {"slidesPerView": 2}, "1024": {"slidesPerView": 3}}'
+              >
+                @for (course of user.courses; track course.id) {
+                  <swiper-slide>
+                    <div class="course-card">
+                      <div class="course-category">
+                        {{ course.categoryName }}
+                      </div>
+                      <h3>{{ course.title }}</h3>
+                      <p class="course-desc">{{ course.description }}</p>
 
-                <div class="course-footer">
-                  <!-- <span class="teachers-info">
-                  👨‍🏫 {{ formatTeachers(course.teachers) }}
-                </span> -->
-                  <button class="btn-go">Перейти</button>
+                      <div class="course-footer">
+                        <a
+                          [routerLink]="['/courses/course-details/', course.id]"
+                        >
+                          <button class="btn-go">Перейти</button>
+                        </a>
+                      </div>
+                    </div>
+                  </swiper-slide>
+                }
+              </swiper-container>
+            </div>
+
+          } @else {
+            <div class="courses-grid">
+              @for (course of user.courses; track course.id) {
+                <div class="course-card">
+                  <div class="course-category">{{ course.categoryName }}</div>
+                  <h3>{{ course.title }}</h3>
+                  <p class="course-desc">{{ course.description }}</p>
+
+                  <div class="course-footer">
+                    <a [routerLink]="['/courses/course-details/', course.id]">
+                      <button class="btn-go">Перейти</button>
+                    </a>
+                  </div>
                 </div>
-              </div>
-            }
-          </div>
+              }
+            </div>
+          }
         }
       </section>
     </div>

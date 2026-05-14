@@ -8,12 +8,17 @@ import {
   signal,
 } from '@angular/core';
 import { HttpAuth } from '../../../../core/services/http-auth';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AssignmentService } from '../assignment.service';
-import { finalize, interval, take, tap } from 'rxjs';
-import { AttemptStartResponseDto, SavedAnswerDto } from './quiz.attempt.model';
+import { catchError, finalize, interval, of, take, tap } from 'rxjs';
+import {
+  AttemptAnswerPatchDto,
+  AttemptStartResponseDto,
+  SavedAnswerDto,
+} from './quiz.attempt.model';
 import { QuizCardComponent } from '../quiz-card/quiz-card.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { LoaderService } from '../../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-quiz-attempt',
@@ -26,6 +31,8 @@ export class QuizAttemptComponent implements OnInit {
   private http = inject(HttpAuth);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
+  private loaderService = inject(LoaderService);
   private assignmentService = inject(AssignmentService);
   public attemptInfo = signal<AttemptStartResponseDto | null>(null);
   public isLoading = signal<boolean>(false);
@@ -57,24 +64,24 @@ export class QuizAttemptComponent implements OnInit {
     );
   });
 
-  @HostListener('document:visibilitychange')
-  onVisibilityChange() {
-    if (document.hidden && this.attemptInfo()) {
-      const currentSwitches = this.tabSwitches() + 1;
-      this.tabSwitches.set(currentSwitches);
+  // @HostListener('document:visibilitychange')
+  // onVisibilityChange() {
+  //   if (document.hidden && this.attemptInfo()) {
+  //     const currentSwitches = this.tabSwitches() + 1;
+  //     this.tabSwitches.set(currentSwitches);
 
-      // if (currentSwitches >= this.maxTabSwitches) {
-      //   alert(
-      //     'Ви занадто багато разів покидали вкладку з тестом! Роботу завершено автоматично.',
-      //   );
-      //   this.submitQuiz();
-      // } else {
-      //   alert(
-      //     `Увага! Виходити з вкладки заборонено. Порушення ${currentSwitches}/${this.maxTabSwitches}.`,
-      //   );
-      // }
-    }
-  }
+  //     if (currentSwitches >= this.maxTabSwitches) {
+  //       alert(
+  //         'Ви занадто багато разів покидали вкладку з тестом! Роботу завершено автоматично.',
+  //       );
+  //       this.submitQuiz();
+  //     } else {
+  //       alert(
+  //         `Увага! Виходити з вкладки заборонено. Порушення ${currentSwitches}/${this.maxTabSwitches}.`,
+  //       );
+  //     }
+  //   }
+  // }
 
   @HostListener('contextmenu', ['$event'])
   onRightClick(event: MouseEvent) {
@@ -89,7 +96,7 @@ export class QuizAttemptComponent implements OnInit {
 
   private startQuizAttempt() {
     this.isLoading.set(true);
-    const id = this.route.snapshot.paramMap.get('id');
+    const id = this.route.snapshot.paramMap.get('assignmentId');
     if (!id) {
       console.error('no id in the root');
       this.isLoading.set(false);
@@ -128,12 +135,45 @@ export class QuizAttemptComponent implements OnInit {
     }
   }
 
+  public onSaveAnswer(patchDto: AttemptAnswerPatchDto): void {
+    this.assignmentService
+      .saveAnswer(this.attemptInfo()!.attemptId, patchDto)
+      .subscribe({
+        next: () => {
+          console.log(
+            `Відповідь на питання ${patchDto.questionId} успішно збережена.`,
+          );
+        },
+        error: (err) => {
+          console.error('Не вдалося зберегти відповідь', err);
+        },
+      });
+  }
+
   public submitQuiz(): void {
-    console.log('Відправляємо тест на перевірку!');
+    this.loaderService.busy();
+    this.assignmentService
+      .submitAnswer(this.attemptInfo()!.attemptId)
+      .pipe(
+        catchError((err) => {
+          console.error(err);
+          return of(err);
+        }),
+        finalize(() => {
+          this.loaderService.idle();
+          this.router.navigate(['../'], { relativeTo: this.route });
+        }),
+        take(1),
+      )
+      .subscribe();
   }
 
   private initTimer(attempt: AttemptStartResponseDto): void {
-    const startTime = new Date(attempt.startedAt).getTime();
+    let startMs = new Date(attempt.startedAt).getTime();
+    const timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
+
+    const startTime = startMs - timezoneOffsetMs;
+
     const limitMs = attempt.timeLimitMinutes * 60 * 1000;
     const endTime = startTime + limitMs;
 

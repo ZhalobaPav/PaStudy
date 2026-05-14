@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using PaStudy.Core.Entities;
 using PaStudy.Core.Helpers.DTOs.Assignment;
 using PaStudy.Core.Helpers.DTOs.Assignment.Quiz;
@@ -6,7 +7,9 @@ using PaStudy.Core.Helpers.DTOs.Reponses;
 using PaStudy.Core.Helpers.DTOs.Section;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Core.Interfaces.Service;
+using PaStudy.Core.Services;
 using PaStudy.Infrastructure.Models;
+using PaStudy.Infrastructure.Repositories;
 using PavStudy.API.Extensions;
 using System.Collections.Immutable;
 using System.Security.Claims;
@@ -22,7 +25,10 @@ public class Assignment: EndpointGroupBase
             .MapGet(GetAssignmentById, "/{assignmentId}")
             .MapPost(CreateAssignment)
             .MapPost(CreateSectionAsync, "section")
-            .MapPost(StartAttemptAsync, "quiz/{quizId}/startAttempt");
+            .MapPost(StartAttemptAsync, "quiz/{quizId}/startAttempt")
+            .MapPatch(SaveAnswer, "attempts/{attemptId}")
+            .MapPost(SubmitAnswers, "attempts/{attemptId}/submit")
+            .MapDelete(DeleteAssignment, "/{id}");
     }
 
     public async Task<BaseResponse<PaStudy.Core.Entities.Assignments.Assignment>> CreateAssignment(CreateAssignmentDto dto, IAssignmentService assignmentService, ClaimsPrincipal user)
@@ -58,4 +64,38 @@ public class Assignment: EndpointGroupBase
         var result = await quizRepository.StartAttemptAsync(quizId, userId);
         return Results.Ok(result);
     }
+    public async Task<IResult> SaveAnswer(int attemptId, [FromBody] AttemptAnswerPatchDto request, ClaimsPrincipal user, IQuizRepository quizRepository)
+    {
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        await quizRepository.SaveAnswerAsync(attemptId, userId, request);
+
+        return Results.Ok();
+    }
+
+    public async Task<IResult> SubmitAnswers(int attemptId, ClaimsPrincipal user, IQuizRepository quizRepository)
+    {
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        var result = await quizRepository.SubmitAttemptAsync(attemptId, userId);
+
+        return Results.Ok(result);
+    }
+
+    public async Task<IResult> DeleteAssignment(int id, CancellationToken ct, IAssignmentRepository assignmentRepository, ClaimsPrincipal user)
+    {
+        await assignmentRepository.DeleteAssignmentAsync(id, user);
+        return Results.Ok(new { message = "Завдання успішно видалено" });
+    }
+
 }

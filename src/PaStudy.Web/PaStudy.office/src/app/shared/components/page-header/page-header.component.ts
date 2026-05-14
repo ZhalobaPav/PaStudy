@@ -5,11 +5,17 @@ import {
   OnInit,
   booleanAttribute,
   ViewEncapsulation,
+  signal,
+  computed,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { MenuService } from '../../../core/bootstrap/menu.service';
 import { AuthService } from '../../../routes/auth/auth.service';
+import { NotificationService } from '../../services/notification.service';
+import { MessagingService } from '../../services/messaging.service';
+import { take, tap } from 'rxjs';
+import { Notification } from '../../models/notification';
 
 @Component({
   selector: 'app-page-header',
@@ -26,6 +32,8 @@ export class PageHeaderComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly menuService = inject(MenuService);
   private readonly authService = inject(AuthService);
+  private notificationsService = inject(MessagingService);
+  public notifications = signal<Notification[]>([]);
   public readonly isAuthenticated = this.authService.isAuthorized;
   @Input() title: string = '';
   @Input() subtitle: string = '';
@@ -36,9 +44,39 @@ export class PageHeaderComponent implements OnInit {
     const menuLevel = this.menuService.getLevel(routes);
 
     this.title = this.title || menuLevel[menuLevel.length - 1];
+    this.fetchNotifications();
   }
   logout() {
     this.authService.logout();
     this.router.navigate(['login']);
+  }
+  public toggleDropdown() {
+    this.isDropdownOpen.update((v) => !v);
+  }
+  public readNotif(notif: Notification) {
+    if (!notif.isRead) {
+    }
+    this.isDropdownOpen.set(false);
+
+    if (notif.clickActionUrl) {
+      this.router.navigateByUrl(notif.clickActionUrl);
+    }
+  }
+  public isDropdownOpen = signal(false);
+
+  public unreadCount = computed(
+    () => this.notifications().filter((n) => !n.isRead).length,
+  );
+
+  private fetchNotifications() {
+    this.notificationsService
+      .getNotifications()
+      .pipe(
+        tap((notifications) => {
+          this.notifications.set(notifications);
+        }),
+        take(1),
+      )
+      .subscribe();
   }
 }
