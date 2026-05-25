@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PaStudy.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using PaStudy.Infrastructure.Data;
 namespace PaStudy.Infrastructure.Migrations
 {
     [DbContext(typeof(PaStudyDbContext))]
-    partial class PaStudyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260517122513_changeDateTimeToOffset")]
+    partial class changeDateTimeToOffset
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -379,9 +382,6 @@ namespace PaStudy.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int?>("StudentId")
-                        .HasColumnType("int");
-
                     b.Property<DateTimeOffset?>("SubmittedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -396,8 +396,6 @@ namespace PaStudy.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("QuizId");
-
-                    b.HasIndex("StudentId");
 
                     b.ToTable("QuizAttempt");
                 });
@@ -1273,13 +1271,7 @@ namespace PaStudy.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("PaStudy.Core.Entities.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId");
-
                     b.Navigation("Quiz");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("PaStudy.Core.Entities.Assignments.QuizAttemptAnswer", b =>

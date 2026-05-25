@@ -7,12 +7,18 @@
 </app-table>
 
 <ng-template #rowTemplate let-row="row">
-  <a class="course-link" [routerLink]="['submission', row.id]">
-    {{ row.studentFullName }}
-  </a>
+  @if (isQuiz()) {
+    <a class="course-link" [routerLink]="['submission/quiz', row.id]">
+      {{ row.studentFullName }}
+    </a>
+  } @else {
+    <a class="course-link" [routerLink]="['submission', row.id]">
+      {{ row.studentFullName }}
+    </a>
+  }
   <span>{{ row.submittedAt | date: "yyyy-MM-dd HH:mm" }}</span>
-  <span>{{ row.status }}</span>
-  @if (row.status === SubmissionStatus.Graded) {
+  <span>{{ row.status | submissionStatus }}</span>
+  @if (row.status === SubmissionStatus.Graded || isQuiz()) {
     <span>{{ row.grade }}</span>
   }
 </ng-template>

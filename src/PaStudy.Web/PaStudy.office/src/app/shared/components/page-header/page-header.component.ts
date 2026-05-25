@@ -8,7 +8,7 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 import { MenuService } from '../../../core/bootstrap/menu.service';
 import { AuthService } from '../../../routes/auth/auth.service';
@@ -33,6 +33,7 @@ export class PageHeaderComponent implements OnInit {
   private readonly menuService = inject(MenuService);
   private readonly authService = inject(AuthService);
   private notificationsService = inject(MessagingService);
+  private route = inject(ActivatedRoute);
   public notifications = signal<Notification[]>([]);
   public readonly isAuthenticated = this.authService.isAuthorized;
   @Input() title: string = '';
@@ -67,7 +68,9 @@ export class PageHeaderComponent implements OnInit {
   public unreadCount = computed(
     () => this.notifications().filter((n) => !n.isRead).length,
   );
-
+  public goBackToCourse(): void {
+    this.router.navigate(['../'], { relativeTo: this.route });
+  }
   private fetchNotifications() {
     this.notificationsService
       .getNotifications()

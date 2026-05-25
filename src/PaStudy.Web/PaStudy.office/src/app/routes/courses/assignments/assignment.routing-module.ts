@@ -19,6 +19,13 @@ const routes: Routes = [
       ),
   },
   {
+    path: ':assignmentId/submission/quiz/:id',
+    loadComponent: () =>
+      import('./submissions/quiz-submission-details/quiz-submission-details.component').then(
+        (m) => m.QuizSubmissionDetailsComponent,
+      ),
+  },
+  {
     path: ':assignmentId',
     component: AssignmentDetailsComponent,
   },

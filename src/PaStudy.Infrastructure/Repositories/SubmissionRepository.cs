@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PaStudy.Core.Entities;
 using PaStudy.Core.Entities.Assignments;
 using PaStudy.Core.Entities.Assignments.Submission;
 using PaStudy.Core.Entities.ConnectionEntities;
+using PaStudy.Core.Entities.Notification;
+using PaStudy.Core.Helpers.DTOs.Assignment.Quiz;
 using PaStudy.Core.Helpers.DTOs.Attachment;
+using PaStudy.Core.Helpers.DTOs.Notification;
 using PaStudy.Core.Helpers.DTOs.Submission;
 using PaStudy.Core.Helpers.Enums;
 using PaStudy.Core.Helpers.Exceptions;
@@ -12,13 +16,9 @@ using PaStudy.Core.Helpers.FilterObjects.Submissions;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
 using PaStudy.Infrastructure.Extensions;
-using PaStudy.Infrastructure.Migrations;
+using PaStudy.Infrastructure.Models;
 using System.Collections.Immutable;
 using System.Security.Claims;
-using MassTransit;
-using PaStudy.Contracts.Commands;
-using PaStudy.Core.Helpers.DTOs.Notification;
-using PaStudy.Core.Entities.Notification;
 
 namespace PaStudy.Infrastructure.Repositories;
 
@@ -27,17 +27,59 @@ public class SubmissionRepository: ISubmissionRepository
     private readonly PaStudyDbContext _dbContext;
     private readonly ITeacherRepository _teacherRepository;
     private readonly INotificationRepository _notificationRepository;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public SubmissionRepository(PaStudyDbContext dbContext, ITeacherRepository teacherRepository, INotificationRepository notificationRepository)
+    public SubmissionRepository(
+        PaStudyDbContext dbContext, 
+        ITeacherRepository teacherRepository, 
+        INotificationRepository notificationRepository,
+        UserManager<ApplicationUser> userManager
+        )
     {
         _dbContext = dbContext;
         _teacherRepository = teacherRepository;
         _notificationRepository = notificationRepository;
+        _userManager = userManager;
     }
-    public async Task<ImmutableArray<SubmissionListItemDto>> GetSubmissionsByAssignmentIdAsync(SubmissionFilter filter, CancellationToken cancellationToken)
+    public async Task<ImmutableArray<SubmissionListItemDto>> GetSubmissionsByAssignmentIdAsync(
+    SubmissionFilter filter,
+    CancellationToken cancellationToken)
     {
         int pageNumber = filter.PageNumber ?? 1;
         int pageSize = filter.PageSize ?? 10;
+
+        var assignmentInfo = await _dbContext.Set<Assignment>()
+            .AsNoTracking()
+            .Where(a => a.Id == filter.AssignmentId)
+            .Select(a => new { a.AssignmentType })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (assignmentInfo == null)
+        {
+            throw new KeyNotFoundException($"Завдання з ID {filter.AssignmentId} не знайдено.");
+        }
+
+        if (assignmentInfo.AssignmentType == AssignmentType.Quiz)
+        {
+            return await _dbContext.Set<QuizAttempt>()
+                .AsNoTracking()
+                .Where(qa => qa.QuizId == filter.AssignmentId)
+                .Join(_dbContext.Set<Student>().AsNoTracking(), q => q.UserId, student => student.UserId, (attempt, student) => new { attempt, student })
+                .Select(qa => new SubmissionListItemDto
+                {
+                    Id = qa.attempt.Id, 
+                    StudentId = null,
+                    StudentFullName = qa.student.LastName.Trim() + " " + qa.student.FirstName.Trim() + " " + qa.student.MiddleName.Trim(),
+                    SubmittedAt = qa.attempt.SubmittedAt ?? qa.attempt.StartedAt,
+                    Grade = qa.attempt.TotalScore,
+                    Status = SubmissionStatus.Graded,
+                })
+                .OrderByDescending(s => s.SubmittedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToImmutableArrayAsync(cancellationToken);
+        }
+
         return await _dbContext.Set<Submission>()
             .AsNoTracking()
             .Where(s => s.AssignmentId == filter.AssignmentId)
@@ -190,7 +232,7 @@ public class SubmissionRepository: ISubmissionRepository
                             s.Assignment.Description,
                             s.Assignment.DueDate,
                             s.Assignment.MaxPoints
-                        )
+                        ),
                     };
 
         var result = await query.AsNoTracking().FirstOrDefaultAsync();

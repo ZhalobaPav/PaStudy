@@ -23,7 +23,7 @@ import { AssignmentType } from '../../../enums/assignment-type';
 import { futureDateValidator } from '../../../../routes/auth/shared/validators/laterDate.validator';
 interface QuizFormInterface {
   title: FormControl<string>;
-  points: FormControl<number>;
+  maxPoints: FormControl<number>;
   questions: FormArray<FormGroup>;
   timeLimitMinutes: FormControl<number>;
   dueDate: FormControl<Date>;
@@ -71,7 +71,7 @@ export class CreateQuizBuilderComponent
   private initForm() {
     this.quizForm = this.fb.nonNullable.group<QuizFormInterface>({
       title: this.fb.nonNullable.control('', [Validators.required]),
-      points: this.fb.nonNullable.control(0, [Validators.required]),
+      maxPoints: this.fb.nonNullable.control(0, [Validators.required]),
       questions: this.fb.array<FormGroup>(
         [],
         [Validators.required, Validators.minLength(1)],
@@ -93,7 +93,7 @@ export class CreateQuizBuilderComponent
 
     const questionGroup = this.fb.group({
       text: ['', Validators.required],
-      points: [1, [Validators.required, Validators.min(1)]],
+      points: [0, [Validators.required, Validators.min(1)]],
       type: [type],
       feedback: [''],
       choiceInfo:
@@ -112,8 +112,11 @@ export class CreateQuizBuilderComponent
             })
           : null,
     });
-
+    questionGroup.get('points')!.valueChanges.subscribe(() => {
+      this.redistributePoints(questionGroup);
+    });
     this.questions.push(questionGroup);
+    this.distributePointsEvenly();
   }
 
   private createOption() {
@@ -135,13 +138,8 @@ export class CreateQuizBuilderComponent
   }
 
   private setupPointsCalculation() {
-    this.quizForm.get('questions')?.valueChanges.subscribe(() => {
-      const totalPoints = this.questions.controls.reduce((sum, control) => {
-        const questionPoints = control.get('points')?.value || 0;
-        return sum + questionPoints;
-      }, 0);
-
-      this.quizForm.patchValue({ points: totalPoints }, { emitEvent: false });
+    this.quizForm.get('maxPoints')?.valueChanges.subscribe(() => {
+      this.distributePointsEvenly();
     });
   }
 
@@ -160,7 +158,7 @@ export class CreateQuizBuilderComponent
     const createQuizDto = {
       title: formValue.title,
       description: '',
-      maxPoints: formValue.points,
+      maxPoints: formValue.maxPoints,
       sectionId: this.data.sectionId,
       assignmentType: AssignmentType.Quiz,
       quizInfo: {
@@ -199,7 +197,54 @@ export class CreateQuizBuilderComponent
       });
   }
 
+  private distributePointsEvenly() {
+    const count = this.questions.length;
+    if (count === 0) return;
+
+    const maxPoints = this.quizForm.get('maxPoints')!.value;
+    const perQuestion = +(maxPoints / count).toFixed(2);
+    const remainder = +(maxPoints - perQuestion * (count - 1)).toFixed(2);
+
+    this.questions.controls.forEach((ctrl, i) => {
+      ctrl.get('points')!.setValue(i === count - 1 ? remainder : perQuestion, {
+        emitEvent: false,
+      });
+    });
+  }
+
   selectType(questionType: QuestionType) {
     this.selectedType.set(questionType);
+  }
+
+  private redistributePoints(changedGroup: FormGroup) {
+    const count = this.questions.length;
+    if (count <= 1) return;
+
+    const changedValue = +changedGroup.get('points')!.value || 0;
+    const otherControls = this.questions.controls.filter(
+      (c) => c !== changedGroup,
+    );
+    const otherSum = +otherControls
+      .reduce((sum, c) => sum + (c.get('points')?.value || 0), 0)
+      .toFixed(2);
+
+    const newMax = +(changedValue + otherSum).toFixed(2);
+
+    this.quizForm.get('maxPoints')!.setValue(newMax, { emitEvent: false });
+
+    const remaining = +(newMax - changedValue).toFixed(2);
+    const perOther = +(remaining / otherControls.length).toFixed(2);
+    const lastRemainder = +(
+      remaining -
+      perOther * (otherControls.length - 1)
+    ).toFixed(2);
+
+    otherControls.forEach((ctrl, i) => {
+      ctrl
+        .get('points')!
+        .setValue(i === otherControls.length - 1 ? lastRemainder : perOther, {
+          emitEvent: false,
+        });
+    });
   }
 }

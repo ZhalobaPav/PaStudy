@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PaStudy.Core.Entities;
 using PaStudy.Core.Helpers.DTOs.Assignment;
 using PaStudy.Core.Helpers.DTOs.Assignment.Quiz;
 using PaStudy.Core.Helpers.DTOs.Reponses;
 using PaStudy.Core.Helpers.DTOs.Section;
+using PaStudy.Core.Helpers.Exceptions;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Core.Interfaces.Service;
-using PaStudy.Core.Services;
 using PaStudy.Infrastructure.Models;
-using PaStudy.Infrastructure.Repositories;
 using PavStudy.API.Extensions;
 using System.Collections.Immutable;
 using System.Security.Claims;
@@ -64,6 +62,7 @@ public class Assignment: EndpointGroupBase
         var result = await quizRepository.StartAttemptAsync(quizId, userId);
         return Results.Ok(result);
     }
+
     public async Task<IResult> SaveAnswer(int attemptId, [FromBody] AttemptAnswerPatchDto request, ClaimsPrincipal user, IQuizRepository quizRepository)
     {
         var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);

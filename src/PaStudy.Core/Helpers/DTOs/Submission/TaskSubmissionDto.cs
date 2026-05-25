@@ -1,5 +1,7 @@
-﻿using PaStudy.Core.Helpers.DTOs.Attachment;
+﻿using PaStudy.Core.Helpers.DTOs.Assignment.Quiz;
+using PaStudy.Core.Helpers.DTOs.Attachment;
 using PaStudy.Core.Helpers.Enums;
+using System.Collections.Immutable;
 
 namespace PaStudy.Core.Helpers.DTOs.Submission;
 
@@ -22,6 +24,7 @@ public record TaskSubmissionDto
     public SubmissionStatus Status { get; set; }
     public StudentInfo StudentInfo { get; set; }
     public AssignmentInfo AssignmentInfo { get; set; }
+    public SubmissionQuizInfoDto? QuizInfo = null;
 }
 public record StudentInfo(string studentFullName, string? studentEmail);
 
@@ -29,10 +32,16 @@ public record AssignmentInfo (string Title, string Description, DateTime? DueDat
 public record SubmissionListItemDto
 {
     public int Id { get; set; }
-    public int StudentId { get; set; }
+    public int? StudentId { get; set; }
     public string StudentFullName { get; set; }
     public string? StudentEmail { get; set; }
-    public DateTime SubmittedAt { get; set; }
+    public DateTimeOffset SubmittedAt { get; set; }
     public decimal? Grade { get; set; }
-    public SubmissionStatus Status { get; set; }
+    public SubmissionStatus Status { get; set; } = SubmissionStatus.Draft;
+}
+
+public record SubmissionQuizInfoDto
+{
+    public ImmutableArray<SavedAnswerDto> SavedAnswers { get; set; } = ImmutableArray<SavedAnswerDto>.Empty;
+    public int TimeLimitMinutes { get; set; }
 }

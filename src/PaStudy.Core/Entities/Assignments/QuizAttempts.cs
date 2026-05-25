@@ -10,10 +10,12 @@ public class QuizAttempt: BaseAuditableEntity
 
     public string UserId { get; set; } = string.Empty;
 
-    public DateTime StartedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? SubmittedAt { get; set; }
+    public DateTimeOffset StartedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset? SubmittedAt { get; set; }
 
     public QuizAttemptStatus Status { get; set; } = QuizAttemptStatus.InProgress;
+    public int? StudentId { get; set; }
+    public Student? Student { get; set; } = null!;
 
     public decimal? TotalScore { get; set; }
 

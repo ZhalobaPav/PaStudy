@@ -28,6 +28,7 @@ export enum SortOrder {
 
 export enum QuestionType {
   SingleChoice = 0,
+  MultipleChoice = 1,
   Matching = 2,
 }
 

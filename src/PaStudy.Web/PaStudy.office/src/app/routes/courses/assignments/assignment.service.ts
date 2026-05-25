@@ -107,6 +107,12 @@ export class AssignmentService {
     );
   }
 
+  getQuizById(attemptId: number): Observable<AttemptStartResponseDto> {
+    return this.httpAuth.get<AttemptStartResponseDto>(
+      `submission/quizAttempt/${attemptId}`,
+    );
+  }
+
   public gradeSubmission(
     data: GradeSubmissionDto,
   ): Observable<TaskSubmissionDetails> {

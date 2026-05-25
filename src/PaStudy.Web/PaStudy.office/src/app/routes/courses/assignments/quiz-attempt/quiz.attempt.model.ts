@@ -4,6 +4,7 @@ import { Attachment } from '../models/attachment';
 export interface StudentAnswerOption {
   id: number;
   text: string;
+  isCorrect?: boolean;
 }
 
 export interface StudentChoiceInfo {
@@ -50,6 +51,7 @@ export interface AttemptStartResponseDto {
   questions: StudentQuestionDto[];
   attachments: Attachment[];
   savedAnswers: SavedAnswerDto[];
+  totalScore?: number;
 }
 export interface AttemptAnswerPatchDto {
   questionId: number;

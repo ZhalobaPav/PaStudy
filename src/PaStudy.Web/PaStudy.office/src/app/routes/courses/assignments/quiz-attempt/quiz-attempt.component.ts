@@ -35,7 +35,7 @@ export class QuizAttemptComponent implements OnInit {
   private loaderService = inject(LoaderService);
   private assignmentService = inject(AssignmentService);
   public attemptInfo = signal<AttemptStartResponseDto | null>(null);
-  public isLoading = signal<boolean>(false);
+  public isLoading = computed<boolean>(() => this.loaderService.isLoading());
   public activeQuestionIndex = signal<number>(0);
   public timeLeftSeconds = signal<number>(0);
   public formattedTime = computed(() => {
@@ -95,11 +95,11 @@ export class QuizAttemptComponent implements OnInit {
   }
 
   private startQuizAttempt() {
-    this.isLoading.set(true);
+    this.loaderService.busy();
     const id = this.route.snapshot.paramMap.get('assignmentId');
     if (!id) {
       console.error('no id in the root');
-      this.isLoading.set(false);
+      this.loaderService.idle();
       return;
     }
     this.assignmentService
@@ -111,7 +111,7 @@ export class QuizAttemptComponent implements OnInit {
           this.restoreActiveQuestion(response);
         }),
         finalize(() => {
-          this.isLoading.set(false);
+          this.loaderService.idle();
         }),
         take(1),
       )
@@ -169,11 +169,7 @@ export class QuizAttemptComponent implements OnInit {
   }
 
   private initTimer(attempt: AttemptStartResponseDto): void {
-    let startMs = new Date(attempt.startedAt).getTime();
-    const timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
-
-    const startTime = startMs - timezoneOffsetMs;
-
+    const startTime = new Date(attempt.startedAt).getTime();
     const limitMs = attempt.timeLimitMinutes * 60 * 1000;
     const endTime = startTime + limitMs;
 
@@ -186,6 +182,7 @@ export class QuizAttemptComponent implements OnInit {
         this.timeLeftSeconds.set(remaining);
 
         if (remaining === 0) {
+          this.submitQuiz();
         }
       });
   }

@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Builder;
 using PaStudy.Infrastructure.ConfigureDependencies;
 using PaStudy.Infrastructure.ConfigureDependencies.BindConfigurations;
-using PaStudy.Infrastructure.Services;
 using PavStudy.API.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -13,6 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAntiforgery();
 builder.Services.AddDbDependencies(builder.Configuration).AddInfrastructureIdentity(builder.Configuration); 
 builder.Services.BindCloudinaryConfiguration(builder.Configuration);
+
 builder.Services.AddDependencyInjection();
 builder.Services.AddCors(opt =>
 {
@@ -22,7 +24,7 @@ builder.Services.AddCors(opt =>
     });
 });
 var app = builder.Build();
-
+app.UseSerilogRequestLogging();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -30,6 +32,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors("CorsPolicy");
+
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();

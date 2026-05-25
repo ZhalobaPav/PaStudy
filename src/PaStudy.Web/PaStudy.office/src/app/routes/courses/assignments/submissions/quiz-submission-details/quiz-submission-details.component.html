@@ -1,0 +1,191 @@
+@if (quizInfo(); as info) {
+  <div class="quiz-review-container">
+    <header class="quiz-review-header">
+      <div class="meta-info">
+        <h1>Результати тестування: {{ info.title }}</h1>
+        <p class="description">{{ info.description }}</p>
+      </div>
+
+      <div class="score-badge" [class.passed]="(info.totalScore ?? 0) > 0">
+        <span class="score-label">Набрано балів:</span>
+        <span class="score-value"
+          >{{ info.totalScore ?? 0 }} / {{ info.maxPoints }}</span
+        >
+      </div>
+    </header>
+
+    <div class="questions-list">
+      @for (question of info.questions; track question.id; let i = $index) {
+        <div class="question-card">
+          <div class="question-card-header">
+            <span class="question-number">Питання {{ i + 1 }}</span>
+            <span class="question-points">Бал: {{ question.points }}</span>
+          </div>
+
+          <p class="question-text">{{ question.text }}</p>
+
+          <div class="question-body">
+            @switch (question.type) {
+              @case (type.MultipleChoice) {
+                <div class="options-group">
+                  @for (
+                    option of question.choiceInfo!.options;
+                    track option.id
+                  ) {
+                    <div
+                      class="option-row"
+                      [ngClass]="{
+                        'correct-answer': option.isCorrect,
+                        'user-selected-wrong':
+                          isOptionSelected(question.id, option.id) &&
+                          !option.isCorrect,
+                        'user-selected-correct':
+                          isOptionSelected(question.id, option.id) &&
+                          option.isCorrect,
+                      }"
+                    >
+                      <input
+                        type="radio"
+                        [checked]="isOptionSelected(question.id, option.id)"
+                        disabled
+                      />
+                      <label>{{ option.text }}</label>
+
+                      @if (
+                        isOptionSelected(question.id, option.id) &&
+                        option.isCorrect
+                      ) {
+                        <span class="badge badge-success"
+                          >✓ Ваша відповідь</span
+                        >
+                      } @else if (
+                        isOptionSelected(question.id, option.id) &&
+                        !option.isCorrect
+                      ) {
+                        <span class="badge badge-danger"
+                          >✗ Ваша відповідь (невірно)</span
+                        >
+                      } @else if (option.isCorrect) {
+                        <span class="badge badge-info"
+                          >Правильна відповідь</span
+                        >
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              @case (type.SingleChoice) {
+                <div class="options-group">
+                  @for (
+                    option of question.choiceInfo!.options;
+                    track option.id
+                  ) {
+                    <div
+                      class="option-row"
+                      [ngClass]="{
+                        'correct-answer': option.isCorrect,
+                        'user-selected-wrong':
+                          isOptionSelected(question.id, option.id) &&
+                          !option.isCorrect,
+                        'user-selected-correct':
+                          isOptionSelected(question.id, option.id) &&
+                          option.isCorrect,
+                      }"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="isOptionSelected(question.id, option.id)"
+                        disabled
+                      />
+                      <label>{{ option.text }}</label>
+
+                      @if (
+                        isOptionSelected(question.id, option.id) &&
+                        option.isCorrect
+                      ) {
+                        <span class="badge badge-success">✓ Обрано</span>
+                      } @else if (
+                        isOptionSelected(question.id, option.id) &&
+                        !option.isCorrect
+                      ) {
+                        <span class="badge badge-danger">✗ Обрано невірно</span>
+                      } @else if (option.isCorrect) {
+                        <span class="badge badge-info">Мало бути обрано</span>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              @case (type.Matching) {
+                <div class="matching-group">
+                  <table class="matching-table">
+                    <thead>
+                      <tr>
+                        <th>Логічна пара</th>
+                        <th>Обрана відповідь студента</th>
+                        <th>Статус</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (
+                        leftItem of question.matchingInfo!.leftSide;
+                        track leftItem.id
+                      ) {
+                        <tr
+                          [class.row-correct]="
+                            getUserMatchingAnswer(question.id, leftItem.id) ===
+                            leftItem.id
+                          "
+                          [class.row-wrong]="
+                            getUserMatchingAnswer(question.id, leftItem.id) !==
+                            leftItem.id
+                          "
+                        >
+                          <td class="left-side">{{ leftItem.text }}</td>
+                          <td class="right-side">
+                            {{
+                              getRightSideTextById(
+                                question,
+                                getUserMatchingAnswer(question.id, leftItem.id)
+                              ) ?? "Не обрано"
+                            }}
+                          </td>
+                          <td>
+                            @if (
+                              getUserMatchingAnswer(
+                                question.id,
+                                leftItem.id
+                              ) === leftItem.id
+                            ) {
+                              <span class="text-success">✓ Вірно</span>
+                            } @else {
+                              <span class="text-danger">
+                                ✗ Невірно (Правильно:
+                                {{
+                                  getCorrectRightSideText(
+                                    question,
+                                    leftItem.id
+                                  )
+                                }})
+                              </span>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="no-data-placeholder">
+    <p>Завантаження результатів спроби...</p>
+  </div>
+}

@@ -72,8 +72,10 @@ export class AssignmentDetailsComponent implements OnInit {
   }
 
   public fetchAssignment(): void {
+    this.loaderService.busy();
     const id = this.route.snapshot.paramMap.get('assignmentId');
     if (!id) {
+      this.loaderService.idle();
       return;
     }
     this.assignmentService
@@ -83,6 +85,9 @@ export class AssignmentDetailsComponent implements OnInit {
           next: (response) => {
             this.assignment.set(response);
           },
+        }),
+        finalize(() => {
+          this.loaderService.idle();
         }),
         take(1),
       )

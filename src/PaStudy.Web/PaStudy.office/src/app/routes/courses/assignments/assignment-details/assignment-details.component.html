@@ -102,6 +102,7 @@
   } @else if (activeTab() === "grading" && isTeacher()) {
     <app-teacher-submission
       [assignmentId]="assignment()!.id"
+      [assignmentType]="assignment()?.assignmentType"
     ></app-teacher-submission>
   }
 }

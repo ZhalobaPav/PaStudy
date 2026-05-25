@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   inject,
   input,
   OnInit,
@@ -8,6 +9,7 @@ import {
 } from '@angular/core';
 import { AssignmentService } from '../../assignment.service';
 import {
+  SUBMISSION_STATUS_LABELS,
   SubmissionFilter,
   SubmissionListItem,
   SubmissionStatus,
@@ -20,11 +22,13 @@ import { TableConfig } from '../../../../../shared/components/table/models/table
 import { tableConfig } from './submission-table.config';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AssignmentType } from '../../../../../shared/enums/assignment-type';
+import { SubmissionStatusPipe } from '../../../../../shared/pipes/submission-status.pipe';
 
 @Component({
   selector: 'app-teacher-submission',
   standalone: true,
-  imports: [TableModule, DatePipe, RouterLink],
+  imports: [TableModule, DatePipe, RouterLink, SubmissionStatusPipe],
   templateUrl: './teacher-submission.component.html',
   styleUrl: './teacher-submission.component.scss',
 })
@@ -35,6 +39,10 @@ export class TeacherSubmissionComponent implements OnInit {
   public isLoading = signal(false);
   public page = signal(1);
   public SubmissionStatus = SubmissionStatus;
+  public readonly statusLabels = SUBMISSION_STATUS_LABELS;
+  public submissionContext!: { row: SubmissionListItem };
+  public assignmentType = input.required<AssignmentType | undefined>();
+  public isQuiz = computed(() => this.assignmentType() === AssignmentType.Quiz);
   public tableConfig: TableConfig = tableConfig;
   ngOnInit(): void {}
   @ViewChild(TableComponent, { static: true })

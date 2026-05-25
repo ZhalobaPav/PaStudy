@@ -41,7 +41,7 @@ public record AttemptResultDto(
     int QuizId,
     decimal TotalScore,
     decimal MaxPoints,
-    DateTime FinishedAt
+    DateTimeOffset FinishedAt
 );
 
 public record AttemptAnswerPatchDto(

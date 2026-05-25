@@ -25,10 +25,10 @@ public record SubmissionInfo(
     bool IsSubmitted,
     TaskSubmissionDto? TaskSubmission,
     QuizSubmissionInfoDto? quizSubmission,
-    DateTime? SubmittedAt,
+    DateTimeOffset? SubmittedAt,
     decimal? Grade,
     string? TeacherFeedback
 );
 
 public record TaskSubmissionDto(string studentNote, ImmutableArray<AttachmentDto>? Attachments);
-public record QuizSubmissionInfoDto(decimal TotalScore, QuizAttemptStatus attemptStatus, DateTime FinishedAt);
+public record QuizSubmissionInfoDto(decimal TotalScore, QuizAttemptStatus attemptStatus, DateTimeOffset FinishedAt);

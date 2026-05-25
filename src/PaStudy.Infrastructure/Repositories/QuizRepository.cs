@@ -26,6 +26,7 @@ public class QuizRepository: IQuizRepository
     public async Task<AttemptStartResponseDto> StartAttemptAsync(int quizId, string userId)
     {
         var activeAttempt = await _dbContext.Set<QuizAttempt>()
+            .AsSplitQuery()
             .Include(a => a.Answers)
             .Include(a => a.Quiz)
                 .ThenInclude(q => q.Questions)
@@ -71,6 +72,8 @@ public class QuizRepository: IQuizRepository
         var quiz = await _dbContext.Set<QuizAssignment>()
             .Include(q => q.Questions)
                 .ThenInclude(q => (q as ChoiceQuestion).Options)
+            .Include(q => q.Questions)
+                .ThenInclude(q => (q as MatchingQuestion).Pairs)
             .Include(q => q.Attachments)
             .FirstOrDefaultAsync(q => q.Id == quizId);
 
@@ -212,6 +215,57 @@ public class QuizRepository: IQuizRepository
             TotalScore: attempt.TotalScore.Value,
             MaxPoints: maxAttemptPoints,
             FinishedAt: attempt.SubmittedAt.Value
+        );
+    }
+
+    public async Task<AttemptStartResponseDto> GetQuizAttemptDetailsAsync(int attemptId)
+    {
+        var attempt = await _dbContext.Set<QuizAttempt>()
+            .AsNoTracking() 
+            .AsSplitQuery()
+            .Include(a => a.Answers)
+            .Include(a => a.Quiz)
+                .ThenInclude(q => q.Questions)
+                    .ThenInclude(q => (q as ChoiceQuestion).Options)
+            .Include(a => a.Quiz)
+                .ThenInclude(q => q.Questions)
+                    .ThenInclude(q => (q as MatchingQuestion).Pairs)
+            .Include(a => a.Quiz)
+                .ThenInclude(q => q.Attachments)
+            .FirstOrDefaultAsync(a => a.Id == attemptId);
+
+        if (attempt == null)
+        {
+            throw new KeyNotFoundException($"Спробу квізу з ID {attemptId} не знайдено");
+        }
+
+        var studentQuestions = attempt.Quiz.Questions
+            .Select(q => q.ToStudentQuestionDto())
+            .ToImmutableArray();
+
+        var attachments = attempt.Quiz.Attachments
+            .Select(a => new AttachmentDto
+            {
+                FileName = a.FileName,
+                FileUrl = a.FileUrl
+            })
+            .ToImmutableArray();
+
+        var savedAnswers = attempt.Answers
+            .Select(ans => new SavedAnswerDto(
+                ans.QuestionId,
+                ans.SelectedOptionId,
+                ans.SelectedOptionIds,
+                ans.MatchingAnswers,
+                ans.TextResponse
+            ))
+            .ToImmutableArray();
+
+        return attempt.ToAttemptResponseDto(
+            attempt.Quiz,
+            studentQuestions,
+            attachments,
+            savedAnswers
         );
     }
     public async Task SaveAnswerAsync(int attemptId, string userId, AttemptAnswerPatchDto dto)

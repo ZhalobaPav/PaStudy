@@ -21,6 +21,15 @@ export enum SubmissionStatus {
   Rejected = 5,
 }
 
+export const SUBMISSION_STATUS_LABELS: Record<SubmissionStatus, string> = {
+  [SubmissionStatus.Draft]: 'Чернетка',
+  [SubmissionStatus.Submitted]: 'Здано',
+  [SubmissionStatus.Graded]: 'Оцінено',
+  [SubmissionStatus.LateAndRejected]: 'Здано пізно, відхилено',
+  [SubmissionStatus.LateAndAccepted]: 'Здано пізно, прийнято',
+  [SubmissionStatus.Rejected]: 'Відхилено',
+};
+
 export interface SubmissionListItem {
   id: number;
   studentId: number;

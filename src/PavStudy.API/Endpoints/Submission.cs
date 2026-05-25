@@ -14,7 +14,12 @@ public class Submission : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        app.MapGroup(this).RequireAuthorization().MapGet(GetSubmissionsByAssignmentId).MapGet(GetSubmissionById, "/{id}").MapPost(SubmitAssignment).MapPut(GradeSubmissionTask);
+        app.MapGroup(this).RequireAuthorization()
+            .MapGet(GetSubmissionsByAssignmentId)
+            .MapGet(GetSubmissionById, "/{id}")
+            .MapGet(GetStudentAwnsers, "quizAttempt/{attemptId}")
+            .MapPost(SubmitAssignment)
+            .MapPut(GradeSubmissionTask);
     }
 
     public async Task<IResult> SubmitAssignment(CreateSubmissionDto dto, ISubmissionService submissionService, ClaimsPrincipal user)
@@ -72,6 +77,29 @@ public class Submission : EndpointGroupBase
         {
             return Results.StatusCode(500);
         }
+    }
+
+    public async Task<IResult> GetStudentAwnsers(int attemptId, ClaimsPrincipal user, IQuizRepository quizRepository)
+    {
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+        {
+            throw new UnauthorizedAccessException("You do not have access");
+        }
+        if (!user.IsInRole("Teacher"))
+        {
+            throw new ForbiddenException("You do not have access");
+        }
+        try
+        {
+            var result = await quizRepository.GetQuizAttemptDetailsAsync(attemptId);
+            return Results.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return Results.BadRequest(ex);
+        }
+
     }
     public async Task<IResult> GradeSubmissionTask(GradeSubmissionDto dto, ISubmissionRepository submissionRepository, ClaimsPrincipal user)
     {

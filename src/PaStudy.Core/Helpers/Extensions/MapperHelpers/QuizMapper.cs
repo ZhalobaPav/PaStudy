@@ -27,7 +27,8 @@ public static class QuizMapper
             MaxPoints = quiz.MaxPoints,
             Questions = questions,
             Attachments = attachments,
-            SavedAnswers = savedAnswers
+            SavedAnswers = savedAnswers,
+            TotalScore = quizAttempt.TotalScore
         };
     }
 
