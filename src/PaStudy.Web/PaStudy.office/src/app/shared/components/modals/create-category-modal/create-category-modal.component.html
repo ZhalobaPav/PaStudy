@@ -1,0 +1,43 @@
+<div class="modal-card">
+  <div class="modal-header">
+    <h2>Створення нової категорії</h2>
+    <button class="close-icon" (click)="close()">×</button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="newCategoryName">Назва категорії</label>
+        <input
+          id="newCategoryName"
+          type="text"
+          formControlName="name"
+          placeholder="Наприклад: Математичний аналіз"
+          [class.error]="form.get('name')?.invalid && form.get('name')?.touched"
+        />
+        @if (form.get("name")?.touched && form.get("name")?.invalid) {
+          <small class="error-text"
+            >Назва категорії є обов'язковою (мін. 3 символи)</small
+          >
+        }
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="close()">
+        Скасувати
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="form.invalid || isSubmitting"
+      >
+        @if (isSubmitting) {
+          Очікування...
+        } @else {
+          Створити
+        }
+      </button>
+    </div>
+  </form>
+</div>

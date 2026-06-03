@@ -1,5 +1,6 @@
 using PaStudy.Infrastructure.ConfigureDependencies;
 using PaStudy.Infrastructure.ConfigureDependencies.BindConfigurations;
+using PaStudy.Infrastructure.Extensions;
 using PavStudy.API.Extensions;
 using Serilog;
 
@@ -39,4 +40,5 @@ app.UseAuthorization();
 app.UseHttpsRedirection();
 app.Map("/", () => Results.Redirect("/api"));
 app.MapEndpoints();
+app.ApplyDockerMigrations();
 app.Run();

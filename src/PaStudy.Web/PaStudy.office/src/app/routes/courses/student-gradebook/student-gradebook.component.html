@@ -1,0 +1,33 @@
+<div class="gradebook-container">
+  <div class="gradebook-header">
+    <h1>Електронний журнал курсу</h1>
+  </div>
+
+  <app-table
+    [rows]="gradebookData()"
+    (fetch)="fetchGradebook($event)"
+    [rowTemplate]="rowTemplate"
+    [config]="tableConfig"
+  >
+  </app-table>
+</div>
+
+<ng-template #rowTemplate let-row="row">
+  <td>
+    <strong>{{ row.studentFullName }}</strong>
+  </td>
+
+  <td>{{ row.groupName }}</td>
+
+  <td>{{ row.progress | number: "1.0-0" }} %</td>
+
+  <td>{{ row.enrolledAt | date: "dd.MM.yyyy" }}</td>
+
+  <td>
+    @if (row.finalGrade !== null) {
+      <span class="grade-value">{{ row.finalGrade }}</span>
+    } @else {
+      <span class="no-grade">—</span>
+    }
+  </td>
+</ng-template>

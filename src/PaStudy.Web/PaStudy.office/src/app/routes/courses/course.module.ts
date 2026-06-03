@@ -7,9 +7,15 @@ import { RouterModule } from '@angular/router';
 import { CourseDetailsComponent } from './course-details/course-details.component';
 import { CourseInfoComponent } from './course-info/course-info.component';
 import { CourseStudentsComponent } from './course-students/course-students.component';
-import { FormsModule, ɵInternalFormsSharedModule } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  ɵInternalFormsSharedModule,
+} from '@angular/forms';
 import { AssignmentModule } from './assignments/assignment.module';
 import { CourseNotesComponent } from './course-notes/course-notes.component';
+import { StudentGradebookComponent } from './student-gradebook/student-gradebook.component';
+import { TextEditorComponent } from '../../shared/components/text-editor/text-editor.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +32,9 @@ import { CourseNotesComponent } from './course-notes/course-notes.component';
     FormsModule,
     AssignmentModule,
     CourseNotesComponent,
+    StudentGradebookComponent,
+    ReactiveFormsModule,
+    TextEditorComponent,
   ],
 })
 export class CoursesModule {}

@@ -18,6 +18,7 @@ export class AssignmentItemComponent implements OnInit {
   private iconNames = {
     taskIcon: 'file-svgrepo-com.svg',
     quizIcon: 'exam-svgrepo-com.svg',
+    readIcon: 'student-icon.svg',
   };
   private readonly defaultIconSrc = './../../../../../assets/images/icons/';
 
@@ -27,6 +28,8 @@ export class AssignmentItemComponent implements OnInit {
         return this.defaultIconSrc + this.iconNames.taskIcon;
       case AssignmentType.Quiz:
         return this.defaultIconSrc + this.iconNames.quizIcon;
+      case AssignmentType.Reading:
+        return this.defaultIconSrc + this.iconNames.readIcon;
       default:
         return this.defaultIconSrc + this.iconNames.taskIcon;
     }

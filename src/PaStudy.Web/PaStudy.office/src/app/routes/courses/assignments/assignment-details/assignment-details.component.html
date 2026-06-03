@@ -1,5 +1,5 @@
 @if (assignment(); as data) {
-  @if (isTeacher()) {
+  @if (isTeacher() && !isRead()) {
     <div class="tabs-navigation">
       <button
         [class.active]="activeTab() === 'content'"
@@ -38,7 +38,7 @@
         <h1 class="assignment-title">{{ data.title }}</h1>
 
         <div class="assignment-meta">
-          @if (data.dueDate) {
+          @if (data.dueDate && !isRead()) {
             <div class="meta-item" [class.overdue]="isOverdue()">
               <i class="icon-calendar"></i>
               @if (isOverdue()) {

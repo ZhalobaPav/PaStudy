@@ -1,6 +1,7 @@
 ﻿using PaStudy.Core.Helpers.DTOs.Category;
 using PaStudy.Core.Helpers.DTOs.Course;
 using PaStudy.Core.Helpers.DTOs.Course.Note;
+using PaStudy.Core.Helpers.DTOs.Enrollment;
 using PaStudy.Core.Helpers.Exceptions;
 using PaStudy.Core.Helpers.FilterObjects;
 using PaStudy.Core.Helpers.FilterObjects.CourseFilters;
@@ -21,9 +22,11 @@ public class Courses : EndpointGroupBase
             .MapGet(GetCourses)
             .MapGet(GetCourseById, "{id}")
             .MapGet(GetNotes, "{courseId}/notes")
+            .MapGet(GetStudentsGradebook, "{courseId}/gradebook")
             .MapPost(EnrollToCourse, "{id}/enroll")
             .MapPost(CreateCourseAsync)
-            .MapGet(GetCategories, "Categories");
+            .MapGet(GetCategories, "Categories")
+            .MapPut(UpdateCourse);
     }
 
     public async Task<ImmutableArray<CourseDto>> GetCourses(CancellationToken cancellationToken, [AsParameters] CourseFilter courseFilter, ICourseRepository repository, ClaimsPrincipal user)
@@ -34,6 +37,19 @@ public class Courses : EndpointGroupBase
     public async Task<ImmutableArray<NoteDto>> GetNotes(CancellationToken cancellationToken, [AsParameters] BaseFilterRequest courseFilter, ICourseRepository repository, ClaimsPrincipal user, int courseId)
     {
         return await repository.GetNotesAsync(courseId, cancellationToken, user, courseFilter);
+    }
+
+    public async Task<IResult> GetStudentsGradebook(int courseId, CancellationToken ct, IEnrollmentRepository repository)
+    {
+        try
+        {
+            var gradebook = await repository.GetCourseGradebookAsync(courseId, ct);
+            return Results.Ok(gradebook);
+        }
+        catch (Exception ex)
+        {
+            return Results.BadRequest(new { error = ex.Message });
+        }
     }
 
     public async Task<CourseDto> GetCourseById(int id, CancellationToken cancellationToken, ICourseRepository repository, ClaimsPrincipal user)
@@ -74,7 +90,18 @@ public class Courses : EndpointGroupBase
             return Results.NotFound(ex.Message);
         }
     }
-
+    public async Task<IResult> UpdateCourse(UpdateCourseDto courseDto, CancellationToken ct, ICourseRepository repository, ClaimsPrincipal user)
+    {
+        try
+        {
+            await repository.UpdateCourseAsync(courseDto, user, ct);
+            return Results.Ok();
+        }
+        catch (Exception ex)
+        {
+            return Results.BadRequest(new { error = ex.Message });
+        }
+    }
     public async Task<ImmutableArray<CategoryBriefDto>> GetCategories(CancellationToken cancellationToken, ICourseRepository repository)
     {
         return await repository.GetCategoryBriefInfo(cancellationToken);

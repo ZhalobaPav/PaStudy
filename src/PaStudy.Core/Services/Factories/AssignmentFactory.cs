@@ -22,6 +22,7 @@ public class AssignmentFactory : IAssignmentElementFactory
         {
             AssignmentType.Task => CreateTaskAssignment(createAssignmentDto),
             AssignmentType.Quiz => CreateQuizAssignment(createAssignmentDto),
+            AssignmentType.Reading => CreateReadAssignment(createAssignmentDto),
             _ => throw new ArgumentException("Invalid assignment type")
         };
     }
@@ -56,6 +57,21 @@ public class AssignmentFactory : IAssignmentElementFactory
             MaxPoints = taskDto.MaxPoints,
             SectionId = taskDto.SectionId,
             AssignmentType = taskDto.AssignmentType
+        };
+    }
+
+    private ReadAssignment CreateReadAssignment(CreateAssignmentDto readDto)
+    {
+        return new ReadAssignment
+        {
+            Title = readDto.Title,
+            Description = readDto.Description,
+            Attachments = readDto.Attachments.Select((att) => _attachmentFactory.CreateAttachment(att)).ToList(),
+            DueDate = readDto.DueDate,
+            StartDate = readDto.StartDate,
+            MaxPoints = 0,
+            SectionId = readDto.SectionId,
+            AssignmentType = AssignmentType.Reading
         };
     }
 }

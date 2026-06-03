@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { BaseModalComponent } from '../base-modal';
 import {
   FormGroup,
@@ -10,7 +10,10 @@ import {
 import { LoaderService } from '../../../services/loader.service';
 import { Category } from '../../../models/category';
 import { CourseService } from '../../../../routes/courses/course.service';
-import { take, finalize, catchError, of, tap } from 'rxjs';
+import { take, finalize, catchError, of, tap, switchMap } from 'rxjs';
+import { ModalService } from '../modal.service';
+import { CreateCategoryModalComponent } from '../create-category-modal/create-category-modal.component';
+import { CategoryService } from '../create-category-modal/category.service';
 interface CourseForm {
   title: FormControl<string>;
   description: FormControl<string>;
@@ -34,10 +37,15 @@ export class CreateCourseModalComponent
   private fb = inject(FormBuilder);
   public loaderService = inject(LoaderService);
   private courseService = inject(CourseService);
+  private modalService = inject(ModalService);
+  private categoryService = inject(CategoryService);
   public isLoading = computed(() => this.loaderService.isLoading());
-  public categories = computed(() => this.data.courseInfo.categories);
+  public categories = signal<Category[]>([]);
   ngOnInit(): void {
     this.initForm();
+    if (this.data?.courseInfo?.categories) {
+      this.categories.set(this.data.courseInfo.categories);
+    }
   }
 
   private initForm(): void {
@@ -70,6 +78,21 @@ export class CreateCourseModalComponent
         }),
         finalize(() => this.loaderService.idle()),
         take(1),
+      )
+      .subscribe();
+  }
+
+  openCreateCategoryModal() {
+    this.modalService
+      .open(CreateCategoryModalComponent, {})
+      .closed.pipe(
+        switchMap((closed) => {
+          return this.categoryService.getCategories();
+        }),
+        tap((newCategories) => {
+          this.categories.set(newCategories);
+          this.data.courseInfo.categories = newCategories;
+        }),
       )
       .subscribe();
   }

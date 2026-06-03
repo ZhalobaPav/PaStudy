@@ -20,7 +20,7 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
             .HasMaxLength(200);
 
         builder.Property(a => a.Description)
-            .HasMaxLength(2000);
+            .HasMaxLength(-1);
 
         builder.Property(a => a.MaxPoints)
             .HasDefaultValue(100);

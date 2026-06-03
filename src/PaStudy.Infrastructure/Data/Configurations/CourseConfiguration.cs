@@ -13,7 +13,7 @@ public class CourseConfiguration: IEntityTypeConfiguration<Course>
             .HasMaxLength(100);
         builder.Property(c => c.Description)
             .IsRequired()
-            .HasMaxLength(1000);
+            .HasMaxLength(-1);
 
         builder.HasOne(c => c.Category)
             .WithMany()

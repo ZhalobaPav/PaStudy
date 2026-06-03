@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # 1. БАЗА ДАНИХ (MSSQL)
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: pastudy_db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/1433' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - pastudy_network
+
+  # 2. БЕКЕНД (Твій .NET API)
+  backend:
+    image: pastudy_backend
+    container_name: pastudy_backend
+    build:
+      context: . # Контекст — вся коренева папка, щоб Docker бачив Core, Infrastructure тощо.
+      dockerfile: PavStudy.API/Dockerfile # Шлях до Dockerfile всередині папки API
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__PaStudyConnection=Server=database;Database=PaStudyDb;User Id=sa;Password=${DB_PASSWORD};Encrypt=True;TrustServerCertificate=True;
+      - RUN_MIGRATIONS=true
+
+      - Jwt__SecretKey=${JWT_SECRET}
+      - Jwt__Issuer=${ISSUER}
+      - Jwt__Audience=${AUDIENCE}
+      - Jwt__ExpireMinutes=720
+      - Cloudinary__ApiKey=${APIKEY}
+      - Cloudinary__ApiSecret=${APISECRET}
+      - Cloudinary__CloudName=${CLOUDNAME}
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - pastudy_network
+
+  # 3. ФРОНТЕНД (Angular)
+  frontend:
+    image: pastudy_frontend
+    container_name: pastudy_frontend
+    build:
+      # Вказуємо точний шлях до папки, де лежить Angular-проєкт з Dockerfile
+      context: ./PaStudy.Web/PaStudy.office 
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - pastudy_network
+
+volumes:
+  mssql_data:
+
+networks:
+  pastudy_network:
+    driver: bridge

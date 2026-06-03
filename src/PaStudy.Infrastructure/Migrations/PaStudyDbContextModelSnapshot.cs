@@ -208,8 +208,8 @@ namespace PaStudy.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasMaxLength(-1)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
@@ -717,8 +717,8 @@ namespace PaStudy.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(-1)
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("datetimeoffset");

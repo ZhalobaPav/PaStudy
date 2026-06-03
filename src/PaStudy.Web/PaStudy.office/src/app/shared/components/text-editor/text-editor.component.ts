@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   EventEmitter,
   forwardRef,
   inject,
@@ -42,7 +43,7 @@ export class TextEditorComponent implements ControlValueAccessor {
   onChange: any = () => {};
   onTouched: any = () => {};
   isDisabled = signal<boolean>(false);
-
+  public minimalMode = input<boolean>(false);
   private quillInstance: any;
 
   onEditorCreated(editor: any) {
@@ -54,6 +55,27 @@ export class TextEditorComponent implements ControlValueAccessor {
     const Image = Quill.import('formats/image') as any;
     Image.sanitize = (url: string) => url;
   }
+
+  editorModules = computed(() => {
+    if (this.minimalMode()) {
+      return {
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike'], // форматування тексту
+          [{ list: 'ordered' }, { list: 'bullet' }], // списки
+          ['clean'], // очистити стилі
+        ],
+      };
+    }
+    return {
+      toolbar: [
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ header: [1, 2, 3, false] }],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'image', 'video'],
+        ['clean'],
+      ],
+    };
+  });
 
   onChanged(event: any) {
     this.value = event.html;

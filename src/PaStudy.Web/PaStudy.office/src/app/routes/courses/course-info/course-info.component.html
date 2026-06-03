@@ -1,9 +1,62 @@
-<div class="title">
-  <h1>{{ course()?.title }}</h1>
-</div>
-<div class="description">
-  <p>{{ course()?.description }}</p>
-</div>
+<form [formGroup]="infoForm" (ngSubmit)="saveInfo()" class="modal-body">
+  <div class="title">
+    @if (isEditMode()) {
+      <div class="form-group">
+        <label for="courseTitle">Назва курсу</label>
+        <input
+          id="courseTitle"
+          type="text"
+          formControlName="title"
+          [class.error]="
+            infoForm.get('title')?.invalid && infoForm.get('title')?.touched
+          "
+        />
+      </div>
+    } @else {
+      <h1>{{ course()?.title }}</h1>
+    }
+  </div>
+
+  @if (isEditMode()) {
+    <div class="form-group">
+      <label for="courseCategory">Категорія курсу</label>
+      <select id="courseCategory" formControlName="categoryId">
+        <option [ngValue]="null" disabled>Оберіть категорію...</option>
+        @for (cat of categories(); track cat.id) {
+          <option [ngValue]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+  }
+
+  <div class="description">
+    @if (isEditMode()) {
+      <div class="edit-input-group">
+        <label for="courseDesc">Опис курсу</label>
+        <app-text-editor
+          formControlName="description"
+          [minimalMode]="true"
+          placeholder="Введіть детальний опис вашого курсу..."
+        ></app-text-editor>
+      </div>
+    } @else {
+      <p class="description-text" [innerHTML]="course()?.description"></p>
+    }
+  </div>
+
+  @if (isEditMode()) {
+    <div class="action-buttons">
+      <button
+        type="submit"
+        class="submit-btn"
+        [disabled]="infoForm.invalid || isSubmitting()"
+      >
+        {{ isSubmitting() ? "Збереження..." : "Зберегти зміни" }}
+      </button>
+    </div>
+  }
+</form>
+
 @if (course() && (course()?.isEnrolled || course()?.isTeaching)) {
   <app-assignment-list
     [course]="course()"

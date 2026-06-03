@@ -8,6 +8,7 @@ export interface ICourse {
   teachers?: ITeacher[];
   isEnrolled?: boolean;
   isTeaching?: boolean;
+  categoryId?: number;
 }
 
 export interface CreateCourseDto {

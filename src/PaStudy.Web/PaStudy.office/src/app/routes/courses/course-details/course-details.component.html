@@ -27,12 +27,17 @@
       <app-course-students [isEditMode]="isEditMode"></app-course-students>
     }
     @case (tab.Notes) {
-      <app-course-notes></app-course-notes>
+      @if (isStudent) {
+        <app-course-notes></app-course-notes>
+      } @else {
+        <app-student-gradebook></app-student-gradebook>
+      }
     }
     @default {
       <app-course-info
         [course]="course()"
         [isEditMode]="isEditMode"
+        (courseUpdated)="fetchAfterUpdate()"
       ></app-course-info>
     }
   }

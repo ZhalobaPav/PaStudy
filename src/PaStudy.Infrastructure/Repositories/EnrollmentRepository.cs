@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PaStudy.Core.Entities;
 using PaStudy.Core.Entities.ConnectionEntities;
+using PaStudy.Core.Helpers.DTOs.Enrollment;
 using PaStudy.Core.Helpers.Enums;
 using PaStudy.Core.Interfaces.Repository;
 using PaStudy.Infrastructure.Data;
@@ -51,5 +52,26 @@ public class EnrollmentRepository: IEnrollmentRepository
         var result = await _dbContext.SaveChangesAsync(cancellationToken);
 
         return result > 0;
+    }
+
+    public async Task<List<TeacherGradebookDto>> GetCourseGradebookAsync(int courseId, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Set<Enrollment>()
+            .Where(e => e.CourseId == courseId)
+            .OrderBy(e => e.Student.LastName)
+            .ThenBy(e => e.Student.FirstName)
+            .Select(e => new TeacherGradebookDto
+            {
+                EnrollmentId = e.Id,
+                StudentId = e.StudentId,
+                StudentFullName = $"{e.Student.LastName} {e.Student.FirstName} {e.Student.MiddleName}".Trim(),
+                GroupName = e.Student.Group != null ? e.Student.Group.GroupNumber : "Без групи",
+                FinalGrade = e.FinalGrade,
+                Progress = e.Progress,
+                Status = e.Status.ToString(),
+                EnrolledAt = e.Created.UtcDateTime
+            })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 }

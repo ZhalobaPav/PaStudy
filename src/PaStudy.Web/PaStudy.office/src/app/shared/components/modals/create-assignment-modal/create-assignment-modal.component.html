@@ -1,5 +1,5 @@
 <app-scroll-view>
-  <div class="modal-card">
+  <div class="modal-card scrollable">
     <div class="modal-header">
       <h2>Додати нове завдання</h2>
       <button class="close-icon" (click)="close()">×</button>
@@ -8,12 +8,27 @@
     <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()">
       <div class="modal-body">
         <div class="form-group">
-          <label for="title">Назва розділу</label>
+          <label for="assignmentType">Тип завдання</label>
+          <select
+            id="assignmentType"
+            class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+            formControlName="assignmentType"
+          >
+            <option [ngValue]="AssignmentTypeEnum.Task">
+              Практичне завдання (з оцінкою)
+            </option>
+            <option [ngValue]="AssignmentTypeEnum.Reading">
+              Матеріал для читання (лекція)
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="title">Назва завдання</label>
           <input
             id="title"
             type="text"
             formControlName="title"
-            placeholder="Наприклад: Вступ до курсу"
+            placeholder="Завдання"
             [class.error]="
               assignmentForm.get('title')?.invalid &&
               assignmentForm.get('title')?.touched
@@ -39,11 +54,15 @@
           <label for="dueDate">Дата</label>
           <input id="dueDate" formControlName="dueDate" rows="3" type="date" />
         </div>
-
-        <div class="form-group">
-          <label for="maxPoints">Кількість балів</label>
-          <input id="maxPoints" formControlName="maxPoints" type="number" />
-        </div>
+        @if (
+          assignmentForm.get("assignmentType")?.value !=
+          AssignmentTypeEnum.Reading
+        ) {
+          <div class="form-group">
+            <label for="maxPoints">Кількість балів</label>
+            <input id="maxPoints" formControlName="maxPoints" type="number" />
+          </div>
+        }
       </div>
       <div class="modal-footer">
         <button type="button" class="btn-secondary" (click)="close()">

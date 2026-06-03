@@ -9,6 +9,7 @@ import { CoursesFilter } from './models/courses-filter';
 import { Note } from './models/note';
 import { BaseFilter } from '../../shared/models/base/base-filter-model';
 import { Observable } from 'rxjs';
+import { TeacherGradebookDto } from './models/teacher-gradebook';
 
 @Injectable({
   providedIn: 'root',
@@ -54,5 +55,24 @@ export class CourseService {
     course: CreateCourseDto,
   ): Observable<CreateCourseResponseDto> {
     return this.authHelper.post('Courses', course);
+  }
+
+  public fetchGradebook(id: number): Observable<TeacherGradebookDto[]> {
+    return this.authHelper.get<TeacherGradebookDto[]>(
+      `Courses/${id}/gradebook`,
+    );
+  }
+  updateCourse(
+    id: number,
+    title: string,
+    description: string,
+    categoryId: number | undefined,
+  ): Observable<ICourse> {
+    return this.authHelper.put<ICourse>(`courses`, {
+      id,
+      title,
+      description,
+      categoryId,
+    });
   }
 }

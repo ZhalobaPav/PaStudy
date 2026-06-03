@@ -67,6 +67,7 @@ export class CreateAssignmentModalComponent
   private fb = inject(FormBuilder);
   private assignmentService = inject(AssignmentService);
   public isLoading = signal<boolean>(false);
+  public AssignmentTypeEnum = AssignmentType;
   private pendingImages: PendingImage[] = [];
   initForm() {
     this.assignmentForm = this.fb.nonNullable.group<AssignmentForm>({

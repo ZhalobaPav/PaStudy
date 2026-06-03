@@ -1,3 +1,16 @@
 .description {
   border-bottom: solid 0.5px;
 }
+.description-text {
+  width: 100%;
+  max-width: 100%;
+  line-height: 1.5;
+
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+
+  ::ng-deep p {
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+}

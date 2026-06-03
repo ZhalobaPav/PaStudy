@@ -43,6 +43,10 @@ export class AssignmentDetailsComponent implements OnInit {
     () => this.assignment()?.assignmentType === AssignmentType.Quiz,
   );
 
+  public isRead = computed(
+    () => this.assignment()?.assignmentType === AssignmentType.Reading,
+  );
+
   public hasNote = computed(
     () => !this.typesWithoutNote.includes(this.assignment()!.assignmentType),
   );

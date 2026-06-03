@@ -79,6 +79,7 @@ public class CourseRepository : ICourseRepository
                 Title = c.Title,
                 Description = c.Description,
                 CategoryName = c.Category != null ? c.Category.Name : string.Empty,
+                CategoryId = c.CategoryId,
                 Teachers = c.TeacherCourses
                     .Select(tc =>
                         new BriefTeacherDto
@@ -170,7 +171,7 @@ public class CourseRepository : ICourseRepository
     public async Task<CourseResponseDto> CreateCourseAsync(CreateCourseDto dto, ClaimsPrincipal user, CancellationToken ct)
     {
         var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-        if(String.IsNullOrEmpty(userId))
+        if (String.IsNullOrEmpty(userId))
         {
             throw new ForbiddenException("You cannot create courses");
         }
@@ -224,6 +225,31 @@ public class CourseRepository : ICourseRepository
             .ToListAsync();
 
         return teacherCourseIds;
+    }
+
+    public async Task UpdateCourseAsync(UpdateCourseDto updateCourseDto, ClaimsPrincipal user, CancellationToken ct)
+    {
+        var course = await _context.Set<Course>()
+            .Include(c => c.TeacherCourses)
+            .ThenInclude(ct => ct.Teacher)
+            .FirstOrDefaultAsync(c => c.Id == updateCourseDto.Id, ct);
+
+        if (course == null)
+        {
+            throw new NotFoundException("Course not found");
+        }
+
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!course.TeacherCourses.Any(tc => tc.Teacher.UserId == userId))
+        {
+            throw new ForbiddenException("You cannot edit this course");
+        }
+
+        course.Title = updateCourseDto.Title;
+        course.Description = updateCourseDto.Description;
+        course.CategoryId = updateCourseDto.CategoryId;
+
+        await _context.SaveChangesAsync(ct);
     }
 }
 

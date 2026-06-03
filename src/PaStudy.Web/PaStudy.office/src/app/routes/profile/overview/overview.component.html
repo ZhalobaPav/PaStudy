@@ -48,7 +48,10 @@
                         {{ course.categoryName }}
                       </div>
                       <h3>{{ course.title }}</h3>
-                      <p class="course-desc">{{ course.description }}</p>
+                      <p
+                        [innerHTML]="course.description"
+                        class="course-desc"
+                      ></p>
 
                       <div class="course-footer">
                         <a
@@ -62,14 +65,13 @@
                 }
               </swiper-container>
             </div>
-
           } @else {
             <div class="courses-grid">
               @for (course of user.courses; track course.id) {
                 <div class="course-card">
                   <div class="course-category">{{ course.categoryName }}</div>
                   <h3>{{ course.title }}</h3>
-                  <p class="course-desc">{{ course.description }}</p>
+                  <p [innerHTML]="course.description" class="course-desc"></p>
 
                   <div class="course-footer">
                     <a [routerLink]="['/courses/course-details/', course.id]">

@@ -8,6 +8,7 @@ public class CourseDto
     public string Title { get; set; }
     public string? Description { get; set; }
     public string? CategoryName { get; set; }
+    public int? CategoryId { get; set; }
     public bool? IsEnrolled { get; set; } = false;
     public bool? IsTeaching { get; set; } = false;
     public ICollection<BriefTeacherDto>? Teachers { get; set; }

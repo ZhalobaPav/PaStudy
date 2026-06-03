@@ -2,7 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ICourse } from '../../../shared/models/course';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService } from '../course.service';
-import { finalize, of, switchMap, take, tap } from 'rxjs';
+import { catchError, finalize, of, switchMap, take, tap } from 'rxjs';
 import {
   CourseHeaderTitles,
   HeaderConfig,
@@ -37,13 +37,22 @@ export class CourseDetailsComponent implements OnInit {
   public isCreatingAssignment = computed(() =>
     this.router.url.includes('assignment/create'),
   );
+  public courseId = signal<number | null>(null);
 
   ngOnInit(): void {
+    this.courseId.set(this.getCourseId());
+    if (this.courseId() === null || this.courseId() === undefined) {
+      return;
+    }
+    this.fetchCourse(this.courseId()!).subscribe();
+  }
+
+  private getCourseId() {
     const courseId = this.route.snapshot.paramMap.get('id');
     if (!courseId) {
       throw new Error('Course does not exist');
     }
-    this.fetchCourse(+courseId).subscribe();
+    return +courseId;
   }
 
   fetchCourse(courseId: number) {
@@ -61,7 +70,26 @@ export class CourseDetailsComponent implements OnInit {
       }),
     );
   }
-
+  public fetchAfterUpdate() {
+    this.fetchCourse(this.courseId()!)
+      .pipe(
+        tap((res) => {
+          this.toasterService.success(
+            `Вдала зміна курсу ${res.title}`,
+            `Успішна зміна`,
+          );
+        }),
+        catchError((err) => {
+          this.toasterService.error(
+            'Помилка при зміні',
+            `Виникла помилка при зміні курсу ${err}`,
+          );
+          return of(null);
+        }),
+        finalize(() => (this.isEditMode = false)),
+      )
+      .subscribe();
+  }
   setTab(title: CourseHeaderTitles) {
     this.activeTab.set(title);
   }

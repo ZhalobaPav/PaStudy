@@ -17,5 +17,6 @@ namespace PaStudy.Core.Interfaces.Repository
         Task<CourseResponseDto> CreateCourseAsync(CreateCourseDto dto, ClaimsPrincipal user, CancellationToken ct);
         Task<ImmutableArray<CategoryBriefDto>> GetCategoryBriefInfo(CancellationToken ct);
         Task<List<int>> GetUserCourseIdsAsync(string userId);
+        Task UpdateCourseAsync(UpdateCourseDto updateCourseDto, ClaimsPrincipal user, CancellationToken ct);
     }
 }
