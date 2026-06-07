@@ -8,4 +8,4 @@ public record NoteDto
     public NoteAssignmentInfo AssignmentInfo { get; set; }
 }
 
-public record struct NoteAssignmentInfo(int MaxPoints, string Name);
+public record struct NoteAssignmentInfo(int MaxPoints, string Name, int Id);

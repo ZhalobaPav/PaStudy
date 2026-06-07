@@ -26,7 +26,8 @@ public class Courses : EndpointGroupBase
             .MapPost(EnrollToCourse, "{id}/enroll")
             .MapPost(CreateCourseAsync)
             .MapGet(GetCategories, "Categories")
-            .MapPut(UpdateCourse);
+            .MapPut(UpdateCourse)
+            .MapPost(BulkEnroll, "bulk-enroll");
     }
 
     public async Task<ImmutableArray<CourseDto>> GetCourses(CancellationToken cancellationToken, [AsParameters] CourseFilter courseFilter, ICourseRepository repository, ClaimsPrincipal user)
@@ -105,5 +106,37 @@ public class Courses : EndpointGroupBase
     public async Task<ImmutableArray<CategoryBriefDto>> GetCategories(CancellationToken cancellationToken, ICourseRepository repository)
     {
         return await repository.GetCategoryBriefInfo(cancellationToken);
+    }
+    public record BulkEnrollmentDto(int CourseId, List<string> Emails);
+
+    public async Task<IResult> BulkEnroll(
+        BulkEnrollmentDto dto,
+        CancellationToken cancellationToken,
+        IEnrollmentRepository repository,
+        ClaimsPrincipal user)
+    {
+        try
+        {
+            if (dto.Emails == null || !dto.Emails.Any())
+            {
+                return Results.BadRequest(new { message = "Список імейлів не може бути порожнім." });
+            }
+
+            var result = await repository.BulkEnrollStudentsByEmailsAsync(dto.CourseId, dto.Emails, user, cancellationToken);
+
+            return Results.Ok(result);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return Results.NotFound(new { message = ex.Message });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Results.Unauthorized();
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem(ex.Message);
+        }
     }
 }

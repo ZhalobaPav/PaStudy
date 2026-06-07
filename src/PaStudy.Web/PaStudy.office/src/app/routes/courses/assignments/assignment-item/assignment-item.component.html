@@ -1,6 +1,12 @@
 <a class="item-element" [routerLink]="['assignment', assignment()?.id]">
-  <img class="icon" src="{{ iconSrc }}" alt="" />
-  <h2>{{ assignment()?.title }}</h2>
+  <div class="left-content">
+    <img class="icon" [src]="iconSrc" alt="assignment-icon" />
+    <h2>{{ assignment()?.title }}</h2>
+  </div>
+
+  @if (assignment()?.status !== 0) {
+    <div class="completed-badge" title="Виконано">✓</div>
+  }
 </a>
 
 @if (isQuiz()) {}

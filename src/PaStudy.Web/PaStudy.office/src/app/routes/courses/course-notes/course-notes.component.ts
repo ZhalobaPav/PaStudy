@@ -17,12 +17,16 @@ import { tap, finalize, take } from 'rxjs';
 import { TableModule } from '../../../shared/components/table/table.module';
 import { tableConfig } from './note-table.config';
 import { BaseFilter } from '../../../shared/models/base/base-filter-model';
-import { ActivatedRoute, RouterStateSnapshot } from '@angular/router';
+import {
+  ActivatedRoute,
+  RouterLink,
+  RouterStateSnapshot,
+} from '@angular/router';
 
 @Component({
   selector: 'app-course-notes',
   standalone: true,
-  imports: [TableModule],
+  imports: [TableModule, RouterLink],
   templateUrl: './course-notes.component.html',
   styleUrl: './course-notes.component.scss',
 })

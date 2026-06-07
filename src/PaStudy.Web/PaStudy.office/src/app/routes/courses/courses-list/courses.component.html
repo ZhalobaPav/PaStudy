@@ -10,7 +10,7 @@
   <a [routerLink]="['/courses/course-details', row.id]" class="course-link">
     {{ row.title }}
   </a>
-  <span>{{ row.description }}</span>
+  <span class="row-description" [innerHTML]="row.description"></span>
   <span>{{ row.categoryName }}</span>
   <div class="teacher-list">
     @for (teacher of row.teachers; track $index) {

@@ -5,3 +5,12 @@
     content: ",";
   }
 }
+.row-description {
+  display: block;
+  width: 100%;
+
+  // 🔥 Друге: змушуємо браузер примусово переносити нерозривні конструкції (&nbsp; та довгі слова)
+  overflow-wrap: break-word;
+  word-break: break-word;
+  word-wrap: break-word;
+}

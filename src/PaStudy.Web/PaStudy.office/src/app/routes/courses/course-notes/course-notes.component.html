@@ -7,7 +7,7 @@
 </app-table>
 
 <ng-template #rowTemplate let-row="row">
-  <p>
+  <p [routerLink]="['assignment', row.assignmentInfo.id]">
     {{ row.assignmentInfo.name }}
   </p>
   <span>{{ row.grade }}</span>

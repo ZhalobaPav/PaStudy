@@ -145,7 +145,7 @@ public class CourseRepository : ICourseRepository
             })
             .Select(x => new NoteDto
             {
-                AssignmentInfo = new NoteAssignmentInfo(x.Assignment.MaxPoints, x.Assignment.Title),
+                AssignmentInfo = new NoteAssignmentInfo(x.Assignment.MaxPoints, x.Assignment.Title, x.Assignment.Id),
                 Grade = x.Assignment.AssignmentType == AssignmentType.Task
                     ? x.TaskSub.Grade
                     : x.QuizSub.Grade,

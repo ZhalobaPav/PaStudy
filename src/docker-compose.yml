@@ -37,9 +37,9 @@ services:
       - Jwt__Issuer=${ISSUER}
       - Jwt__Audience=${AUDIENCE}
       - Jwt__ExpireMinutes=720
-      - Cloudinary__ApiKey=${APIKEY}
-      - Cloudinary__ApiSecret=${APISECRET}
-      - Cloudinary__CloudName=${CLOUDNAME}
+      - CloudinarySettings__CloudName=${CLOUDNAME}
+      - CloudinarySettings__ApiKey=${APIKEY}
+      - CloudinarySettings__ApiSecret=${APISECRET}
     ports:
       - "8080:8080"
     depends_on:

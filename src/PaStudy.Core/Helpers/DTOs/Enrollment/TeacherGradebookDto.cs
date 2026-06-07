@@ -11,3 +11,10 @@ public record TeacherGradebookDto
     public string Status { get; set; } = string.Empty;
     public DateTime EnrolledAt { get; set; }
 }
+public record BulkEnrollmentResult
+{
+    public bool Success { get; set; } = false;
+    public int EnrolledCount { get; set; } = 0;
+    public int SkippedCount { get; set; } = 0;
+    public string Message { get; set; } = string.Empty;
+}

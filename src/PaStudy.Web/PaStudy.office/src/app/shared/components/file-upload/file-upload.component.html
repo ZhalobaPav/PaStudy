@@ -1,0 +1,70 @@
+<div class="upload-container">
+  <div
+    class="drop-zone"
+    [class.drag-over]="isDragOver"
+    [class.has-file]="selectedFile"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+  >
+    <input
+      type="file"
+      #fileInput
+      (change)="onFileChange($event)"
+      accept=".pdf,.doc,.docx"
+      style="display: none"
+    />
+
+    <ng-container *ngIf="!selectedFile">
+      <div class="upload-info">
+        <svg
+          class="upload-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+          />
+        </svg>
+        <p class="main-text">
+          Перетягніть файл сюди або <span>клікніть для вибору</span>
+        </p>
+        <p class="sub-text">Доступні формати: PDF, DOC, DOCX (макс. 10MB)</p>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="selectedFile">
+      <div class="file-preview">
+        <span
+          class="file-badge"
+          [class.pdf-badge]="selectedFile.type === 'application/pdf'"
+        >
+          {{ getFileIcon() }}
+        </span>
+        <div class="file-details">
+          <span class="file-name">{{ selectedFile.name }}</span>
+          <span class="file-size"
+            >{{ selectedFile.size / 1024 / 1024 | number: "1.0-2" }} MB</span
+          >
+        </div>
+        <button
+          class="btn-remove"
+          (click)="removeFile($event)"
+          title="Видалити файл"
+        >
+          &times;
+        </button>
+      </div>
+    </ng-container>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+</div>

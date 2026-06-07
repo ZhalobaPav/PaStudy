@@ -12,6 +12,13 @@ export interface Assignment {
   assignmentType: AssignmentType;
   quizInfo?: QuizInfoBrieft;
   submissionInfo?: SubmissionInfo | null;
+  status?: AssignmentStatus;
+}
+
+export enum AssignmentStatus {
+  NotStarted = 0,
+  Submited = 1,
+  Graded = 2,
 }
 
 export interface QuizInfoBrieft {

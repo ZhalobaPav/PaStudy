@@ -3,6 +3,7 @@ export interface Note {
   grade: number;
   teacherFeedback: string;
   assignmentInfo: {
+    id: number;
     name: string;
     maxPoints: number;
   };

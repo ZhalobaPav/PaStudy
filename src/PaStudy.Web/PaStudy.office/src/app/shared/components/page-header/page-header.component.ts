@@ -16,6 +16,7 @@ import { NotificationService } from '../../services/notification.service';
 import { MessagingService } from '../../services/messaging.service';
 import { take, tap } from 'rxjs';
 import { Notification } from '../../models/notification';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-page-header',
@@ -34,6 +35,7 @@ export class PageHeaderComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private notificationsService = inject(MessagingService);
   private route = inject(ActivatedRoute);
+  private location = inject(Location);
   public notifications = signal<Notification[]>([]);
   public readonly isAuthenticated = this.authService.isAuthorized;
   @Input() title: string = '';
@@ -69,7 +71,7 @@ export class PageHeaderComponent implements OnInit {
     () => this.notifications().filter((n) => !n.isRead).length,
   );
   public goBackToCourse(): void {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    this.location.back();
   }
   private fetchNotifications() {
     this.notificationsService

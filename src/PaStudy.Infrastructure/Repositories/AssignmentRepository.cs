@@ -110,9 +110,24 @@ public class AssignmentRepository: IAssignmentRepository
                            ((QuizAssignment)a).TimeLimitMinutes,
                            ((QuizAssignment)a).Questions.Count
                         )
-                : null
-                }).ToImmutableArray()
-            })
+                    : null,
+                    Status = a.Submissions
+                        .Where(s => s.Student.UserId == userId)
+                        .Select(sub => (SubmissionStatus?)sub.Status)
+                        .FirstOrDefault() == null
+                            ? AssignmentStatus.NotStarted
+                            : a.Submissions
+                                .Where(s => s.Student.UserId == userId)
+                                .Select(sub => sub.Status)
+                                .FirstOrDefault() == SubmissionStatus.Draft ||
+                              a.Submissions
+                                .Where(s => s.Student.UserId == userId)
+                                .Select(sub => sub.Status)
+                                .FirstOrDefault() == SubmissionStatus.Rejected
+                                    ? AssignmentStatus.NotStarted
+                                    : AssignmentStatus.Submited
+                                    }).ToImmutableArray()
+                                })
             .ToListAsync(cancellationToken);
 
         if (sectionsData.Count == 0)

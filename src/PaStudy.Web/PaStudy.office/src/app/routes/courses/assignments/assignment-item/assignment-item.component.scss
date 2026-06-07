@@ -1,5 +1,73 @@
 .item-element {
   display: flex;
-  gap: 50px;
-  cursor: pointer;
+  align-items: center;
+  justify-content: space-between; /* Розносить текст та галочку по краях */
+  gap: 16px;
+  padding: 14px 20px; /* Даємо простір всередині картки */
+  margin-bottom: 12px;
+  background-color: #ffffff;
+  border-radius: 12px; /* Більш м'яке та сучасне закруглення кутів */
+  border: 1px solid #eef2f5;
+  text-decoration: none;
+  transition: all 0.25s ease-in-out; /* Плавна анімація для ховеру */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); /* Легка тінь */
+
+  // Ефекти при наведенні мишкою
+  &:hover {
+    transform: translateY(-2px); /* Картка ніби піднімається */
+    border-color: #d1dbe5;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06); /* Тінь стає глибшою */
+
+    h2 {
+      color: #3964fe; /* Текст назви підсвічується твоїм фірмовим синім */
+    }
+  }
+
+  .left-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .icon {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      opacity: 0.85;
+    }
+
+    h2 {
+      font-size: 15px;
+      font-weight: 500;
+      color: #1e293b; /* Глибокий темний колір замість чисто чорного */
+      margin: 0;
+      transition: color 0.2s ease;
+    }
+  }
+
+  // Зелений бейдж виконання (Галочка) у правому кутку
+  .completed-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e8f8f0; /* Світло-зелений пастельний фон */
+    color: #2ecc71; /* Яскраво-зелена галочка */
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+    font-weight: bold;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+}
+
+// Анімація появи галочки
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

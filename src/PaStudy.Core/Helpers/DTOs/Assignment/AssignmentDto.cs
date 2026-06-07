@@ -17,6 +17,13 @@ public class AssignmentDto
     public AssignmentType AssignmentType { get; set; } = AssignmentType.Task;
     public QuizInfoBrief? QuizInfo { get; set; }
     public SubmissionInfo? SubmissionInfo { get; set; }
+    public AssignmentStatus? Status { get; set; }
+}
+public enum AssignmentStatus
+{
+    NotStarted = 0,
+    Submited = 1,
+    Graded = 2
 }
 
 public record struct QuizInfoBrief(bool ShuffleQuestions, int TimeLimitMinutes, int questionQuantity);
