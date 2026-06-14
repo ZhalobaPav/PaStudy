@@ -73,7 +73,9 @@ jobs:
           export APIKEY="${{ secrets.APIKEY }}"
           export APISECRET="${{ secrets.APISECRET }}"
 
-          docker compose --context remote -f src/docker-compose.yml up -d --pull always
+          export DOCKER_CONTEXT="remote"
+
+          docker compose -f src/docker-compose.yml up -d --pull always
 
       - name: Cleanup
         if: always() # Очищаємо ключі навіть якщо деплой впав з помилкою
