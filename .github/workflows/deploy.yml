@@ -75,7 +75,7 @@ jobs:
 
           export DOCKER_CONTEXT="remote"
 
-          docker compose -f src/docker-compose.yml up -d --pull always
+          docker compose -f src/docker-compose.yml up -d --pull always --remove-orphans
 
       - name: Cleanup
         if: always() # Очищаємо ключі навіть якщо деплой впав з помилкою
