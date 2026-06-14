@@ -8,3 +8,11 @@ services:
     image: europe-west4-docker.pkg.dev/loyal-curve-498920-t5/pastudy-repo/pastudy_frontend:latest
     pull_policy: always
     build: null
+volumes:
+  mssql_data:
+    name: pastudy_mssql_data
+
+networks:
+  pastudy_network:
+    name: pastudy_network
+    driver: bridge
