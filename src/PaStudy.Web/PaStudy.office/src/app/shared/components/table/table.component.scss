@@ -33,3 +33,25 @@
     box-shadow: 0 0 12px 0 #9aa0bc80;
   }
 }
+
+@media (max-width: 768px) {
+  .table-wrapper {
+    height: auto;
+    padding: 10px;
+  }
+
+  .headers {
+    gap: 12px;
+  }
+
+  .rows {
+    height: auto;
+    overflow-x: auto;
+  }
+
+  .row {
+    gap: 12px;
+    padding: 10px 12px;
+    min-height: 42px;
+  }
+}

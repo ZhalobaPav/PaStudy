@@ -30,7 +30,7 @@ public class GroupRepository: IGroupRepository
             Year = g.Year,
             Faculty = g.Faculty,
             Speciality = g.Speciality,
-            Teacher = new TeacherDto
+            Teacher = g.CuratorOfGroup == null ? null : new TeacherDto
             {
                 Id = g.CuratorOfGroup.Id,
                 FirstName = g.CuratorOfGroup.FirstName,
