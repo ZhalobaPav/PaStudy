@@ -29,13 +29,13 @@ jobs:
       - name: Build and push backend
         run: |
           docker build -t ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.REPO }}/pastudy_backend:latest \
-            -f src/PavStudy.API/Dockerfile .
+            -f src/PavStudy.API/Dockerfile src/
           docker push ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.REPO }}/pastudy_backend:latest
 
       - name: Build and push frontend
         run: |
           docker build -t ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.REPO }}/pastudy_frontend:latest \
-            ./src/PaStudy.Web/PaStudy.office
+            src/PaStudy.Web/PaStudy.office
           docker push ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.REPO }}/pastudy_frontend:latest
 
   deploy:
@@ -73,7 +73,7 @@ jobs:
           export APIKEY="${{ secrets.APIKEY }}"
           export APISECRET="${{ secrets.APISECRET }}"
 
-          docker compose --context remote -f docker-compose.yml up -d --pull always
+          docker compose --context remote -f src/docker-compose.yml up -d --pull always
 
       - name: Cleanup
         if: always() # Очищаємо ключі навіть якщо деплой впав з помилкою
