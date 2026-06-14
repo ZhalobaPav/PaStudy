@@ -1,0 +1,10 @@
+services:
+  backend:
+    image: europe-west4-docker.pkg.dev/loyal-curve-498920-t5/pastudy-repo/pastudy_backend:latest
+    pull_policy: always
+    build: null
+
+  frontend:
+    image: europe-west4-docker.pkg.dev/loyal-curve-498920-t5/pastudy-repo/pastudy_frontend:latest
+    pull_policy: always
+    build: null

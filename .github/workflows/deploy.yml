@@ -64,8 +64,10 @@ jobs:
       - name: Create Docker context
         run: |
           docker context create remote --docker host=ssh://${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}
-
-      - name: Deploy via Docker Context
+      - name: Login to Artifact Registry on VM
+        run: |
+          echo '${{ secrets.GCP_SA_KEY }}' | docker --context remote login europe-west4-docker.pkg.dev -u _json_key --password-stdin
+      - name: Deploy via remote override compose
         run: |
           export DB_PASSWORD="${{ secrets.MSSQL_SA_PASSWORD }}"
           export JWT_SECRET="${{ secrets.JWT_SECRET_KEY }}"
@@ -74,9 +76,9 @@ jobs:
           export CLOUDNAME="${{ secrets.CLOUDNAME }}"
           export APIKEY="${{ secrets.APIKEY }}"
           export APISECRET="${{ secrets.APISECRET }}"
-          export DOCKER_CONTEXT="remote"
 
-          docker compose -f src/docker-compose.yml up -d --pull always --remove-orphans
+          docker --context remote rm -f pastudy_db pastudy_backend pastudy_frontend || true
+          docker --context remote compose -f src/docker-compose.yml -f src/docker-compose.remote.yml up -d --remove-orphans
 
       - name: Cleanup
         if: always()
