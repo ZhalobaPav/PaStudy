@@ -1,4 +1,5 @@
-﻿using PaStudy.Contracts.Commands;
+﻿using Microsoft.EntityFrameworkCore;
+using PaStudy.Contracts.Commands;
 using PaStudy.Core.Entities.Notification;
 using PaStudy.Core.Helpers.DTOs.Notification;
 using PaStudy.Core.Helpers.StaticData;
@@ -27,6 +28,7 @@ public class NotificationRepository: INotificationRepository
                 Message = n.Message,
                 Type = n.Type,
                 ClickActionUrl = n.ClickActionUrl,
+                InvitationStatus = n.InvitationStatus,
                 RecipientUserId = n.RecipientUserId,
                 CourseId = n.CourseId,
                 IsRead = n.IsRead
@@ -39,6 +41,7 @@ public class NotificationRepository: INotificationRepository
             Title = dto.Title,
             Message = dto.Message,
             Type = dto.Type,
+            InvitationStatus = dto.Type == NotificationType.CourseInvitation ? InvitationStatus.Pending : null,
             ClickActionUrl = dto.ClickActionUrl,
             RecipientUserId = dto.RecipientUserId,
             CourseId = dto.CourseId,
@@ -49,5 +52,33 @@ public class NotificationRepository: INotificationRepository
         await _context.Set<Notification>().AddAsync(notification);
         await _context.SaveChangesAsync();
         return notification;
+    }
+
+    // PaStudy.Infrastructure.Repositories.NotificationRepository.cs
+
+    public async Task<(bool Success, int? CourseId)> RespondToInvitationAsync(
+        int notificationId,
+        string userId,
+        bool accept,
+        CancellationToken ct)
+    {
+        var notification = await _context.Set<Notification>()
+            .FirstOrDefaultAsync(n => n.Id == notificationId && n.RecipientUserId == userId, ct);
+
+        // Перевіряємо, чи існує нотифікація і чи це дійсно запрошення зі статусом Pending
+        if (notification == null ||
+            notification.Type != NotificationType.CourseInvitation ||
+            notification.InvitationStatus != InvitationStatus.Pending)
+        {
+            return (false, null);
+        }
+
+        // Змінюємо статус
+        notification.InvitationStatus = accept ? InvitationStatus.Accepted : InvitationStatus.Declined;
+        notification.IsRead = true; // Відразу позначаємо як прочитане
+
+        await _context.SaveChangesAsync(ct);
+
+        return (true, notification.CourseId);
     }
 }

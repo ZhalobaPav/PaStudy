@@ -18,6 +18,7 @@ using System.Collections.Immutable;
 using System.Security.Claims;
 
 namespace PaStudy.Infrastructure.Repositories;
+
 public class CourseRepository : ICourseRepository
 {
     private readonly PaStudyDbContext _context;
@@ -170,16 +171,29 @@ public class CourseRepository : ICourseRepository
 
     public async Task<CourseResponseDto> CreateCourseAsync(CreateCourseDto dto, ClaimsPrincipal user, CancellationToken ct)
     {
-        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (String.IsNullOrEmpty(userId))
-        {
-            throw new ForbiddenException("You cannot create courses");
-        }
-        var teacher = await _teacherRepository.GetByUserIdAsync(userId);
+        Teacher? teacher;
 
-        if (teacher == null)
+        if (dto.TeacherId.HasValue)
         {
-            throw new ForbiddenException("You cannot create courses");
+            teacher = await _teacherRepository.GetByIdAsync(dto.TeacherId.Value, ct);
+            if (teacher == null)
+            {
+                throw new NotFoundException("Teacher not found.");
+            }
+        }
+        else
+        {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ForbiddenException("You cannot create courses");
+            }
+
+            teacher = await _teacherRepository.GetByUserIdAsync(userId, ct);
+            if (teacher == null)
+            {
+                throw new ForbiddenException("You cannot create courses");
+            }
         }
         var course = new Course
         {

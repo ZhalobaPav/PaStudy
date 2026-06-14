@@ -11,6 +11,13 @@ public enum NotificationType
     SubmissionUploaded = 5
 }
 
+public enum InvitationStatus
+{
+    Pending = 1,
+    Accepted = 2,
+    Declined = 3
+}
+
 public class Notification : BaseAuditableEntity
 {
     public string Title { get; set; } = null!;
@@ -20,7 +27,7 @@ public class Notification : BaseAuditableEntity
 
     public string? ClickActionUrl { get; set; }
     public string? RecipientUserId { get; set; }
-
+    public InvitationStatus? InvitationStatus { get; set; }
     public int? CourseId { get; set; }
     public Course? Course { get; set; }
 

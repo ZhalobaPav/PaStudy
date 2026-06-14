@@ -14,7 +14,7 @@ using System.Security.Claims;
 
 namespace PaStudy.Infrastructure.Repositories;
 
-public class TeacherRepository: ITeacherRepository
+public class TeacherRepository : ITeacherRepository
 {
     private readonly PaStudyDbContext _dbContext;
     private readonly UserManager<ApplicationUser> _userManager;
@@ -34,7 +34,7 @@ public class TeacherRepository: ITeacherRepository
                                      t.LastName.ToLower().Contains(term) ||
                                      t.MiddleName.ToLower().Contains(term));
         }
-        if(userFilter.CourseId.HasValue)
+        if (userFilter.CourseId.HasValue)
         {
             query = query.Where(t => t.TeacherCourses.Any(c => c.CourseId == userFilter.CourseId.Value));
         }
@@ -92,11 +92,17 @@ public class TeacherRepository: ITeacherRepository
     }
     public async Task<Teacher?> GetByUserIdAsync(string userId, CancellationToken ct = default)
     {
-        return await _dbContext.Set<Teacher>()   
+        return await _dbContext.Set<Teacher>()
             .FirstOrDefaultAsync(t => t.UserId == userId, ct);
     }
 
-    public  bool IsTeacher(ClaimsPrincipal user)
+    public async Task<Teacher?> GetByIdAsync(int teacherId, CancellationToken ct = default)
+    {
+        return await _dbContext.Set<Teacher>()
+            .FirstOrDefaultAsync(t => t.Id == teacherId, ct);
+    }
+
+    public bool IsTeacher(ClaimsPrincipal user)
     {
         var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null)

@@ -25,6 +25,7 @@ public class Courses : EndpointGroupBase
             .MapGet(GetStudentsGradebook, "{courseId}/gradebook")
             .MapPost(EnrollToCourse, "{id}/enroll")
             .MapPost(CreateCourseAsync)
+            .MapPost(BulkCreateCoursesAsync, "bulk-create")
             .MapGet(GetCategories, "Categories")
             .MapPut(UpdateCourse)
             .MapPost(BulkEnroll, "bulk-enroll");
@@ -66,15 +67,48 @@ public class Courses : EndpointGroupBase
             var result = await repository.CreateCourseAsync(dto, user, cancellationToken);
             return result != null ? Results.Ok(result) : Results.BadRequest();
         }
-        catch(ForbiddenException ex)
+        catch (ForbiddenException ex)
         {
             return Results.Problem(ex.Message, statusCode: 403);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return Results.Problem(ex.Message);
         }
     }
+    public async Task<IResult> BulkCreateCoursesAsync(List<CreateCourseDto> dtos, CancellationToken cancellationToken, ICourseRepository repository, ClaimsPrincipal user)
+    {
+        try
+        {
+            if (dtos == null || !dtos.Any())
+            {
+                return Results.BadRequest(new { message = "Список курсів не може бути порожнім." });
+            }
+
+            var createdCourses = new List<CourseResponseDto>();
+
+            foreach (var dto in dtos)
+            {
+                var result = await repository.CreateCourseAsync(dto, user, cancellationToken);
+                createdCourses.Add(result);
+            }
+
+            return Results.Ok(new
+            {
+                message = $"Successfully created {createdCourses.Count} courses.",
+                courses = createdCourses
+            });
+        }
+        catch (ForbiddenException ex)
+        {
+            return Results.Problem(ex.Message, statusCode: 403);
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem(ex.Message);
+        }
+    }
+
     public async Task<IResult> EnrollToCourse(int id, CancellationToken cancellationToken, IEnrollmentRepository repository, ClaimsPrincipal user)
     {
         try

@@ -1,0 +1,80 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: europe-west4-docker.pkg.dev
+  PROJECT: loyal-curve-498920-t5
+  REPO: pastudy-repo
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker europe-west4-docker.pkg.dev --quiet
+
+      - name: Build and push backend
+        run: |
+          docker build -t ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.REPO }}/pastudy_backend:latest \
+            -f src/PavStudy.API/Dockerfile .
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.REPO }}/pastudy_backend:latest
+
+      - name: Build and push frontend
+        run: |
+          docker build -t ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.REPO }}/pastudy_frontend:latest \
+            ./src/PaStudy.Web/PaStudy.office
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.REPO }}/pastudy_frontend:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      # КРИТИЧНО: Завантажуємо репозиторій, щоб отримати доступ до локального docker-compose.yml
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SSH key
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create Docker context
+        run: |
+          docker context create remote --docker host=ssh://${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}
+
+      - name: Configure Docker for Artifact Registry on VM
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} \
+            "gcloud auth configure-docker europe-west4-docker.pkg.dev --quiet"
+
+      # ВИПРАВЛЕНО: Змінні передаються перед викликом команди docker compose
+      - name: Deploy via Docker Context
+        run: |
+          export DB_PASSWORD="${{ secrets.MSSQL_SA_PASSWORD }}"
+          export JWT_SECRET="${{ secrets.JWT_SECRET_KEY }}"
+          export ISSUER="${{ secrets.ISSUER }}"
+          export AUDIENCE="${{ secrets.AUDIENCE }}"
+          export CLOUDNAME="${{ secrets.CLOUDNAME }}"
+          export APIKEY="${{ secrets.APIKEY }}"
+          export APISECRET="${{ secrets.APISECRET }}"
+
+          docker compose --context remote -f docker-compose.yml up -d --pull always
+
+      - name: Cleanup
+        if: always() # Очищаємо ключі навіть якщо деплой впав з помилкою
+        run: rm -rf ~/.ssh

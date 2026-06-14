@@ -5,13 +5,12 @@
   gap: 16px;
   padding: 14px 20px; /* Даємо простір всередині картки */
   margin-bottom: 12px;
-  background-color: #ffffff;
   border-radius: 12px; /* Більш м'яке та сучасне закруглення кутів */
   border: 1px solid #eef2f5;
   text-decoration: none;
   transition: all 0.25s ease-in-out; /* Плавна анімація для ховеру */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); /* Легка тінь */
-
+  background-color: white;
   // Ефекти при наведенні мишкою
   &:hover {
     transform: translateY(-2px); /* Картка ніби піднімається */

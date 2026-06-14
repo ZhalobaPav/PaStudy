@@ -1,58 +1,128 @@
-.form-field-full {
-  padding: 2em;
-  .mat-mdc-form-field {
-    width: 100%;
-  }
-}
-
-.form-field {
-  margin-top: 1em;
-}
-
-.register-control {
-  border: 2px solid transparent;
-  width: 15em;
-  height: 2.5em;
-  padding-left: 0.8em;
-  outline: none;
-  overflow: hidden;
-  background-color: #f3f3f3;
-  border-radius: 10px;
-  transition: all 0.5s;
-  margin-left: 1em;
-}
-
-.register-control:hover,
-.register-control:focus {
-  border: 2px solid #4a9dec;
-  box-shadow: 0px 0px 0px 7px rgb(74, 157, 236, 20%);
-  background-color: white;
-}
-
+/* Головний контейнер форми-картки */
 .register-form {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 24px;
-  max-width: 900px;
-  margin: auto;
+  gap: 32px;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 32px 24px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Сучасна легка тінь */
+  box-sizing: border-box; /* Захищає від вилазання за межі екрану */
 }
 
+/* Заголовок форми */
 .form-header {
   text-align: center;
+
+  h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    color: #1e293b;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 15px;
+    color: #64748b;
+    font-weight: 400;
+  }
 }
 
+/* Гнучка сітка для полів.
+  На мобілці (< 600px) буде 1 колонка.
+  На планшеті/десктопі буде 2 колонки.
+*/
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px 32px; /* рядки x колонки */
+  gap: 20px 32px;
 }
 
+/* Обгортка кожного поля (Лейбл + Інпут) */
 .form-field {
   display: flex;
   flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    margin-left: 4px; /* Акуратний візуальний відступ */
+  }
 }
 
+/* Стилі для інпутів та селектів */
 .register-control {
-  padding: 8px;
+  box-sizing: border-box;
+  width: 100%; /* Розтягується на всю колонку, а не фіксовано 15em */
+  height: 44px; /* Оптимальна висота для тапу на смартфоні */
+  padding: 10px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #1e293b;
+  background-color: #f8fafc;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #f1f5f9;
+  }
+
+  &:focus {
+    background-color: #ffffff;
+    border-color: #3b82f6; /* Сучасний синій акцент */
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); /* М'яке світіння */
+  }
+
+  /* Стиль для помилок валідації (червоний) */
+  &.is-invalid {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+    &:focus {
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+    }
+  }
+}
+
+/* Головна кнопка */
+.btn-primary {
+  width: 100%; /* На телефоні кнопка на всю ширину екрану - це зручно */
+  height: 48px;
+  background-color: #3b82f6;
+  color: #ffffff;
   font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+
+  &:hover:not(:disabled) {
+    background-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+  }
+
+  &:disabled {
+    background-color: #cbd5e1;
+    cursor: not-allowed;
+  }
+}
+
+/* Адаптація під десктоп: робимо кнопку красивою та центрованою */
+@media (min-width: 768px) {
+  .register-form {
+    padding: 40px; /* Більше "повітря" на великих екранах */
+  }
+
+  .btn-primary {
+    width: 250px;
+    justify-self: center; /* Ставить кнопку рівно по центру під колонками */
+  }
 }

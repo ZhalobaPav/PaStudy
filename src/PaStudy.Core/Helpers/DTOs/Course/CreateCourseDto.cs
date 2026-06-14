@@ -3,7 +3,8 @@
 public record CreateCourseDto(
     string Title,
     string? Description,
-    int? CategoryId
+    int? CategoryId,
+    int? TeacherId
 );
 
 public record CourseResponseDto(

@@ -64,24 +64,24 @@ export class QuizAttemptComponent implements OnInit {
     );
   });
 
-  // @HostListener('document:visibilitychange')
-  // onVisibilityChange() {
-  //   if (document.hidden && this.attemptInfo()) {
-  //     const currentSwitches = this.tabSwitches() + 1;
-  //     this.tabSwitches.set(currentSwitches);
+  @HostListener('document:visibilitychange')
+  onVisibilityChange() {
+    if (document.hidden && this.attemptInfo()) {
+      const currentSwitches = this.tabSwitches() + 1;
+      this.tabSwitches.set(currentSwitches);
 
-  //     if (currentSwitches >= this.maxTabSwitches) {
-  //       alert(
-  //         'Ви занадто багато разів покидали вкладку з тестом! Роботу завершено автоматично.',
-  //       );
-  //       this.submitQuiz();
-  //     } else {
-  //       alert(
-  //         `Увага! Виходити з вкладки заборонено. Порушення ${currentSwitches}/${this.maxTabSwitches}.`,
-  //       );
-  //     }
-  //   }
-  // }
+      if (currentSwitches >= this.maxTabSwitches) {
+        alert(
+          'Ви занадто багато разів покидали вкладку з тестом! Роботу завершено автоматично.',
+        );
+        this.submitQuiz();
+      } else {
+        alert(
+          `Увага! Виходити з вкладки заборонено. Порушення ${currentSwitches}/${this.maxTabSwitches}.`,
+        );
+      }
+    }
+  }
 
   @HostListener('contextmenu', ['$event'])
   onRightClick(event: MouseEvent) {

@@ -14,6 +14,9 @@ public class NotificationConfiguration: IEntityTypeConfiguration<Notification>
             .IsRequired()
             .HasMaxLength(150);
 
+        builder.Property(n => n.InvitationStatus)
+            .IsRequired(false);
+
         builder.Property(n => n.Message)
             .IsRequired()
             .HasMaxLength(1000);

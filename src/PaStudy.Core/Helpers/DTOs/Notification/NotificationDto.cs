@@ -9,6 +9,7 @@ public record NotificationDto
     public string Message { get; set; } = null!;
 
     public NotificationType Type { get; set; }
+    public InvitationStatus? InvitationStatus { get; set; }
 
     public string? ClickActionUrl { get; set; }
     public string? RecipientUserId { get; set; }
@@ -18,3 +19,6 @@ public record NotificationDto
     public bool IsRead { get; set; } = false;
 
 }
+
+public record SendInviteDto(int CourseId, string RecipientUserId, string CourseName);
+public record RespondToInviteDto(bool Accept);
