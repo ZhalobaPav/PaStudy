@@ -23,6 +23,13 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: europe-west4-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GCP_SA_KEY }}
+
       - name: Build and push backend
         run: |
           docker build -t ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.REPO }}/pastudy_backend:latest \
@@ -40,26 +47,24 @@ jobs:
     needs: build-and-push
 
     steps:
-      # КРИТИЧНО: Завантажуємо репозиторій, щоб отримати доступ до локального docker-compose.yml
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ВИПРАВЛЕНО: Надійний запис багаторядкового SSH-ключа
       - name: Install SSH key
         run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          cat << EOF > ~/.ssh/id_rsa
+          ${{ secrets.DEPLOY_KEY }}
+          EOF
+          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
       - name: Create Docker context
         run: |
           docker context create remote --docker host=ssh://${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}
 
-      - name: Configure Docker for Artifact Registry on VM
-        run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }} \
-            "gcloud auth configure-docker europe-west4-docker.pkg.dev --quiet"
-
-      # ВИПРАВЛЕНО: Змінні передаються перед викликом команди docker compose
       - name: Deploy via Docker Context
         run: |
           export DB_PASSWORD="${{ secrets.MSSQL_SA_PASSWORD }}"
@@ -69,11 +74,10 @@ jobs:
           export CLOUDNAME="${{ secrets.CLOUDNAME }}"
           export APIKEY="${{ secrets.APIKEY }}"
           export APISECRET="${{ secrets.APISECRET }}"
-
           export DOCKER_CONTEXT="remote"
 
           docker compose -f src/docker-compose.yml up -d --pull always --remove-orphans
 
       - name: Cleanup
-        if: always() # Очищаємо ключі навіть якщо деплой впав з помилкою
+        if: always()
         run: rm -rf ~/.ssh
