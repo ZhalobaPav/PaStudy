@@ -51,5 +51,36 @@ public class AssignmentService: IAssignmentService
         var result = await _assignmentRepository.CreateSectionAsync(section);
         return BaseResponse<Section>.Success(result);
     }
+    public async Task<BaseResponse<List<Section>>> BulkCreateSectionsAsync(BulkCreateSectionDto dto, string userId)
+    {
+        // 1. Отримуємо викладача та обов'язково робимо return у разі помилки
+        var teacher = await _teacherRepository.GetByUserIdAsync(userId);
+        if (teacher == null)
+            return BaseResponse<List<Section>>.Failure("Teacher not found");
 
+        // 2. Перевіряємо доступ до курсу (один раз на весь масив)
+        var hasAccess = await _teacherRepository.CanTeacherManageCourse(teacher.Id, dto.CourseId);
+        if (!hasAccess)
+            return BaseResponse<List<Section>>.Failure("Teacher has no access to this course");
+
+        if (dto.Sections == null || !dto.Sections.Any())
+            return BaseResponse<List<Section>>.Failure("Sections list cannot be empty");
+
+        var createdSections = new List<Section>();
+
+        foreach (var item in dto.Sections)
+        {
+            var section = new Section
+            {
+                Title = item.Title,
+                Description = item.Description,
+                CourseId = dto.CourseId
+            };
+
+            var result = await _assignmentRepository.CreateSectionAsync(section);
+            createdSections.Add(result);
+        }
+
+        return BaseResponse<List<Section>>.Success(createdSections);
+    }
 }

@@ -36,6 +36,16 @@ public record SubmissionInfo(
     decimal? Grade,
     string? TeacherFeedback
 );
+public class BulkCreateSectionDto
+{
+    public int CourseId { get; set; }
+    public List<SectionItemDto> Sections { get; set; } = new();
+}
 
+public class SectionItemDto
+{
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+}
 public record TaskSubmissionDto(string studentNote, ImmutableArray<AttachmentDto>? Attachments);
 public record QuizSubmissionInfoDto(decimal TotalScore, QuizAttemptStatus attemptStatus, DateTimeOffset FinishedAt);

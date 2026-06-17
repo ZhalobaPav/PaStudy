@@ -23,6 +23,7 @@ public class Assignment: EndpointGroupBase
             .MapGet(GetAssignmentById, "/{assignmentId}")
             .MapPost(CreateAssignment)
             .MapPost(CreateSectionAsync, "section")
+            .MapPost(BulkCreateSectionsAsync, "section/bulkCreate")
             .MapPost(StartAttemptAsync, "quiz/{quizId}/startAttempt")
             .MapPatch(SaveAnswer, "attempts/{attemptId}")
             .MapPost(SubmitAnswers, "attempts/{attemptId}/submit")
@@ -96,5 +97,13 @@ public class Assignment: EndpointGroupBase
         await assignmentRepository.DeleteAssignmentAsync(id, user);
         return Results.Ok(new { message = "Завдання успішно видалено" });
     }
+    public async Task<BaseResponse<List<Section>>> BulkCreateSectionsAsync(BulkCreateSectionDto dto, IAssignmentService assignmentService, ClaimsPrincipal user)
+    {
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
+        if (string.IsNullOrWhiteSpace(userId))
+            return BaseResponse<List<Section>>.Failure("User is not authenticated");
+
+        return await assignmentService.BulkCreateSectionsAsync(dto, userId);
+    }
 }

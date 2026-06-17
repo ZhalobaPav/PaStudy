@@ -11,4 +11,5 @@ public interface IAssignmentService
 {
     Task<BaseResponse<Assignment>> CreateAssignmentAsync(CreateAssignmentDto dto, string userId);
     Task<BaseResponse<Section>> CreateSectionAsync(CreateSectionDto dto, string userId);
+    Task<BaseResponse<List<Section>>> BulkCreateSectionsAsync(BulkCreateSectionDto dto, string userId);
 }
