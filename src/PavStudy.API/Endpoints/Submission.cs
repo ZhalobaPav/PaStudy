@@ -1,4 +1,5 @@
-﻿using PaStudy.Core.Helpers.DTOs.Submission;
+﻿using Microsoft.AspNetCore.Mvc;
+using PaStudy.Core.Helpers.DTOs.Submission;
 using PaStudy.Core.Helpers.Exceptions;
 using PaStudy.Core.Helpers.FilterObjects.Submissions;
 using PaStudy.Core.Interfaces.Repository;
@@ -19,6 +20,7 @@ public class Submission : EndpointGroupBase
             .MapGet(GetSubmissionById, "/{id}")
             .MapGet(GetStudentAwnsers, "quizAttempt/{attemptId}")
             .MapPost(SubmitAssignment)
+            .MapPost(SubmitAssignmentDev, "dev-submit/{userId}")
             .MapPut(GradeSubmissionTask);
     }
 
@@ -120,6 +122,29 @@ public class Submission : EndpointGroupBase
         catch (Exception ex)
         {
             return Results.Problem(detail: ex.Message, statusCode: 500);
+        }
+    }
+
+    public static async Task<IResult> SubmitAssignmentDev(
+    [FromBody] CreateSubmissionDto dto,
+    [FromRoute] string userId, // Передаємо в Postman через URL: ?userId=твій-guid
+    ISubmissionService submissionService)
+    {
+        if (string.IsNullOrEmpty(userId))
+            return Results.BadRequest("User ID is required for dev endpoint.");
+
+        try
+        {
+            await submissionService.CreateSubmission(dto, userId);
+            return Results.Ok(new { message = "Dev Submission created successfully" });
+        }
+        catch (ArgumentException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return Results.StatusCode(500);
         }
     }
 }
