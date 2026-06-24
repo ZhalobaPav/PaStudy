@@ -3,21 +3,19 @@ import {
   computed,
   inject,
   Input,
-  input,
   OnInit,
   signal,
 } from '@angular/core';
-import { UserService } from '../../users/user.service';
 import { ActivatedRoute } from '@angular/router';
+import { take, tap } from 'rxjs';
 import { FetchOptions } from '../../../shared/components/table/models/table.models';
-import { finalize, take, tap } from 'rxjs';
-import { FilterUserProfile } from '../../users/enums/filterUserProfile';
-import { UserFilter } from '../../users/models/user-filter';
 import { User } from '../../../shared/models/user';
-import { tableConfig } from '../../users/helpers/user-list-table.config';
 import { LoaderService } from '../../../shared/services/loader.service';
-import { UserRole } from '../../../shared/enums/userRole';
 import { AuthService } from '../../auth/auth.service';
+import { FilterUserProfile } from '../../users/enums/filterUserProfile';
+import { tableConfig } from '../../users/helpers/user-list-table.config';
+import { UserFilter } from '../../users/models/user-filter';
+import { UserService } from '../../users/user.service';
 
 @Component({
   selector: 'app-course-students',

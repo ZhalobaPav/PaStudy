@@ -10,9 +10,11 @@
   @if (!hideBreadcrumb) {
     <app-breadcrumb />
   }
-  <div class="courses-link"><a routerLink="courses">Courses</a></div>
+  <div class="courses-link"><a routerLink="courses">Курси</a></div>
   @if (isAuthenticated) {
-    <div class="logout"><button (click)="logout()">Logout</button></div>
+    <div class="logout">
+      <button (click)="logout()">Вийти з акаунту</button>
+    </div>
   }
   <div class="notification-container">
     <div class="notification-bell" (click)="toggleDropdown()">

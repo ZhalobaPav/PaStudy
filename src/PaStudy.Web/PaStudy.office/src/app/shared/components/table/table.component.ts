@@ -99,6 +99,8 @@ export class TableComponent<
   }
 
   templateColumn() {
-    return this.headers.map((h) => `${h.width}px`).join(' ');
+    return this.headers
+      .map((h) => `minmax(${h.width * 0.6}px, ${h.width}px)`)
+      .join(' ');
   }
 }

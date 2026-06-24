@@ -6,7 +6,7 @@ export const tableConfig: TableConfig = {
   headers: [
     {
       name: 'userName',
-      label: 'Name',
+      label: "Ім'я",
       component: SearchFilterComponent,
       width: 200,
       componentInputs: {
@@ -15,7 +15,7 @@ export const tableConfig: TableConfig = {
     },
     {
       name: 'dateOfBirth',
-      label: 'Birth date',
+      label: 'Дата народження',
       component: null,
       width: 130,
       componentInputs: {
@@ -24,16 +24,16 @@ export const tableConfig: TableConfig = {
     },
     {
       name: 'email',
-      label: 'Email',
+      label: 'Ел. пошта',
       component: null,
-      width: 190,
+      width: 220,
       componentInputs: {
         inputType: 'text',
       },
     },
     {
       name: 'groupNumber',
-      label: 'Group number',
+      label: 'Номер групи',
       component: null,
       width: 190,
       componentInputs: {

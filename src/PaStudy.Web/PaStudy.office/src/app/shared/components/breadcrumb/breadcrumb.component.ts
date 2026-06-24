@@ -25,7 +25,7 @@ export class BreadcrumbComponent implements OnInit {
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
-        startWith(this.router)
+        startWith(this.router),
       )
       .subscribe(() => {
         this.genBreadcrumb();
@@ -34,11 +34,11 @@ export class BreadcrumbComponent implements OnInit {
 
   public genBreadcrumb() {
     const routes = this.router.url.slice(1).split('/');
-    if(this.nav.length > 0) {
+    if (this.nav.length > 0) {
       this.navItems = [...this.nav];
     } else {
       this.navItems = this.menuService.getLevel(routes);
-      this.navItems.unshift('home');
+      this.navItems.unshift('Кабінет');
     }
   }
 }
